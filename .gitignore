@@ -8,3 +8,8 @@ project.faf
 .faf
 CLAUDE.md
 AGENTS.md
+
+# mcp-publisher local auth (never commit)
+.mcpregistry_github_token
+.mcpregistry_registry_token
+.mcp_publisher_token
