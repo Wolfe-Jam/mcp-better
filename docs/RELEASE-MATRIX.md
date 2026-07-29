@@ -36,7 +36,7 @@ Every row is a **gate surface**. A version is **REAL** only when required cells 
 | M12 | `cargo install mcp-better@0.1.0` + Discover smoke | **Yes** | ✅ | installed binary via `MCP_BETTER_BIN` |
 | M13 | git tag `vX.Y.Z` | **Yes** | ✅ | `v0.1.0` |
 | M14 | GitHub Release published | **Yes** | ✅ | [release](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.1.0) |
-| M15 | MCP Registry `io.github.Wolfe-Jam/mcp-better@0.1.0` | **Yes** (LIVE complete) | ⏳ | 404 — needs `mcp-publisher login github` + publish |
+| M15 | MCP Registry `io.github.Wolfe-Jam/mcp-better@0.1.0` | **Yes** (LIVE complete) | ⏳ | Run `bash scripts/registry-publish.sh` (device login) |
 | M16 | Truth-table exit 0 | **Yes** | ✅ | Registry warned only |
 | M17 | Streamable HTTP | — | — | **v0.2** |
 | M18 | `Mcp-Method` / `Mcp-Name` | — | — | **v0.2** |

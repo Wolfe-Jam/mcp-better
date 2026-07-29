@@ -29,22 +29,48 @@ stdio-client: OK (Discover + list tools + health + echo)
 
 Optional: `MCP_BETTER_BIN=/path/to/mcp-better cargo run --example stdio-client`
 
-## Wire as an MCP server (host config)
+## Wire as an MCP server (host smoke)
 
-Example (Claude Desktop / generic MCP host — shape varies by host):
+Install from crates (or use a local `cargo build --release` binary):
+
+```bash
+cargo install mcp-better
+which mcp-better   # use this absolute path below
+```
+
+### Claude Desktop / Cursor-style `mcpServers`
 
 ```json
 {
   "mcpServers": {
     "mcp-better": {
-      "command": "/absolute/path/to/mcp-better",
+      "command": "/absolute/path/from/which/mcp-better",
       "args": []
     }
   }
 }
 ```
 
-Logs go to **stderr**; protocol is **stdio** JSON-RPC on stdin/stdout.
+### Claude Code (example)
+
+```bash
+# shape varies by version — binary stdio server:
+# point your MCP server entry at: mcp-better  (no args)
+```
+
+### Host smoke checklist
+
+1. Host starts the process (stdio JSON-RPC; logs on **stderr**).
+2. Tools list shows **`health`** then **`echo`** (stable order).
+3. Call **`health`** → JSON with `"protocol":"2026-07-28"`, `"tier":"BETTER"`.
+4. Call **`echo`** with `{"message":"hello"}` → `hello`.
+
+Automated Discover smoke (no host UI):
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+MCP_BETTER_BIN="$(command -v mcp-better)" cargo run --example stdio-client
+```
 
 ## Cold clone target
 
