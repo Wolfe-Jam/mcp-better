@@ -1,0 +1,45 @@
+[package]
+name = "mcp-better"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+authors = ["Wolfe-Jam <wolfejam@faf.one>"]
+description = "AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook)."
+license = "MIT"
+repository = "https://github.com/Wolfe-Jam/mcp-better"
+homepage = "https://github.com/Wolfe-Jam/mcp-better"
+readme = "README.md"
+keywords = ["mcp", "rmcp", "ai", "protocol", "stdio"]
+categories = ["development-tools", "command-line-utilities"]
+exclude = ["target/", ".git/"]
+
+[dependencies]
+anyhow = "1"
+rmcp = { version = "3.0", features = [
+    "server",
+    "client",
+    "macros",
+    "transport-io",
+    "transport-child-process",
+    "schemars",
+] }
+schemars = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt", "macros", "io-std", "io-util", "process"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[[bin]]
+name = "mcp-better"
+path = "src/main.rs"
+
+[[example]]
+name = "stdio-client"
+path = "examples/stdio_client.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

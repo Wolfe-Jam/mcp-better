@@ -1,0 +1,10 @@
+/target/
+**/*.rs.bk
+.DS_Store
+.env
+.env.*
+!.env.example
+project.faf
+.faf
+CLAUDE.md
+AGENTS.md
