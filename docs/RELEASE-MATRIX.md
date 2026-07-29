@@ -36,7 +36,7 @@ Every row is a **gate surface**. A version is **REAL** only when required cells 
 | M12 | `cargo install mcp-better@0.1.0` + Discover smoke | **Yes** | ✅ | installed binary via `MCP_BETTER_BIN` |
 | M13 | git tag `vX.Y.Z` | **Yes** | ✅ | `v0.1.0` |
 | M14 | GitHub Release published | **Yes** | ✅ | [release](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.1.0) |
-| M15 | MCP Registry `io.github.Wolfe-Jam/mcp-better@0.1.0` | **Yes** (LIVE complete) | ⏳ | Run `bash scripts/registry-publish.sh` (device login) |
+| M15 | MCP Registry `io.github.Wolfe-Jam/mcp-better@0.1.0` | **Yes** (LIVE complete) | ✅ | Published 2026-07-29 · HTTP 200 |
 | M16 | Truth-table exit 0 | **Yes** | ✅ | Registry warned only |
 | M17 | Streamable HTTP | — | — | **v0.2** |
 | M18 | `Mcp-Method` / `Mcp-Name` | — | — | **v0.2** |
@@ -54,11 +54,11 @@ Discover (installed) ✅ same stamps against crates binary
 GH CI main           ✅ success @ 9486831
 crates.io API        ✅ max_version=0.1.0
 GH release           ✅ v0.1.0 published
-MCP Registry         ⏳ 404 Server not found
-truth-table          ✅ coherent (Registry warn)
+MCP Registry         ✅ 0.1.0 HTTP 200 (2026-07-29)
+truth-table          ✅ coherent (all hard surfaces)
 ```
 
-**Verdict v0.1.0:** **crates LIVE** · **Registry incomplete** · protocol claims **proved**.
+**Verdict v0.1.0:** **FULL LIVE** — crates + Registry + GH · protocol claims **proved**.
 
 ---
 
