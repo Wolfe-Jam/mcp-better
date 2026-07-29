@@ -1,4 +1,4 @@
-//! mcp-better — AAIF-verified modern MCP (BETTER textbook)
+//! mcp-better — modern MCP textbook (BETTER) — built for 7/28
 //!
 //! stdio tools server on protocol **2026-07-28**.
 //! See README.md and BETTER.md for the claim surface (v0.1 = stdio + tools + list cache).

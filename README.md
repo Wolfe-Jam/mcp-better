@@ -4,7 +4,7 @@
 
 *(protocol **2026-07-28** — the modern MCP release)*
 
-AAIF-verified modern MCP textbook. Rust · `rmcp` 3.0 · Discover · stamped list cache.
+Modern MCP textbook — built for 7/28. Rust · `rmcp` 3.0 · Discover · stamped list cache.
 
 > **BEST** (persistent AI project context) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
 
