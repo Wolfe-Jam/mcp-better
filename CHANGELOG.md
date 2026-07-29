@@ -1,8 +1,8 @@
 # Changelog
 
-## [0.1.0] — unreleased (pre-ship)
+## [0.1.0] — 2026-07-29 — 7/28 over stdio (foundation)
 
-Promote this header to a dated release only via **`/pubbetter`** (never tag without publish).
+**mcp-better — built for 7/28** (protocol `2026-07-28`).
 
 ### Added
 
@@ -11,6 +11,6 @@ Promote this header to a dated release only via **`/pubbetter`** (never tag with
 - Stamped `tools/list`: `ttlMs=60000`, `cacheScope=public`, stable order
 - Example `stdio-client` with `ClientLifecycleMode::Discover` → `2026-07-28`
 - CI: fmt, clippy, test, Discover smoke · `scripts/ci.sh`
-- Docs: README, BETTER.md, BETTER-BEST, GETTING-STARTED, SDK-NOTES, SECURITY
+- Docs: 7/28 definition · README · BETTER.md · roadmap v0.1 stdio / v0.2 HTTP
 - `server.json` identity: `io.github.Wolfe-Jam/mcp-better` (cargo)
 - **`/pubbetter`** publish protocol (dry-run · CI · tag · crates · Registry)
