@@ -25,7 +25,9 @@ echo "    Open https://github.com/login/device and enter the code shown."
 mcp-publisher login github
 
 echo "==> mcp-publisher publish"
+# Publish from repo root; strip any tokens publisher drops into cwd (never commit)
 mcp-publisher publish server.json
+rm -f .mcpregistry_github_token .mcpregistry_registry_token .mcp_publisher_token 2>/dev/null || true
 
 echo "==> verify"
 ENC=$(python3 -c "import urllib.parse; print(urllib.parse.quote('io.github.Wolfe-Jam/mcp-better', safe=''))")
