@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Wolfe-Jam/mcp-better",
   "title": "mcp-better",
-  "description": "Modern MCP textbook optimised to the 2026-07-28 model (BETTER) — built for 7/28.",
+  "description": "AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook).",
   "repository": {
     "url": "https://github.com/Wolfe-Jam/mcp-better",
     "source": "github"
