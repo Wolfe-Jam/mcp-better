@@ -40,7 +40,7 @@ Every row is a **gate surface**. A version is **REAL** only when required cells 
 | M16 | Truth-table exit 0 | **Yes** | ✅ | Registry warned only |
 | M17 | Streamable HTTP | — | — | **v0.2** |
 | M18 | `Mcp-Method` / `Mcp-Name` | — | — | **v0.2** |
-| M19 | Host smoke (Claude Desktop / Cursor) | Soft | ⏳ | config-level; not blocking crates LIVE |
+| M19 | Host smoke (Claude Desktop / Cursor) | Soft | 🟨 | Cursor `~/.cursor/mcp.json` wired · binary path proved · UI enable in Cursor Settings → MCP |
 | M20 | AAIF project_contribution filed | Soft | ⏳ | after Registry preferred |
 | M21 | Multi-OS CI matrix | Soft | ○ | ubuntu-only pre-ship today |
 
