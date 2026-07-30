@@ -27,10 +27,10 @@ NONE  →  GOOD  →  BETTER  →  BEST
 
 - Runnable **Rust** server on official **`rmcp` 3.0**
 - **v0.1:** **7/28 over stdio** · tools `health` + `echo`
+- **v0.2:** same era + **Streamable HTTP** (`--http`) + routing-header smoke
 - **`tools/list`** stamped: `ttlMs` + `cacheScope=public`
-- Example client uses **`ClientLifecycleMode::Discover`** preferred `2026-07-28`
-- **v0.2:** same era + Streamable HTTP + routing headers
-- CI: fmt · clippy · test · Discover smoke
+- Examples: Discover stdio client · HTTP smoke
+- CI: fmt · clippy · test · both smokes
 - Registry-ready `server.json` (`io.github.Wolfe-Jam/mcp-better`, cargo)
 - **No** `project.faf` required on `main`
 

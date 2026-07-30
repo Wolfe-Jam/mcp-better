@@ -25,8 +25,13 @@ echo "==> BETTER purity"
 test ! -f project.faf
 test ! -f .faf
 
-echo "==> Discover smoke"
-cargo build
+echo "==> Discover smoke (stdio)"
+cargo build --bins
 cargo run --example stdio-client
+
+echo "==> Streamable HTTP smoke"
+# http-smoke spawns the bin — must exist; example alone does not build [[bin]]
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 
 echo "✅ scripts/ci.sh green"

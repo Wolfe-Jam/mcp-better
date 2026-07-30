@@ -39,5 +39,11 @@ jobs:
 
       - name: stdio client smoke (Discover)
         run: |
-          cargo build
+          cargo build --bins
           cargo run --example stdio-client
+
+      - name: Streamable HTTP smoke
+        run: |
+          # http-smoke spawns the bin; example alone does not build [[bin]]
+          cargo build --bins
+          MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example http-smoke

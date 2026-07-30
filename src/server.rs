@@ -1,6 +1,6 @@
 //! BETTER textbook MCP server — tools only, stamped list cache.
 //!
-//! Protocol claim: **2026-07-28** on **stdio**.
+//! Protocol claim: **2026-07-28** (stdio default · Streamable HTTP via `--http`).
 //! List results stamp `ttlMs` + `cacheScope` (SEP-2549) — SDK defaults are unstamped.
 
 use rmcp::handler::server::router::tool::ToolRouter;

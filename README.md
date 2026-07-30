@@ -35,7 +35,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 2. **Discover-compatible** — clients should use `ClientLifecycleMode::Discover` (or Auto → 7/28), not only legacy initialize.
 3. **List cache stamps** — `tools/list` returns positive `ttlMs` and `cacheScope` (static catalog → `public`). SDK defaults are unstamped.
 4. **Stable tool order** — same process, same order across N list calls.
-5. **v0.1 transport** — **stdio** (7/28-coherent). HTTP is **v0.2** road in the **same era**, not “when we become modern.”
+5. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
 
 ## Quickstart (≤10 min)
 
@@ -43,15 +43,26 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 # Requires Rust stable (1.85+)
 git clone https://github.com/Wolfe-Jam/mcp-better.git
 cd mcp-better
-cargo build
+cargo build --bins
 cargo test
 cargo run --example stdio-client
+# http-smoke spawns the bin — build --bins first (or: bash scripts/ci.sh)
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```
 
-Run the server alone (stdio JSON-RPC on stdin/stdout; logs on stderr):
+**stdio** (default — Cursor / Claude Desktop):
 
 ```bash
 cargo run --release
+# or: cargo install mcp-better && mcp-better
+```
+
+**Streamable HTTP** (local demo, loopback Host guards):
+
+```bash
+cargo run --release -- --http
+# http://127.0.0.1:8787/mcp
+# MCP_BETTER_HTTP_ADDR=127.0.0.1:9000 mcp-better --http
 ```
 
 ## Tools
@@ -61,16 +72,17 @@ cargo run --release
 | `health` | Liveness — status, version, protocol. No side effects. Not a k8s probe contract. |
 | `echo` | Pure demo — returns `message` unchanged. |
 
-## Protocol claims (v0.1 — 7/28 over stdio)
+## Protocol claims (v0.2 — same 7/28 era, more road)
 
 | Surface | Status |
 |---------|--------|
 | Era / protocol | **7/28** · negotiated **`2026-07-28`** (Discover preferred) |
-| Transport | **stdio** (HTTP → v0.2, same era) |
+| Transport | **stdio** (default) · **Streamable HTTP** (`--http`) |
+| HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
+| Routing headers | Clients may send **`Mcp-Method` / `Mcp-Name`** (SEP-2243); SDK-aware |
 | Capabilities | **tools** only |
 | List cache | **`ttlMs=60000`**, **`cacheScope=public`** |
-| Streamable HTTP / `Mcp-Method` · `Mcp-Name` | **v0.2** |
-| Resources / prompts / OAuth / tasks | out of v0.1 |
+| Resources / prompts / OAuth / tasks | out of v0.2 hero |
 
 ## Non-goals (GOOD-era habits we refuse)
 
