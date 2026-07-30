@@ -1,6 +1,7 @@
 //! mcp-better library surface — server handler + stamped list helpers.
 //!
-//! The binary (`src/main.rs`) is the stdio entrypoint. Tests and examples use this crate.
+//! Process entry is the binary (`src/main.rs`): **stdio** by default, **Streamable HTTP** via `--http`.
+//! Unit tests, integration tests, and examples depend on this crate (not the binary).
 
 pub mod server;
 

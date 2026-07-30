@@ -1,22 +1,25 @@
-//! Conformance stubs T3–T8 (unit-level; full wire Discover is examples/stdio-client).
+//! Crate-boundary checks via the **public lib** (`mcp_better::…`).
+//!
+//! | Layer | Where |
+//! |-------|--------|
+//! | Unit (stamp · order · tool count) | `src/server.rs` `#[cfg(test)]` |
+//! | Lib re-export / constant | **this file** |
+//! | Wire Discover (stdio) | `examples/stdio-client` |
+//! | Wire Streamable HTTP | `examples/http-smoke` |
+//!
+//! Intentionally thin — not a second copy of the unit suite.
 
-use mcp_better::server::{BetterServer, LIST_TOOLS_TTL_MS};
+use mcp_better::{BetterServer, LIST_TOOLS_TTL_MS};
 use rmcp::model::CacheScope;
 
-// Re-export server module for integration tests via lib — we test via binary crate.
-// Until a lib target exists, these tests live next to src unit tests.
-// This file exercises the public binary crate layout via path include pattern.
-
-// Prefer `cargo test` unit tests in src/server.rs for stamp/order.
-// This integration file verifies the binary builds and the public constants.
-
 #[test]
-fn list_ttl_constant_is_one_minute() {
+fn public_lib_exports_list_ttl_one_minute() {
     assert_eq!(LIST_TOOLS_TTL_MS, 60_000);
 }
 
+/// Crate-boundary recheck: consumers of the lib see the same BETTER stamps as unit tests.
 #[test]
-fn stamped_list_public() {
+fn public_lib_stamped_list_contract() {
     let server = BetterServer::new();
     let list = server.stamped_list_tools();
     assert_eq!(list.ttl_ms, Some(LIST_TOOLS_TTL_MS));

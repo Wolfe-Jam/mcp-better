@@ -16,6 +16,8 @@
 ### Fixed / honesty
 
 - Server `instructions` are transport-neutral (no longer claim “over stdio” only)
+- HTTP smoke: `echo` round-trip over Streamable HTTP (parity with stdio-client)
+- Lib/test comments: dual-transport entry; integration tests labeled as crate-boundary only
 
 ### Unchanged
 

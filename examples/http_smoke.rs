@@ -225,8 +225,45 @@ async fn run_checks(client: &reqwest::Client, base: &str) -> anyhow::Result<()> 
         anyhow::bail!("health body missing BETTER/7-28 markers: {text}");
     }
 
+    // echo round-trip over HTTP (stdio-client already covers this on stdio)
+    let echo_msg = "http-smoke-echo-roundtrip";
+    let echo_body = serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+            "name": "echo",
+            "arguments": { "message": echo_msg },
+            "_meta": {
+                "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                "io.modelcontextprotocol/clientInfo": {"name": "http-smoke", "version": "0.2.0"},
+                "io.modelcontextprotocol/clientCapabilities": {}
+            }
+        }
+    });
+
+    let resp = client
+        .post(base)
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json, text/event-stream")
+        .header("MCP-Protocol-Version", "2026-07-28")
+        .header("Mcp-Method", "tools/call")
+        .header("Mcp-Name", "echo")
+        .json(&echo_body)
+        .send()
+        .await?;
+
+    let status = resp.status();
+    let text = resp.text().await?;
+    if !status.is_success() {
+        anyhow::bail!("tools/call echo HTTP {status}: {text}");
+    }
+    if !text.contains(echo_msg) {
+        anyhow::bail!("echo body missing round-trip message {echo_msg:?}: {text}");
+    }
+
     println!(
-        "http-smoke: OK (Streamable HTTP · tools/list stamped · health · Mcp-Method/Mcp-Name on call)"
+        "http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · Mcp-Method/Mcp-Name)"
     );
     Ok(())
 }
