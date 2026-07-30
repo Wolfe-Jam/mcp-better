@@ -54,8 +54,12 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 
 ```bash
 cargo run --release
-# or: cargo install mcp-better && mcp-better
+# or from crates.io:
+cargo install mcp-better --version 0.2.0
+mcp-better --help
 ```
+
+> First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
 
