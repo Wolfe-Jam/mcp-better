@@ -95,10 +95,12 @@ impl ServerHandler for BetterServer {
     fn get_info(&self) -> ServerInfo {
         let mut info = ServerInfo::new(ServerCapabilities::builder().enable_tools().build());
         info.server_info = Implementation::new("mcp-better", env!("CARGO_PKG_VERSION"));
+        // Transport-neutral: same server runs stdio (default) or Streamable HTTP (--http).
         info.instructions = Some(
-            "BETTER textbook MCP server — protocol 2026-07-28 over stdio. \
+            "BETTER textbook MCP server — protocol 2026-07-28. \
              Tools: health (liveness), echo (pure demo). \
-             tools/list stamps ttlMs + cacheScope for Discover-compatible clients."
+             tools/list stamps ttlMs + cacheScope for Discover-compatible clients. \
+             Transports: stdio (default) · Streamable HTTP (--http, local demo)."
                 .into(),
         );
         info

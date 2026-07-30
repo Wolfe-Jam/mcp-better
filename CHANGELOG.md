@@ -10,6 +10,12 @@
 - Stateless 7/28 path · `json_response` · loopback **Host** guards
 - Example `http-smoke` — list stamps + `health` with `Mcp-Method` / `Mcp-Name`
 - CLI `--help` · keep **stdio** as default (Cursor / Desktop)
+- **SECURITY.md** v0.2 HTTP threat posture (no auth/TLS · loopback bind · Host ≠ ACL)
+- Docs: transport env (`MCP_BETTER_TRANSPORT` / `MCP_TRANSPORT`) · Registry lists **stdio only by design**
+
+### Fixed / honesty
+
+- Server `instructions` are transport-neutral (no longer claim “over stdio” only)
 
 ### Unchanged
 

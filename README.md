@@ -57,13 +57,22 @@ cargo run --release
 # or: cargo install mcp-better && mcp-better
 ```
 
-**Streamable HTTP** (local demo, loopback Host guards):
+**Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
 
 ```bash
 cargo run --release -- --http
 # http://127.0.0.1:8787/mcp
 # MCP_BETTER_HTTP_ADDR=127.0.0.1:9000 mcp-better --http
 ```
+
+**Transport selection** (CLI wins over env):
+
+| How | Value |
+|-----|--------|
+| CLI | `mcp-better` (stdio) · `mcp-better --http` · `mcp-better --stdio` |
+| Bare args | `http` / `stdio` (same meaning as flags) |
+| Env | `MCP_BETTER_TRANSPORT=stdio\|http` (alias: `MCP_TRANSPORT`) |
+| HTTP bind | `MCP_BETTER_HTTP_ADDR` — default **`127.0.0.1:8787`**. Do **not** use `0.0.0.0` unless you accept an unauthenticated open endpoint. |
 
 ## Tools
 
@@ -95,6 +104,9 @@ cargo run --release -- --http
 
 - MCP Registry name: `mcp-name: io.github.Wolfe-Jam/mcp-better`
 - `registryType`: cargo · `identifier`: `mcp-better`
+- **Package transport in `server.json` is stdio only — by design.**  
+  `cargo install mcp-better` / Desktop / Cursor hosts spawn the binary on **stdio**.  
+  Streamable HTTP (`--http`) is an **opt-in local demo** in the same binary and the same 7/28 era; it is **not** a second Registry package. Discover it in this README and `--help`, not as a remote registry transport.
 
 See [`server.json`](./server.json). **Not** `one.faf/*`.
 

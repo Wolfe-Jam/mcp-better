@@ -40,8 +40,18 @@ fn transport_mode() -> String {
             "--help" | "-h" => {
                 eprintln!(
                     "mcp-better v{} — built for 7/28\n\n\
-                     Usage:\n  mcp-better              stdio (default)\n  mcp-better --http       Streamable HTTP on MCP_BETTER_HTTP_ADDR\n\n\
-                     Env:\n  MCP_BETTER_HTTP_ADDR    default 127.0.0.1:8787\n  RUST_LOG                tracing filter\n",
+                     Usage:\n\
+                       mcp-better              stdio (default)\n\
+                       mcp-better --http       Streamable HTTP (local demo)\n\
+                       mcp-better --stdio      force stdio\n\n\
+                     Args (CLI wins over env):\n\
+                       --http | http           Streamable HTTP\n\
+                       --stdio | stdio         stdio\n\n\
+                     Env:\n\
+                       MCP_BETTER_HTTP_ADDR    default 127.0.0.1:8787 (loopback only recommended)\n\
+                       MCP_BETTER_TRANSPORT    stdio | http  (alias: MCP_TRANSPORT)\n\
+                       RUST_LOG                tracing filter\n\n\
+                     Security: --http has no auth/TLS. Do not bind 0.0.0.0. See SECURITY.md.\n",
                     env!("CARGO_PKG_VERSION")
                 );
                 std::process::exit(0);
