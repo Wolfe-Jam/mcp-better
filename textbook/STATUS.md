@@ -59,7 +59,10 @@ Binary remains source of truth if docs and wire disagree again.
 
 | Extract | Canonical chapter | Live URL | AAIF |
 |---------|-------------------|----------|------|
-| Part I InterOp | 03 (+ 09 lab slice) | [dev.to](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) | [#363](https://github.com/aaif/ambassadors/issues/363) |
+| Part I InterOp | 03 (+ 09 lab slice) | [dev.to](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) | [#363](https://github.com/aaif/ambassadors/issues/363) **20 tutorial** ✅ |
+| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates 0.3.0 | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3 |
+
+**Policy:** teach points for protocol lessons; product once; no semver diary filings.
 
 When a new public piece ships: add a row here. Prefer **one extract per chapter**, not six posts per chapter.
 
