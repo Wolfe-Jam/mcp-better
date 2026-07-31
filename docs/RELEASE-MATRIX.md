@@ -130,11 +130,11 @@ Registry transport    ✅ stdio only by design (HTTP not a second Registry packa
 | M9 | GH CI green ship SHA | **Yes** | ✅ | `@8a74697` |
 | M10–M11 | crates.io 0.3.0 | **Yes** | ✅ | published 2026-07-31 |
 | M13–M14 | tag + GH Release | **Yes** | ✅ | [v0.3.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.3.0) |
-| M15 | MCP Registry `@0.3.0` | **Yes** | ⏳ | JWT expired — re-login + `bash scripts/registry-publish.sh` |
-| M16 | Truth-table | **Yes** | ✅ | coherent (Registry soft until M15) |
+| M15 | MCP Registry `@0.3.0` | **Yes** | ✅ | HTTP 200 · device re-login 2026-07-31 |
+| M16 | Truth-table | **Yes** | ✅ | ✪ RELEASE COHERENT |
 | M24 | Product release note | Soft | ✅ | GH Release + `docs/RELEASE-NOTES/v0.3.0.md` |
 
-**Verdict v0.3.0:** **LIVE** (crates + tag + GH) · **Registry follow-up** for FULL LIVE matrix.
+**Verdict v0.3.0:** **FULL LIVE** — crates · Registry · GH tag/release · truth-table ✪.
 
 ---
 
