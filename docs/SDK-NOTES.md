@@ -46,7 +46,7 @@ We do **not** claim on v0.1:
 - Server-side “Discover API” beyond correct results under Discover clients  
 - Resources, prompts, tasks, OAuth  
 
-### v0.2 — same 7/28 era + Streamable HTTP (current · 0.2.0)
+### v0.2 — same 7/28 era + Streamable HTTP
 
 We claim **everything in v0.1**, plus:
 
@@ -56,12 +56,22 @@ We claim **everything in v0.1**, plus:
 - Same tools (`health`, `echo`), same stamps, same era string `2026-07-28`  
 - **SECURITY.md** posture: no auth/TLS — **local demo only**  
 
-We do **not** claim on v0.2:
+### v0.3 — deeper correctness (current · 0.3.0)
+
+We claim **everything in v0.2**, plus:
+
+- **Multi-list stability** — Discover stdio smoke asserts stamps + order across repeated `tools/list`  
+- **Restart-stable order** — `order-restart-smoke` (two processes)  
+- **Lying companion** — `mcp-worse` + `contrast-smoke` (better passes · worse fails)  
+- Same tools on **mcp-better** (`health`, `echo`); worse is teaching-only  
+
+We do **not** claim on v0.2/v0.3:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  
 - Resources, prompts, tasks, OAuth, MRTR demos  
 - Server-side Discover “API product” beyond correct wire results under Discover clients  
+- That `mcp-worse` is a supported peer (it is intentionally dishonest)
 
 **Rule:** versions **add road inside 7/28**. They do not rebrand each transport as a new protocol era.
 

@@ -77,11 +77,23 @@ async fn main() -> anyhow::Result<()> {
         );
     }
 
-    // Second list — order must match (T6).
-    let list2 = client.list_tools(Default::default()).await?;
-    let names2: Vec<_> = list2.tools.iter().map(|t| t.name.as_ref()).collect();
-    if names2 != names {
-        anyhow::bail!("tool order not stable: first={names:?} second={names2:?}");
+    // Same-process N lists — order + stamps must not drift (0.3 louder).
+    for i in 1..=5 {
+        let list_n = client.list_tools(Default::default()).await?;
+        let names_n: Vec<_> = list_n.tools.iter().map(|t| t.name.as_ref()).collect();
+        if names_n != names {
+            anyhow::bail!("tool order not stable at list #{i}: first={names:?} got={names_n:?}");
+        }
+        match list_n.ttl_ms {
+            Some(ms) if ms > 0 => {}
+            other => anyhow::bail!("positive ttl_ms required at list #{i}, got {other:?}"),
+        }
+        if list_n.cache_scope != Some(CacheScope::Public) {
+            anyhow::bail!(
+                "cache_scope=public required at list #{i}, got {:?}",
+                list_n.cache_scope
+            );
+        }
     }
 
     let health = client
@@ -101,6 +113,6 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("echo result: {echo:?}");
 
     client.cancel().await?;
-    println!("stdio-client: OK (Discover + stamped list + health + echo)");
+    println!("stdio-client: OK (Discover + stamped list ×6 + health + echo)");
     Ok(())
 }

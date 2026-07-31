@@ -52,7 +52,7 @@ A two-tool textbook with fixed `health` + `echo` is a **public** catalog. Markin
 | Guarantee | Level |
 |-----------|--------|
 | Same process, N consecutive `tools/list` | Same order |
-| Process restart, static catalog | Same order when the catalog is code-fixed (e.g. `mcp-better` sorts by a constant `TOOL_ORDER`). **Prove with smoke if you claim restart-stable in public docs**; v0.2 automated smoke proves **same-process** N lists |
+| Process restart, static catalog | Same order when the catalog is code-fixed (`BETTER_TOOL_ORDER`). **v0.3:** `order-restart-smoke` proves two processes; unit tests prove multi-instance |
 | Dynamic catalogs | Document when order may change; bump understanding of ttl |
 
 **mcp-better** order: `health`, then `echo`. Always.
@@ -96,7 +96,7 @@ If the framework “helps” you omit stamps, override. Document the override. T
 | `cacheScope` omitted on a static public catalog | Assert scope present |
 | Order shuffles between calls | N-list smoke |
 
-A future **lying companion** binary (product road 0.3) exists to make these differences visceral. Season 1 does not require it to understand the rule.
+**v0.3 ships `mcp-worse`** — a lying companion that omits stamps and reverses order. Run `contrast-smoke` to see the difference fail closed.
 
 ---
 

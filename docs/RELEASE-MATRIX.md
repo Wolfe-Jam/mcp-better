@@ -111,17 +111,41 @@ Registry transport    ✅ stdio only by design (HTTP not a second Registry packa
 
 ---
 
+## v0.3.0 — deeper correctness (same 7/28 era) — **2026-07-31**
+
+**Lesson:** louder proof of the list contract · lying companion for contrast. Not a new era.
+
+| # | Surface | Required? | v0.3.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (Cargo/server.json/CHANGELOG/README = **0.3.0**) | **Yes** | ⏳ | close at `/pubbetter` |
+| M2 | BETTER purity | **Yes** | ✅ | |
+| M3–M4 | Identity | **Yes** | ✅ | |
+| M5 | `scripts/ci.sh` (fmt·clippy·test·**all smokes**) | **Yes** | ✅ | local 2026-07-31 green |
+| M6 | Discover smoke | **Yes** | ✅ | multi-list ×6 |
+| M7 | Stamped list | **Yes** | ✅ | |
+| M8 | Tools health+echo order | **Yes** | ✅ | restart-stable smoke |
+| **M22** | **order-restart-smoke** (two processes) | **Yes** | ✅ | local |
+| **M23** | **contrast-smoke** + **mcp-worse** | **Yes** | ✅ | local · worse not Registry |
+| M17–M18 | HTTP + headers | **Yes** | ✅ | retained |
+| M9–M16 | GH CI · crates · tag · Registry | **Yes** for FULL LIVE | ⏳ | after GO `/pubbetter` |
+
+**Verdict v0.3.0:** **IN TREE** until local ci.sh + pubbetter gates close → then FULL LIVE.
+
+---
+
 ## Version roadmap × matrix (advance here)
 
-| Gate | v0.1 stdio foundation | v0.2 HTTP + headers | v0.3+ polish |
-|------|:---------------------:|:-------------------:|:------------:|
-| 7/28 era claim | **Yes** | **Yes** (same era) | **Yes** |
+| Gate | v0.1 stdio foundation | v0.2 HTTP + headers | v0.3 deeper correctness |
+|------|:---------------------:|:-------------------:|:-----------------------:|
+| 7/28 era claim | **Yes** | **Yes** (same era) | **Yes** (same era) |
 | stdio | **Required** | Keep | Keep |
-| Discover + stamped lists | **Required** | **Required** | **Required** |
-| Streamable HTTP | — | **Required ✅** | Required |
-| Routing headers | — | **Required ✅** | Required |
-| crates.io | **Required** | **Required ✅** | **Required** |
-| MCP Registry | **Required** | **Required ✅** | **Required** |
+| Discover + stamped lists | **Required** | **Required** | **Required** + multi-list |
+| Streamable HTTP | — | **Required ✅** | Keep |
+| Routing headers | — | **Required ✅** | Keep |
+| Restart-order smoke | — | — | **Required** |
+| Lying contrast | — | — | **Required** (mcp-worse) |
+| crates.io | **Required** | **Required ✅** | **Required** at ship |
+| MCP Registry | **Required** | **Required ✅** | **Required** at ship |
 | Host smoke | Soft | Soft | Soft→Required |
 | TS twin | — | Soft | Soft |
 | MRTR / subscriptions demo | — | Soft (pick one) | Soft |

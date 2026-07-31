@@ -3,7 +3,7 @@
 **Status:** SOLID  
 **Read time:** ~15 minutes hands-on  
 **Depends on:** [03](./03-interop.md)–[08](./08-claim-equals-wire.md) recommended  
-**Pins:** **mcp-better 0.2.0** · protocol **`2026-07-28`**  
+**Pins:** **mcp-better 0.3.0** · protocol **`2026-07-28`**  
 **Repo:** https://github.com/Wolfe-Jam/mcp-better
 
 ---
@@ -34,7 +34,7 @@ Copy the **operational contract**, not a megaserver.
 ## Path A — Install from crates.io
 
 ```bash
-cargo install mcp-better --version 0.2.0
+cargo install mcp-better --version 0.3.0
 mcp-better --help
 ```
 
@@ -57,8 +57,25 @@ MCP_BETTER_BIN="$(command -v mcp-better)" cargo run --example stdio-client
 Expect the success line (exact wording from the example binary):
 
 ```text
-stdio-client: OK (Discover + stamped list + health + echo)
+stdio-client: OK (Discover + stamped list ×6 + health + echo)
 ```
+
+### Louder proof (v0.3)
+
+```bash
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example order-restart-smoke
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
+  MCP_WORSE_BIN="$(pwd)/target/debug/mcp-worse" \
+  cargo run --example contrast-smoke
+```
+
+```text
+order-restart-smoke: OK (two processes · same order · same stamps)
+contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it)
+```
+
+`mcp-worse` is a **lying companion** (teaching only): same tool names, unstamped list, reversed order. Do not point hosts at it.
 
 ---
 

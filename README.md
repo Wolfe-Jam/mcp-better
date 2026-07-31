@@ -34,6 +34,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 |---------|--------------------------------------|
 | **v0.1** | **7/28 over stdio** — Discover, stamped `ttlMs` / `cacheScope`, stable order, `health` + `echo` |
 | **v0.2** | Same 7/28 era + **Streamable HTTP** road + routing headers (`Mcp-Method` / `Mcp-Name`) |
+| **v0.3** | Same era + **deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast |
 
 ## What BETTER means
 
@@ -52,7 +53,11 @@ cd mcp-better
 cargo build --bins
 cargo test
 cargo run --example stdio-client
-# http-smoke spawns the bin — build --bins first (or: bash scripts/ci.sh)
+# louder 0.3 smokes (build --bins first; or: bash scripts/ci.sh)
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example order-restart-smoke
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
+  MCP_WORSE_BIN="$(pwd)/target/debug/mcp-worse" \
+  cargo run --example contrast-smoke
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```
 
@@ -61,8 +66,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```bash
 cargo run --release
 # or from crates.io:
-cargo install mcp-better --version 0.2.0
+cargo install mcp-better --version 0.3.0
 mcp-better --help
+# optional lying companion (teaching only — not for hosts):
+# cargo install mcp-better --version 0.3.0 --bin mcp-worse
 ```
 
 > First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.
@@ -100,8 +107,9 @@ cargo run --release -- --http
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
 | Capabilities | **tools** only |
-| List cache | **`ttlMs=60000`**, **`cacheScope=public`** |
-| Resources / prompts / OAuth / tasks | out of v0.2 hero |
+| List cache | **`ttlMs=60000`**, **`cacheScope=public`**, order **`health`→`echo`** (restart-stable) |
+| Lying companion | **`mcp-worse`** — unstamped + reversed order (contrast-smoke only) |
+| Resources / prompts / OAuth / tasks | out of hero |
 
 ## Textbook
 

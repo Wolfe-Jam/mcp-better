@@ -1,6 +1,6 @@
 [package]
 name = "mcp-better"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.85"
 authors = ["Wolfe-Jam <wolfejam@faf.one>"]
@@ -46,6 +46,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 name = "mcp-better"
 path = "src/main.rs"
 
+[[bin]]
+name = "mcp-worse"
+path = "src/bin/mcp_worse.rs"
+
 [[example]]
 name = "stdio-client"
 path = "examples/stdio_client.rs"
@@ -53,6 +57,14 @@ path = "examples/stdio_client.rs"
 [[example]]
 name = "http-smoke"
 path = "examples/http_smoke.rs"
+
+[[example]]
+name = "order-restart-smoke"
+path = "examples/order_restart_smoke.rs"
+
+[[example]]
+name = "contrast-smoke"
+path = "examples/contrast_smoke.rs"
 
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

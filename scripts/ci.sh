@@ -29,9 +29,16 @@ echo "==> Discover smoke (stdio)"
 cargo build --bins
 cargo run --example stdio-client
 
+echo "==> Order restart smoke (two processes)"
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example order-restart-smoke
+
+echo "==> Contrast smoke (better passes · worse fails)"
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
+  MCP_WORSE_BIN="$(pwd)/target/debug/mcp-worse" \
+  cargo run --example contrast-smoke
+
 echo "==> Streamable HTTP smoke"
 # http-smoke spawns the bin — must exist; example alone does not build [[bin]]
-cargo build --bins
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 
 echo "✅ scripts/ci.sh green"

@@ -24,15 +24,29 @@ cargo run --example stdio-client
 Expected last line (exact wording from the example):
 
 ```text
-stdio-client: OK (Discover + stamped list + health + echo)
+stdio-client: OK (Discover + stamped list ×6 + health + echo)
 ```
 
 Optional: `MCP_BETTER_BIN=/path/to/mcp-better cargo run --example stdio-client`
 
-HTTP happy-path (spawns the binary itself — build bins first):
+### Louder smokes (v0.3)
 
 ```bash
 cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example order-restart-smoke
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
+  MCP_WORSE_BIN="$(pwd)/target/debug/mcp-worse" \
+  cargo run --example contrast-smoke
+```
+
+```text
+order-restart-smoke: OK (two processes · same order · same stamps)
+contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it)
+```
+
+HTTP happy-path (spawns the binary itself — build bins first):
+
+```bash
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```
 

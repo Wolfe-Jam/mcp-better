@@ -45,6 +45,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 |---------|--------|
 | **v0.1** | 7/28 over **stdio** — Discover path, stamped list, stable order, `health` + `echo` |
 | **v0.2** | Same era + **Streamable HTTP** road (`--http`) + routing-header smoke |
+| **v0.3** | Same era + **deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast |
 | Later | More road / louder proof inside 7/28 — never a new “protocol era” by semver alone |
 
 Also: official **`rmcp` 3.0** · Registry `server.json` · **no** `project.faf` required on `main`.

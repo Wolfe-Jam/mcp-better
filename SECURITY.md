@@ -29,6 +29,10 @@
 2. Never advertise `--http` as “safe for the internet”
 3. Registry package transport remains **stdio** — see README “Registry identity”
 
+## mcp-worse (lying companion)
+
+`mcp-worse` is a **teaching binary** that deliberately omits list stamps and reverses tool order. It is **not** a secure or honest MCP peer. Do not expose it on a network. Do not point production hosts at it. Use only with `contrast-smoke` / local curriculum.
+
 ## Reporting
 
 Open a private security advisory on the GitHub repository when available, or contact the maintainer listed in `Cargo.toml`.

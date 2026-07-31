@@ -1,18 +1,30 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] — 2026-07-31 — deeper correctness (same 7/28 era)
+
+**Lesson:** make the BETTER list contract harder to lie about and easier to verify.  
+More road inside 7/28 — not a new protocol era. Still two tools on `mcp-better`.
 
 ### Added
 
-- **`textbook/`** — Season 1 MCP 7/28 book ships with the app (book = app = book)
-- Doctrine: [`textbook/DOCTRINE-book-is-app.md`](./textbook/DOCTRINE-book-is-app.md) — lesson after lesson, version after version
+- **Louder smokes:** `stdio-client` asserts stamps + order on **6** list calls (1 + 5)
+- **`order-restart-smoke`** — two sequential processes, same order + stamps
+- **`mcp-worse`** binary — lying companion (unstamped list, reversed order)
+- **`contrast-smoke`** — better passes BETTER contract · worse fails it
+- Unit tests: 20× same-process lists · multi-instance order · worse contract
+- Public `BETTER_TOOL_ORDER` constant
+- **`textbook/`** Season 1 + doctrine book=app (from unreleased) shipped with app
 
-### Fixed / honesty
+### Fixed / honesty (pre-0.3 doc pass)
 
-- `GETTING-STARTED`: exact `stdio-client` / `http-smoke` OK lines
-- README / `--help`: env precedence (`MCP_TRANSPORT` first, then `MCP_BETTER_TRANSPORT`)
-- README: routing headers stated as Streamable HTTP contract (not “may send”)
-- README: textbook entrypoint + version-as-lesson table wording
+- `GETTING-STARTED` exact OK lines · env precedence · header claim wording
+
+### Unchanged
+
+- Tools on **mcp-better:** `health` + `echo` only
+- Era **7/28** / wire **`2026-07-28`**
+- stdio default · Streamable HTTP `--http` local demo
+- **mcp-worse** is teaching-only · not Registry product surface
 
 ---
 

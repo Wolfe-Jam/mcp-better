@@ -14,8 +14,9 @@ use serde::{Deserialize, Serialize};
 /// Catalog is static → public cache with a one-minute freshness window.
 pub const LIST_TOOLS_TTL_MS: u64 = 60_000;
 
-/// Fixed tool order for stable `tools/list` across calls (HashMap is unordered).
-const TOOL_ORDER: &[&str] = &["health", "echo"];
+/// Fixed tool order for stable `tools/list` across calls and process restarts.
+/// Public so smokes and the lying companion can name the BETTER contract.
+pub const BETTER_TOOL_ORDER: &[&str] = &["health", "echo"];
 
 #[derive(Debug, Clone)]
 pub struct BetterServer {
@@ -33,11 +34,11 @@ impl BetterServer {
     pub fn stamped_list_tools(&self) -> ListToolsResult {
         let mut tools = self.tool_router.list_all();
         tools.sort_by(|a, b| {
-            let ia = TOOL_ORDER
+            let ia = BETTER_TOOL_ORDER
                 .iter()
                 .position(|n| *n == a.name.as_ref())
                 .unwrap_or(usize::MAX);
-            let ib = TOOL_ORDER
+            let ib = BETTER_TOOL_ORDER
                 .iter()
                 .position(|n| *n == b.name.as_ref())
                 .unwrap_or(usize::MAX);
@@ -149,5 +150,40 @@ mod tests {
         assert!(server.tool_router.has_route("health"));
         assert!(server.tool_router.has_route("echo"));
         assert!(!server.tool_router.has_route("shell"));
+    }
+
+    /// Same-process: many lists must not drift (prompt-cache / client cache).
+    #[test]
+    fn list_tools_stable_across_many_calls() {
+        let server = BetterServer::new();
+        let first: Vec<String> = server
+            .stamped_list_tools()
+            .tools
+            .iter()
+            .map(|t| t.name.to_string())
+            .collect();
+        assert_eq!(first, vec!["health".to_string(), "echo".to_string()]);
+        for i in 0..20 {
+            let names: Vec<String> = server
+                .stamped_list_tools()
+                .tools
+                .iter()
+                .map(|t| t.name.to_string())
+                .collect();
+            assert_eq!(names, first, "order drifted at list call {i}");
+        }
+    }
+
+    /// New server instances (stand-in for process restart) keep the same catalog order.
+    #[test]
+    fn list_tools_order_survives_new_instances() {
+        let a = BetterServer::new().stamped_list_tools();
+        let b = BetterServer::new().stamped_list_tools();
+        let names_a: Vec<_> = a.tools.iter().map(|t| t.name.as_ref()).collect();
+        let names_b: Vec<_> = b.tools.iter().map(|t| t.name.as_ref()).collect();
+        assert_eq!(names_a, BETTER_TOOL_ORDER);
+        assert_eq!(names_b, BETTER_TOOL_ORDER);
+        assert_eq!(a.ttl_ms, Some(LIST_TOOLS_TTL_MS));
+        assert_eq!(b.ttl_ms, Some(LIST_TOOLS_TTL_MS));
     }
 }

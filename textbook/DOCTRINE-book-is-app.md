@@ -71,7 +71,7 @@ Versions add **road inside 7/28**. They do not invent a new protocol era.
 |---------|--------------------------------|------------|
 | **0.1** | 7/28 over **stdio** — Discover path, stamped list, stable order, `health`+`echo` | Ch 04–05 · 09 (stdio) |
 | **0.2** | Same era + **Streamable HTTP** road — headers, local-demo honesty | Ch 07 · 09 (HTTP) |
-| **0.3** | **Deeper correctness** — louder smokes, edge rejection, harder to lie | Ch 04–05 · 08 (deepen) |
+| **0.3** | **Deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast | Ch 05 · 08 · 09 |
 | **0.4** | **Pedagogical tools** (≤2) — protocol concepts only | New micro-lessons + Ch 10 filter |
 | **0.5** | **Matching tiny client** — what a modern client expects | Lab + client chapter |
 | Later | Extension demos only if core stays pure | Ch 15 · marked extension |

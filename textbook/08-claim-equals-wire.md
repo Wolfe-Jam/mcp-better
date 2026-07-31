@@ -67,11 +67,11 @@ Happy-path smoke is necessary and insufficient.
 |-------------|---------|
 | Happy path | Proves the demo works |
 | Edge: old client / bad version | Proves rejection honesty |
-| Edge: missing/wrong HTTP headers | Proves transport contract (not in v0.2 `http-smoke` happy path) |
-| Edge: order across process restart | Proves restart-stable catalog claims (v0.2 proves same-process N lists) |
-| Negative companion (“lying server”) | Teaches detection by contrast |
+| Edge: missing/wrong HTTP headers | Proves transport contract (still happy-path only on `http-smoke`) |
+| Edge: order across process restart | **v0.3** `order-restart-smoke` |
+| Negative companion (`mcp-worse`) | **v0.3** `contrast-smoke` |
 
-Product road **0.3** deepens these without adding domain tools. The textbook principle is already here: **fail loudly**.
+v0.3 ships the restart + lying contrast legs. Missing-header HTTP edges remain future classroom work. Principle: **fail loudly**.
 
 ---
 
