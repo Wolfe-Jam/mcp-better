@@ -29,20 +29,41 @@ ListToolsResult::with_all_items(tools)
 
 This repo overrides `list_tools` and uses `BetterServer::stamped_list_tools()`.
 
-## v0.1 claim surface
+## Claim surface by version
+
+### v0.1 — 7/28 over stdio (foundation)
 
 We claim:
 
 - stdio transport  
 - tools capability  
 - Discover-compatible results  
-- stamped list cache  
+- stamped list cache (`ttlMs` / `cacheScope`)  
 
-We do **not** claim on day 0:
+We do **not** claim on v0.1:
 
 - Streamable HTTP / `Mcp-Method` / `Mcp-Name`  
 - Server-side “Discover API” beyond correct results under Discover clients  
 - Resources, prompts, tasks, OAuth  
+
+### v0.2 — same 7/28 era + Streamable HTTP (current · 0.2.0)
+
+We claim **everything in v0.1**, plus:
+
+- **Streamable HTTP** via `--http` (or `MCP_BETTER_TRANSPORT=http`)  
+- Default bind **`127.0.0.1:8787/mcp`** · loopback **Host** guards  
+- HTTP smoke with required routing headers **`Mcp-Method` / `Mcp-Name`**  
+- Same tools (`health`, `echo`), same stamps, same era string `2026-07-28`  
+- **SECURITY.md** posture: no auth/TLS — **local demo only**  
+
+We do **not** claim on v0.2:
+
+- Production remote HTTP (auth, TLS, open bind)  
+- Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  
+- Resources, prompts, tasks, OAuth, MRTR demos  
+- Server-side Discover “API product” beyond correct wire results under Discover clients  
+
+**Rule:** versions **add road inside 7/28**. They do not rebrand each transport as a new protocol era.
 
 ## Pin
 
@@ -50,4 +71,4 @@ We do **not** claim on day 0:
 rmcp = { version = "3.0", features = ["server", "client", "transport-io", "transport-child-process", "macros", "schemars"] }
 ```
 
-Do not track `main` git deps for production pins.
+HTTP path uses the same `rmcp` 3.x stack with Streamable HTTP features enabled in the binary. Do **not** track `main` git deps for production pins.
