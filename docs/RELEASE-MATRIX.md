@@ -117,19 +117,24 @@ Registry transport    ✅ stdio only by design (HTTP not a second Registry packa
 
 | # | Surface | Required? | v0.3.0 | Notes |
 |---|---------|:---------:|:------:|-------|
-| M1 | Doc Gate (Cargo/server.json/CHANGELOG/README = **0.3.0**) | **Yes** | ⏳ | close at `/pubbetter` |
+| M1 | Doc Gate (Cargo/server.json/CHANGELOG/README = **0.3.0**) | **Yes** | ✅ | |
 | M2 | BETTER purity | **Yes** | ✅ | |
 | M3–M4 | Identity | **Yes** | ✅ | |
-| M5 | `scripts/ci.sh` (fmt·clippy·test·**all smokes**) | **Yes** | ✅ | local 2026-07-31 green |
+| M5 | `scripts/ci.sh` (fmt·clippy·test·**all smokes**) | **Yes** | ✅ | |
 | M6 | Discover smoke | **Yes** | ✅ | multi-list ×6 |
 | M7 | Stamped list | **Yes** | ✅ | |
 | M8 | Tools health+echo order | **Yes** | ✅ | restart-stable smoke |
-| **M22** | **order-restart-smoke** (two processes) | **Yes** | ✅ | local |
-| **M23** | **contrast-smoke** + **mcp-worse** | **Yes** | ✅ | local · worse not Registry |
+| **M22** | **order-restart-smoke** (two processes) | **Yes** | ✅ | |
+| **M23** | **contrast-smoke** + **mcp-worse** | **Yes** | ✅ | worse not Registry package |
 | M17–M18 | HTTP + headers | **Yes** | ✅ | retained |
-| M9–M16 | GH CI · crates · tag · Registry | **Yes** for FULL LIVE | ⏳ | after GO `/pubbetter` |
+| M9 | GH CI green ship SHA | **Yes** | ✅ | `@8a74697` |
+| M10–M11 | crates.io 0.3.0 | **Yes** | ✅ | published 2026-07-31 |
+| M13–M14 | tag + GH Release | **Yes** | ✅ | [v0.3.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.3.0) |
+| M15 | MCP Registry `@0.3.0` | **Yes** | ⏳ | JWT expired — re-login + `bash scripts/registry-publish.sh` |
+| M16 | Truth-table | **Yes** | ✅ | coherent (Registry soft until M15) |
+| M24 | Product release note | Soft | ✅ | GH Release + `docs/RELEASE-NOTES/v0.3.0.md` |
 
-**Verdict v0.3.0:** **IN TREE** until local ci.sh + pubbetter gates close → then FULL LIVE.
+**Verdict v0.3.0:** **LIVE** (crates + tag + GH) · **Registry follow-up** for FULL LIVE matrix.
 
 ---
 
