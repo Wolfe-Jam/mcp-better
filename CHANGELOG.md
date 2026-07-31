@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`textbook/`** — Season 1 MCP 7/28 book ships with the app (book = app = book)
+- Doctrine: [`textbook/DOCTRINE-book-is-app.md`](./textbook/DOCTRINE-book-is-app.md) — lesson after lesson, version after version
+
+### Fixed / honesty
+
+- `GETTING-STARTED`: exact `stdio-client` / `http-smoke` OK lines
+- README / `--help`: env precedence (`MCP_TRANSPORT` first, then `MCP_BETTER_TRANSPORT`)
+- README: routing headers stated as Streamable HTTP contract (not “may send”)
+- README: textbook entrypoint + version-as-lesson table wording
+
+---
+
 ## [0.2.0] — 2026-07-29 — same 7/28 era + Streamable HTTP
 
 **mcp-better — built for 7/28** · more road, not a new era.

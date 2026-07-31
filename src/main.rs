@@ -49,7 +49,8 @@ fn transport_mode() -> String {
                        --stdio | stdio         stdio\n\n\
                      Env:\n\
                        MCP_BETTER_HTTP_ADDR    default 127.0.0.1:8787 (loopback only recommended)\n\
-                       MCP_BETTER_TRANSPORT    stdio | http  (alias: MCP_TRANSPORT)\n\
+                       MCP_TRANSPORT           stdio | http  (read first if both set)\n\
+                       MCP_BETTER_TRANSPORT    same values (fallback)\n\
                        RUST_LOG                tracing filter\n\n\
                      Security: --http has no auth/TLS. Do not bind 0.0.0.0. See SECURITY.md.\n",
                     env!("CARGO_PKG_VERSION")

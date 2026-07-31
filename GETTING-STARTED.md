@@ -21,13 +21,24 @@ cargo build
 cargo run --example stdio-client
 ```
 
-Expected last line:
+Expected last line (exact wording from the example):
 
 ```text
-stdio-client: OK (Discover + list tools + health + echo)
+stdio-client: OK (Discover + stamped list + health + echo)
 ```
 
 Optional: `MCP_BETTER_BIN=/path/to/mcp-better cargo run --example stdio-client`
+
+HTTP happy-path (spawns the binary itself — build bins first):
+
+```bash
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
+```
+
+```text
+http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · Mcp-Method/Mcp-Name)
+```
 
 ## Wire as an MCP server (host smoke)
 

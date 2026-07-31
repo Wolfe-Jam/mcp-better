@@ -50,7 +50,7 @@ We do **not** claim on v0.1:
 
 We claim **everything in v0.1**, plus:
 
-- **Streamable HTTP** via `--http` (or `MCP_BETTER_TRANSPORT=http`)  
+- **Streamable HTTP** via `--http` (or env `MCP_TRANSPORT` / `MCP_BETTER_TRANSPORT=http`; `MCP_TRANSPORT` wins if both set)  
 - Default bind **`127.0.0.1:8787/mcp`** · loopback **Host** guards  
 - HTTP smoke with required routing headers **`Mcp-Method` / `Mcp-Name`**  
 - Same tools (`health`, `echo`), same stamps, same era string `2026-07-28`  

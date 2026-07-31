@@ -4,7 +4,13 @@
 
 *(protocol **2026-07-28** — the modern MCP release)*
 
-AAIF-verified modern MCP textbook. Rust · `rmcp` 3.0 · Discover · stamped list cache.
+```text
+the book is the app is the book
+```
+
+AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` 3.0 · Discover · stamped list cache.  
+**Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
+**App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
 > **BEST** (persistent AI project context) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
 
@@ -24,10 +30,10 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 2. **Honest surface** — transport and capabilities match docs and CI.
 3. **Roadmap expands the era** — versions add road; they do not “become” 7/28 later.
 
-| Version | What you get |
-|---------|----------------|
-| **v0.1** | **7/28 over stdio** — foundation: tools, Discover, stamped `ttlMs` / `cacheScope` |
-| **v0.2** | Same 7/28 era + **Streamable HTTP** + routing headers (`Mcp-Method` / `Mcp-Name`) |
+| Version | Lesson (the version *is* the lesson) |
+|---------|--------------------------------------|
+| **v0.1** | **7/28 over stdio** — Discover, stamped `ttlMs` / `cacheScope`, stable order, `health` + `echo` |
+| **v0.2** | Same 7/28 era + **Streamable HTTP** road + routing headers (`Mcp-Method` / `Mcp-Name`) |
 
 ## What BETTER means
 
@@ -75,7 +81,7 @@ cargo run --release -- --http
 |-----|--------|
 | CLI | `mcp-better` (stdio) · `mcp-better --http` · `mcp-better --stdio` |
 | Bare args | `http` / `stdio` (same meaning as flags) |
-| Env | `MCP_BETTER_TRANSPORT=stdio\|http` (alias: `MCP_TRANSPORT`) |
+| Env | `MCP_TRANSPORT` or `MCP_BETTER_TRANSPORT` → `stdio` \| `http` (**`MCP_TRANSPORT` first** if both set) |
 | HTTP bind | `MCP_BETTER_HTTP_ADDR` — default **`127.0.0.1:8787`**. Do **not** use `0.0.0.0` unless you accept an unauthenticated open endpoint. |
 
 ## Tools
@@ -92,10 +98,16 @@ cargo run --release -- --http
 | Era / protocol | **7/28** · negotiated **`2026-07-28`** (Discover preferred) |
 | Transport | **stdio** (default) · **Streamable HTTP** (`--http`) |
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
-| Routing headers | Clients may send **`Mcp-Method` / `Mcp-Name`** (SEP-2243); SDK-aware |
+| Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
 | Capabilities | **tools** only |
 | List cache | **`ttlMs=60000`**, **`cacheScope=public`** |
 | Resources / prompts / OAuth / tasks | out of v0.2 hero |
+
+## Textbook
+
+The book is the app is the book — [`textbook/`](./textbook/) (Season 1 · [doctrine](./textbook/DOCTRINE-book-is-app.md)).
+
+Start: [textbook/README.md](./textbook/README.md) → lab [Ch 09](./textbook/09-run-the-textbook.md).
 
 ## Non-goals (GOOD-era habits we refuse)
 
