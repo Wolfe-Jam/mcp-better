@@ -8,7 +8,7 @@
 the book is the app is the book
 ```
 
-AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` 3.0 · Discover · stamped list cache.  
+AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock **3.0.1**, Tier 1 assessed) · Discover · stamped list cache.  
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
@@ -26,7 +26,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 ## What to expect
 
-1. **Built for 7/28** — not bolted onto a legacy server (official `rmcp` 3.0).
+1. **Built for 7/28** — not bolted onto a legacy server (official `rmcp` 3.0.x / Tier-1 assessed cut).
 2. **Honest surface** — transport and capabilities match docs and CI.
 3. **Roadmap expands the era** — versions add road; they do not “become” 7/28 later.
 
