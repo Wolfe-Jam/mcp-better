@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2] — 2026-08-08 — OIDC Trusted Publishing proof
+
+- **OIDC ship path:** `v*` tag triggers crates.io (crates-io-auth-action) + npm Trusted Publishing via Environment `release` — zero long-lived registry tokens after bootstrap.
+- Pure patch for proof of the dual-package OIDC release workflow. No tool/protocol behaviour change.
+
+---
+
 ## [0.4.1] — 2026-08-08 — Registry dual-package metadata
 
 - **npm `mcpName`:** `package.json` now declares `"mcpName": "io.github.Wolfe-Jam/mcp-better"` so the MCP Registry accepts the npm package alongside cargo (validator requirement; no behaviour change).
