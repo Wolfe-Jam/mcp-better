@@ -1,6 +1,7 @@
 {
   "name": "mcp-better",
-  "version": "0.4.0",
+  "version": "0.4.1",
+  "mcpName": "io.github.Wolfe-Jam/mcp-better",
   "description": "AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook). npm shim downloads the native binary from GitHub Releases.",
   "license": "MIT",
   "author": "Wolfe-Jam <wolfejam@faf.one>",

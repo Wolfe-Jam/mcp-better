@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] — 2026-08-08 — Registry dual-package metadata
+
+- **npm `mcpName`:** `package.json` now declares `"mcpName": "io.github.Wolfe-Jam/mcp-better"` so the MCP Registry accepts the npm package alongside cargo (validator requirement; no behaviour change).
+
+---
+
 ## [0.4.0] — 2026-08-07 — dual package (cargo + npm, zero-toolchain npx)
 
 **Lesson:** ship the textbook where the host already is.  
