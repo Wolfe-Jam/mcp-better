@@ -1,17 +1,20 @@
-# Native binary builds for mcp-better GitHub Releases.
-# cargo-dist config lives in dist-workspace.toml (durable path).
-# This workflow builds the targets listed there and attaches archives
-# the npm shim (bin/mcp-better.js) knows how to download.
+# mcp-better Release
 #
-# npm + crates.io publish stay in the /pubbetter human motion.
+# 1) Multi-arch native binaries → GitHub Release assets (npm shim downloads these)
+# 2) On tag push only: OIDC publish to crates.io + npm (zero long-lived registry tokens)
 #
-# Note: hand-maintained (not pure cargo-dist output). macos-13 retired —
-# x86_64-apple-darwin is cross-compiled on macos-15 (arm).
+# Prerequisites (one-time manual):
+#   - crates.io Trusted Publishing → Wolfe-Jam/mcp-better, workflow release.yml, env release
+#   - npm Trusted Publisher → same
+#   - GitHub Environment `release` (protection optional: reviewers / v* tags)
+#
+# See docs/OIDC-TRUSTED-PUBLISHING-BRIEF.md and docs/MCP-DIST-POST.md
+#
+# cargo-dist config: dist-workspace.toml (durable path).
+# mcp-dist-post stays a local post-step (does not publish).
+# MCP Registry still uses mcp-publisher (human / separate auth).
 
 name: Release
-
-permissions:
-  contents: write
 
 on:
   push:
@@ -20,19 +23,24 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to build and attach assets to (e.g. v0.4.0)"
+        description: "Release tag to build and attach assets to (e.g. v0.4.1)"
         required: true
-        default: "v0.4.0"
+        default: "v0.4.1"
+
+# Default: no tokens. Jobs elevate only what they need.
+permissions: {}
 
 jobs:
   build:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         include:
           - runner: macos-14
             target: aarch64-apple-darwin
-          # macos-13 retired / queues forever — cross-compile x86_64 on arm64 macOS
+          # macos-13 retired — cross-compile x86_64 on arm64 macOS
           - runner: macos-15
             target: x86_64-apple-darwin
           - runner: ubuntu-22.04
@@ -43,17 +51,16 @@ jobs:
             target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          # Tag push: the tag ref. Manual: build the requested release tag's tree.
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
 
       - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
         with:
           targets: ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           key: release-${{ matrix.target }}
 
@@ -71,7 +78,6 @@ jobs:
           if [[ "$TRIPLE" == *windows* ]]; then
             BIN="target/${TRIPLE}/release/mcp-better.exe"
             test -f "$BIN"
-            # zip with binary at archive root (cargo-dist-like)
             STAGE="$OUT/stage"
             mkdir -p "$STAGE"
             cp "$BIN" "$STAGE/mcp-better.exe"
@@ -83,14 +89,13 @@ jobs:
             mkdir -p "$STAGE"
             cp "$BIN" "$STAGE/mcp-better"
             chmod +x "$STAGE/mcp-better"
-            # Prefer .tar.xz (cargo-dist default); also .tar.gz for shim fallbacks
             tar -C "$STAGE" -cJf "$OUT/mcp-better-${TRIPLE}.tar.xz" mcp-better
             tar -C "$STAGE" -czf "$OUT/mcp-better-${TRIPLE}.tar.gz" mcp-better
           fi
           ls -la "$OUT"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: dist-${{ matrix.target }}
           path: |
@@ -99,11 +104,14 @@ jobs:
             dist-out/mcp-better-*.zip
           if-no-files-found: error
 
+  # Attach binaries to the GitHub Release (not OIDC-sensitive)
   publish-release:
     needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Resolve release tag
         id: tag
@@ -116,7 +124,7 @@ jobs:
           fi
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: artifacts
           pattern: dist-*
@@ -126,7 +134,7 @@ jobs:
         run: find artifacts -type f | sort
 
       - name: Attach to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           files: artifacts/**
@@ -134,3 +142,48 @@ jobs:
           generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── OIDC publish (tag push only — never workflow_dispatch / PR) ───────────
+  # Requires Trusted Publishing + Environment `release` configured first.
+  # Do NOT delete classic secrets until this job has succeeded once.
+  publish-registries:
+    needs: [build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write # OIDC
+      contents: read  # checkout only
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+
+      - name: crates.io OIDC token
+        uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1
+        id: crates-auth
+
+      - name: cargo publish
+        run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.crates-auth.outputs.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Lockstep + mcpName (mcp-dist-post dry-run)
+        run: |
+          ./scripts/mcp-dist-post.sh \
+            --crate mcp-better \
+            --mcp-name io.github.Wolfe-Jam/mcp-better \
+            --dry-run
+
+      - name: npm publish (OIDC Trusted Publishing — no NODE_AUTH_TOKEN)
+        run: npm publish --access public
+        # Trusted Publishing: do not set NODE_AUTH_TOKEN / NPM_TOKEN
