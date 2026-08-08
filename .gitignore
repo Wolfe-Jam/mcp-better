@@ -13,3 +13,9 @@ AGENTS.md
 .mcpregistry_github_token
 .mcpregistry_registry_token
 .mcp_publisher_token
+
+# npm shim
+node_modules/
+package-lock.json
+# binary cache for local npm shim tests
+.cache/

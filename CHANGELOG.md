@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.0] — 2026-08-07 — dual package (cargo + npm, zero-toolchain npx)
+
+**Lesson:** ship the textbook where the host already is.  
+Rust stays the source of truth; npm is a **downloader shim** so `npx mcp-better` starts a real stdio session on a machine with **no Rust toolchain**.
+
+### Added
+
+- **npm package `mcp-better`** — `bin/mcp-better.js` detects platform/arch, downloads the matching binary from GitHub Releases, execs it on stdio
+- **`server.json` dual packages** — `cargo` (`crates.io`) + `npm` (`registry.npmjs.org`), both stdio, same version
+- **cargo-dist durable path** — `dist-workspace.toml` + `.github/workflows/release.yml` (native multi-target archives on `v*` tags)
+- **Three-file lockstep gate** — `Cargo.toml` · `package.json` · `server.json` versions must agree (doc-gate fails on drift)
+
+### Unchanged
+
+- Tools on **mcp-better:** `health` + `echo` only
+- Era **7/28** / wire **`2026-07-28`**
+- stdio default · Streamable HTTP `--http` local demo
+- **cargo path** — `cargo install mcp-better` still works; no breaking change
+- **mcp-worse** teaching companion only
+
+---
+
 ## [0.3.0] — 2026-07-31 — deeper correctness (same 7/28 era)
 
 **Lesson:** make the BETTER list contract harder to lie about and easier to verify.  

@@ -1,0 +1,43 @@
+{
+  "name": "mcp-better",
+  "version": "0.4.0",
+  "description": "AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook). npm shim downloads the native binary from GitHub Releases.",
+  "license": "MIT",
+  "author": "Wolfe-Jam <wolfejam@faf.one>",
+  "homepage": "https://github.com/Wolfe-Jam/mcp-better",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wolfe-Jam/mcp-better.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Wolfe-Jam/mcp-better/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "rmcp",
+    "stdio",
+    "better"
+  ],
+  "bin": {
+    "mcp-better": "bin/mcp-better.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

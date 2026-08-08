@@ -9,6 +9,9 @@ cd "$(dirname "$0")/.."
 echo "==> PATH cargo: $(command -v cargo)"
 echo "==> rustc: $(rustc --version)"
 
+echo "==> three-file lockstep (doc-gate)"
+bash scripts/doc-gate.sh
+
 echo "==> fmt"
 cargo fmt --all -- --check
 

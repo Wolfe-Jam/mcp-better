@@ -1,0 +1,112 @@
+# Native binary builds for mcp-better GitHub Releases.
+# cargo-dist config lives in dist-workspace.toml (durable path).
+# This workflow builds the targets listed there and attaches archives
+# the npm shim (bin/mcp-better.js) knows how to download.
+#
+# npm + crates.io publish stay in the /pubbetter human motion.
+
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            target: aarch64-apple-darwin
+          - runner: macos-13
+            target: x86_64-apple-darwin
+          - runner: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - runner: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+          - runner: windows-2022
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+
+      - name: Build release binary
+        shell: bash
+        run: cargo build --release --bin mcp-better --target ${{ matrix.target }}
+
+      - name: Package artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          TRIPLE="${{ matrix.target }}"
+          OUT="dist-out"
+          mkdir -p "$OUT"
+          if [[ "$TRIPLE" == *windows* ]]; then
+            BIN="target/${TRIPLE}/release/mcp-better.exe"
+            test -f "$BIN"
+            # zip with binary at archive root (cargo-dist-like)
+            STAGE="$OUT/stage"
+            mkdir -p "$STAGE"
+            cp "$BIN" "$STAGE/mcp-better.exe"
+            (cd "$STAGE" && 7z a -tzip "../mcp-better-${TRIPLE}.zip" "mcp-better.exe")
+          else
+            BIN="target/${TRIPLE}/release/mcp-better"
+            test -f "$BIN"
+            STAGE="$OUT/stage"
+            mkdir -p "$STAGE"
+            cp "$BIN" "$STAGE/mcp-better"
+            chmod +x "$STAGE/mcp-better"
+            # Prefer .tar.xz (cargo-dist default); also .tar.gz for shim fallbacks
+            tar -C "$STAGE" -cJf "$OUT/mcp-better-${TRIPLE}.tar.xz" mcp-better
+            tar -C "$STAGE" -czf "$OUT/mcp-better-${TRIPLE}.tar.gz" mcp-better
+          fi
+          ls -la "$OUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.target }}
+          path: |
+            dist-out/mcp-better-*.tar.xz
+            dist-out/mcp-better-*.tar.gz
+            dist-out/mcp-better-*.zip
+          if-no-files-found: error
+
+  publish-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: dist-*
+          merge-multiple: true
+
+      - name: List artifacts
+        run: find artifacts -type f | sort
+
+      - name: Attach to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
+          fail_on_unmatched_files: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -35,6 +35,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.1** | **7/28 over stdio** — Discover, stamped `ttlMs` / `cacheScope`, stable order, `health` + `echo` |
 | **v0.2** | Same 7/28 era + **Streamable HTTP** road + routing headers (`Mcp-Method` / `Mcp-Name`) |
 | **v0.3** | Same era + **deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast |
+| **v0.4** | Same era + **dual package** — cargo + npm shim · `npx mcp-better` with **no Rust toolchain** |
 
 ## What BETTER means
 
@@ -46,8 +47,18 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 ## Quickstart (≤10 min)
 
+### Zero Rust — npm / npx (v0.4+)
+
 ```bash
-# Requires Rust stable (1.85+)
+# No Rust toolchain required. Downloads the native binary from GitHub Releases.
+npx mcp-better --help
+npx mcp-better
+# hosts: point stdio command at `npx` / `mcp-better` from the npm package
+```
+
+### From source / crates.io (Rust 1.85+)
+
+```bash
 git clone https://github.com/Wolfe-Jam/mcp-better.git
 cd mcp-better
 cargo build --bins
@@ -66,13 +77,14 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```bash
 cargo run --release
 # or from crates.io:
-cargo install mcp-better --version 0.3.0
+cargo install mcp-better --version 0.4.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.3.0 --bin mcp-worse
+# cargo install mcp-better --version 0.4.0 --bin mcp-worse
 ```
 
-> First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.
+> First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.  
+> Prefer **no compile**? Use `npx mcp-better` (npm shim).
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
 
@@ -98,7 +110,7 @@ cargo run --release -- --http
 | `health` | Liveness — status, version, protocol. No side effects. Not a k8s probe contract. |
 | `echo` | Pure demo — returns `message` unchanged. |
 
-## Protocol claims (v0.2 — same 7/28 era, more road)
+## Protocol claims (v0.4 — same 7/28 era, dual package)
 
 | Surface | Status |
 |---------|--------|
@@ -127,10 +139,13 @@ Start: [textbook/README.md](./textbook/README.md) → lab [Ch 09](./textbook/09-
 ## Registry identity
 
 - MCP Registry name: `mcp-name: io.github.Wolfe-Jam/mcp-better`
-- `registryType`: cargo · `identifier`: `mcp-better`
+- **Dual packages** (same version, both **stdio**):
+  - `registryType`: **cargo** · `identifier`: `mcp-better` · crates.io
+  - `registryType`: **npm** · `identifier`: `mcp-better` · registry.npmjs.org  
+    (Node shim downloads the native binary from GitHub Releases — no Rust on the host)
 - **Package transport in `server.json` is stdio only — by design.**  
-  `cargo install mcp-better` / Desktop / Cursor hosts spawn the binary on **stdio**.  
-  Streamable HTTP (`--http`) is an **opt-in local demo** in the same binary and the same 7/28 era; it is **not** a second Registry package. Discover it in this README and `--help`, not as a remote registry transport.
+  Hosts spawn via `cargo install` / `npx mcp-better` on **stdio**.  
+  Streamable HTTP (`--http`) is an **opt-in local demo** in the same binary and the same 7/28 era; it is **not** a Registry remote package. Discover it in this README and `--help`.
 
 See [`server.json`](./server.json). **Not** `one.faf/*`.
 
