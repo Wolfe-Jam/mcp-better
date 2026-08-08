@@ -118,13 +118,34 @@ Brief: [`OIDC-TRUSTED-PUBLISHING-BRIEF.md`](./OIDC-TRUSTED-PUBLISHING-BRIEF.md).
 | MCP Registry | dual cargo + npm @ 0.4.2 |
 | Repo classic secrets | **none** — scrub not required |
 
-### Bootstrap (brand-new crate)
+### Proven on rust-faf-mcp@0.4.1 (second-server · 2A-recipe closed)
+
+| Gate | Result |
+|------|--------|
+| crates.io | OIDC · `publish-crate.yml` · env `crates-io` |
+| npm | bootstrap OTP once · Trusted Publisher proven · `mcpName: one.faf/rust-faf-mcp` |
+| MCP Registry | dual cargo + npm @ 0.4.1 · DNS login (`FAF_ONE_MCP_PRIVATE_KEY`) |
+| Identity | **`one.faf/*`** (not `io.github`) |
+| Workflows | split surface (not single `release.yml`) — see recipe deltas |
+
+### Bootstrap (brand-new crate / brand-new npm name)
 
 - First crates.io publish of a **new** crate still needs a classic token once.
-- Then configure Trusted Publishing (workflow `release.yml`, Environment `release`).
-- npm OIDC from first publish if account 2FA is enabled.
+- Then configure Trusted Publishing (workflow filename + Environment must match exactly).
+- **New npm package name:** first publish is often **human OTP / recovery code** (`npm publish --access public --otp=…`) when OIDC returns E404 “package not found.” Then add Trusted Publisher on npmjs.com.
+- Registry dual publish **requires** both package registries to already host that version (npm 404 → registry 400).
 - Do **not** delete classic tokens until a successful OIDC dual publish.
 
+### Recipe deltas (mcp-better → rust-faf-mcp)
+
+| Area | mcp-better | rust-faf-mcp (portable pattern) |
+|------|------------|----------------------------------|
+| Release jobs | one `release.yml` + env `release` | `release.yml` (binaries) + `publish-crate.yml` + `publish-npm.yml` + `publish-mcp-registry.yml` |
+| GH Environments | `release` | `crates-io` + `npm` |
+| Registry auth | GitHub OIDC for `io.github…` | **DNS** for `one.faf/*` (`login dns --domain faf.one`) |
+| Order | cargo/npm then registry | **npm must exist before** dual `server.json` registry publish |
+
+`mcp-dist-post` still never publishes — lockstep + dual `server.json` only.
 ### Steady-state (this repo)
 
 On `v*` tag push, `.github/workflows/release.yml`:
