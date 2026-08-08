@@ -6,17 +6,34 @@ It does **not** publish to crates.io or npm.
 It does **not** replace `/pubcrate`.  
 It only owns the MCP-specific dual-package surface.
 
+**Receipt (2026-08-08):** dual-package + OIDC steady-state proven on **`mcp-better@0.4.2`**.  
+Post-ship brief: [`GB-BRIEF-POST-0.4.2.md`](./GB-BRIEF-POST-0.4.2.md).
+
 ---
 
 ## Where it sits
 
+### Steady-state (mcp-better after 0.4.2)
+
 ```
-/pubcrate  (or manual cargo publish)     → crates.io live
-cargo-dist (or equivalent)               → binaries + npm package live
-         ↓
-scripts/mcp-dist-post.sh                 ← this step
-         ↓
-mcp-publisher publish server.json        → Registry dual entry live
+tag vX.Y.Z on main
+  → .github/workflows/release.yml
+       · build multi-arch binaries → GitHub Release assets
+       · publish-registries (Environment release, OIDC)
+           cargo publish via crates-io-auth-action
+           mcp-dist-post --dry-run (CI lockstep check)
+           npm publish (Trusted Publishing, no NODE_AUTH_TOKEN)
+  → scripts/mcp-dist-post.sh   (local: write dual server.json)
+  → mcp-publisher publish server.json
+```
+
+### Human quality path (still valid)
+
+```
+/pubcrate or local gates     → dry-run reviewed → GO
+cargo/npm via OIDC on tag    → crates.io + npm live
+scripts/mcp-dist-post.sh     ← this step (real run)
+mcp-publisher publish server.json
 ```
 
 ---
@@ -32,13 +49,14 @@ mcp-publisher publish server.json        → Registry dual entry live
    ```json
    "mcpName": "io.github.<owner>/<server>"
    ```
-   This is distinct from the README `mcp-name:` token that `/pubcrate` Step 1.6 already enforces.
+   This is distinct from the README `mcp-name:` token that `/pubcrate` Step 1.6 already enforces.  
+   Registry **rejects** npm packages that lack `mcpName` (lived 0.4.0 → fixed 0.4.1).
 
 3. **Dual-package `server.json`**  
    Writes / updates a `server.json` that declares **both**:
    - `registryType: "cargo"`
    - `registryType: "npm"`  
-   under the same server identity, with matching versions.
+   under the same server identity, with matching versions and `transport: stdio` by default.
 
 4. **Optional paste-ready block**  
    With `--print-mcp-json` it prints a ready-to-paste `mcpServers` snippet.
@@ -49,8 +67,9 @@ mcp-publisher publish server.json        → Registry dual entry live
 
 - `Cargo.toml` and `package.json` already exist and share the same version.
 - The npm `package.json` already contains the correct `mcpName` field  
-  (add it before `npm publish` — the Registry rejects packages that lack it).
+  (add it **before** `npm publish` — the Registry rejects packages that lack it).
 - `python3` available (used for JSON read/write).
+- For OIDC CI: Trusted Publishing configured on crates.io + npm for this repo; GitHub Environment `release`.
 
 ---
 
@@ -85,6 +104,55 @@ chmod +x scripts/mcp-dist-post.sh
 
 ---
 
+## OIDC Trusted Publishing (lived path)
+
+Goal: **zero long-lived registry tokens** after bootstrap.  
+Brief: [`OIDC-TRUSTED-PUBLISHING-BRIEF.md`](./OIDC-TRUSTED-PUBLISHING-BRIEF.md).
+
+### Proven on mcp-better@0.4.2
+
+| Gate | Result |
+|------|--------|
+| crates.io | OIDC · `trustpub_data.provider=github` (VIA GITHUB) |
+| npm | Trusted Publishing · no CI token · `mcpName` present |
+| MCP Registry | dual cargo + npm @ 0.4.2 |
+| Repo classic secrets | **none** — scrub not required |
+
+### Bootstrap (brand-new crate)
+
+- First crates.io publish of a **new** crate still needs a classic token once.
+- Then configure Trusted Publishing (workflow `release.yml`, Environment `release`).
+- npm OIDC from first publish if account 2FA is enabled.
+- Do **not** delete classic tokens until a successful OIDC dual publish.
+
+### Steady-state (this repo)
+
+On `v*` tag push, `.github/workflows/release.yml`:
+
+1. Multi-arch binaries → GitHub Release assets  
+2. Job **`publish-registries`** (Environment **`release`**, `id-token: write`):
+   - crates.io via `rust-lang/crates-io-auth-action` → short-lived token only  
+   - `mcp-dist-post --dry-run` in CI  
+   - `npm publish --access public` with **no** `NODE_AUTH_TOKEN`
+
+`workflow_dispatch` rebuilds **assets only** — no registry re-publish.
+
+### Lived CI lessons (0.4.2)
+
+1. **SHA-pinning `dtolnay/rust-toolchain`:** floating `@stable` implies the toolchain; a **commit SHA does not**. Always pass:
+   ```yaml
+   with:
+     toolchain: stable
+   ```
+2. **Gate scripts:** do **not** pipe long steps through `| tail` (`cargo doc` looked “stuck” while still running).
+3. **Tag retarget** only when nothing has published yet for that version (we retargeted `v0.4.2` after the toolchain fix).
+
+### What this post-step still does
+
+`mcp-dist-post` never publishes. It only enforces lockstep / mcpName and writes dual `server.json` for the Registry handoff.
+
+---
+
 ## Recommended `dist-workspace.toml` skeleton
 
 ```toml
@@ -114,72 +182,23 @@ github-attestations = true
 
 ---
 
-## Full dual-package motion (with existing skills)
-
-```
-1. /pubcrate                  # crates.io quality + docs gate + approval
-2. cargo-dist release         # binaries + npm downloader package
-3. scripts/mcp-dist-post.sh   # lockstep + mcpName + dual server.json
-4. mcp-publisher publish server.json
-```
-
-`/pubcrate` stays the crates.io gate.  
-This post-step stays the MCP dual-package companion.  
-They do not merge.
-
----
-
-## OIDC Trusted Publishing (steady-state)
-
-Goal: **zero long-lived registry tokens** after bootstrap.  
-Brief: [`OIDC-TRUSTED-PUBLISHING-BRIEF.md`](./OIDC-TRUSTED-PUBLISHING-BRIEF.md).
-
-### Bootstrap (first-time / until OIDC works)
-
-- crates.io may still need a classic token for the **first** human publish of a new crate.
-- npm Trusted Publisher is configured after the package exists.
-- **Do not delete** classic repo secrets until a tag-triggered OIDC dual publish has succeeded.
-
-### Steady-state (this repo)
-
-On `v*` tag push, `.github/workflows/release.yml`:
-
-1. Builds multi-arch binaries → GitHub Release assets  
-2. Job `publish-registries` (Environment **`release`**, `id-token: write`):
-   - crates.io via `rust-lang/crates-io-auth-action` → short-lived `CARGO_REGISTRY_TOKEN`
-   - `mcp-dist-post --dry-run` (lockstep + mcpName)
-   - `npm publish --access public` with **no** `NODE_AUTH_TOKEN` (npm Trusted Publishing)
-
-`workflow_dispatch` rebuilds **assets only** — it does **not** re-publish registries.
-
-### After OIDC is proven
-
-1. Confirm crates.io version shows **VIA GITHUB**  
-2. Confirm npm published without a classic token  
-3. Remove any remaining `CARGO_REGISTRY_TOKEN` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` repo secrets  
-4. MCP Registry remains `mcp-publisher publish server.json` (separate auth — not OIDC here)
-
-### What this post-step still does
-
-`mcp-dist-post` never publishes. It only enforces lockstep / mcpName and writes dual `server.json` for the Registry handoff.
-
----
-
 ## Explicit non-goals
 
-- Does not run `cargo publish` or `npm publish`
+- Does not run `cargo publish` or `npm publish` (CI OIDC jobs do that)
 - Does not generate the platform matrix or binary download logic
 - Does not touch the README `mcp-name:` token
 - Does not decide public/private status
 - Does not create GitHub tags or releases
+- Does not rewrite `/pubcrate`
 
 ---
 
 ## Phase 2 path
 
-- **2A (this)** — documented recipe + small post-step script  
-- **2B (later)** — promote into a thin CLI / skill once the recipe is proven on a second server
+- **2A-flagship** — closed on `mcp-better@0.4.2` (dual-package + OIDC)  
+- **2A-recipe** — open until a **second** FAF Rust MCP server uses the same path  
+- **2B** — thin CLI/skill only after second-server friction is observed  
 
 ---
 
-*Phase 2A · Rust-First · 2026-08-08*
+*Phase 2A · Rust-First · lived 2026-08-08 (mcp-better@0.4.2)*
