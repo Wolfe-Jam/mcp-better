@@ -4,6 +4,9 @@
 # the npm shim (bin/mcp-better.js) knows how to download.
 #
 # npm + crates.io publish stay in the /pubbetter human motion.
+#
+# Note: hand-maintained (not pure cargo-dist output). macos-13 retired —
+# x86_64-apple-darwin is cross-compiled on macos-15 (arm).
 
 name: Release
 
@@ -14,6 +17,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build and attach assets to (e.g. v0.4.0)"
+        required: true
+        default: "v0.4.0"
 
 jobs:
   build:
@@ -23,7 +32,8 @@ jobs:
         include:
           - runner: macos-14
             target: aarch64-apple-darwin
-          - runner: macos-13
+          # macos-13 retired / queues forever — cross-compile x86_64 on arm64 macOS
+          - runner: macos-15
             target: x86_64-apple-darwin
           - runner: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
@@ -34,6 +44,9 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Tag push: the tag ref. Manual: build the requested release tag's tree.
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -92,6 +105,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve release tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -105,6 +128,7 @@ jobs:
       - name: Attach to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
           files: artifacts/**
           fail_on_unmatched_files: true
           generate_release_notes: false
