@@ -6,6 +6,8 @@ It does **not** publish to crates.io or npm.
 It does **not** replace `/pubcrate`.  
 It only owns the MCP-specific dual-package surface.
 
+**Author guide (Phase 3):** [DUAL-PACKAGE-RUST-MCP.md](./DUAL-PACKAGE-RUST-MCP.md) — stranger-path dual cargo+npm publish.
+
 **Receipt (2026-08-08):** dual-package + OIDC steady-state proven on **`mcp-better@0.4.2`**.  
 Post-ship brief: [`GB-BRIEF-POST-0.4.2.md`](./GB-BRIEF-POST-0.4.2.md).
 

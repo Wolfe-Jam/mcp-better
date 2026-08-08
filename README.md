@@ -170,6 +170,8 @@ For persistent, versionable AI project context beyond a protocol textbook:
 - [docs/BETTER-BEST.md](./docs/BETTER-BEST.md) — BETTER vs BEST  
 - [GETTING-STARTED.md](./GETTING-STARTED.md)  
 - [docs/SDK-NOTES.md](./docs/SDK-NOTES.md) — `serve` vs Discover honesty  
+- [docs/DUAL-PACKAGE-RUST-MCP.md](./docs/DUAL-PACKAGE-RUST-MCP.md) — ship dual cargo+npm (canonical guide)  
+- [docs/MCP-DIST-POST.md](./docs/MCP-DIST-POST.md) — lockstep post-step (does not publish)  
 - [SECURITY.md](./SECURITY.md) · [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## License
