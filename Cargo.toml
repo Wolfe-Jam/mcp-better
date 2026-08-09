@@ -24,6 +24,7 @@ rmcp = { version = "3.0", features = [
     "transport-child-process",
     "transport-streamable-http-server",
     "schemars",
+    "request-state",
 ] }
 schemars = "1"
 serde = { version = "1", features = ["derive"] }

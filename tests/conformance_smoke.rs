@@ -21,7 +21,7 @@ fn public_lib_exports_list_ttl_one_minute() {
 
 #[test]
 fn public_lib_exports_better_tool_order() {
-    assert_eq!(BETTER_TOOL_ORDER, &["health", "echo"]);
+    assert_eq!(BETTER_TOOL_ORDER, &["health", "echo", "confirm_echo"]);
 }
 
 /// Crate-boundary recheck: consumers of the lib see the same BETTER stamps as unit tests.
@@ -32,7 +32,14 @@ fn public_lib_stamped_list_contract() {
     assert_eq!(list.ttl_ms, Some(LIST_TOOLS_TTL_MS));
     assert_eq!(list.cache_scope, Some(CacheScope::Public));
     let names: Vec<_> = list.tools.iter().map(|t| t.name.to_string()).collect();
-    assert_eq!(names, vec!["health".to_string(), "echo".to_string()]);
+    assert_eq!(
+        names,
+        vec![
+            "health".to_string(),
+            "echo".to_string(),
+            "confirm_echo".to_string()
+        ]
+    );
 }
 
 /// Lying companion is exported and fails the BETTER list contract on purpose.

@@ -36,6 +36,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.2** | Same 7/28 era + **Streamable HTTP** road + routing headers (`Mcp-Method` / `Mcp-Name`) |
 | **v0.3** | Same era + **deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast |
 | **v0.4** | Same era + **dual package** — cargo + npm shim · `npx mcp-better` with **no Rust toolchain** |
+| **main** | Same era + **`confirm_echo`** textbook MRTR tool (SEP-2322) — see [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) (publish when you GO version) |
 
 ## What BETTER means
 
@@ -119,7 +120,8 @@ cargo run --release -- --http
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
 | Capabilities | **tools** only |
-| List cache | **`ttlMs=60000`**, **`cacheScope=public`**, order **`health`→`echo`** (restart-stable) |
+| List cache | **`ttlMs=60000`**, **`cacheScope=public`**, order **`health`→`echo`→`confirm_echo`** (restart-stable) |
+| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) |
 | Lying companion | **`mcp-worse`** — unstamped + reversed order (contrast-smoke only) |
 | Resources / prompts / OAuth / tasks | out of hero |
 
