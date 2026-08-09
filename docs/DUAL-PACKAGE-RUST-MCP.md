@@ -337,6 +337,7 @@ Implementation note for integrators: this server’s stdio framing is **NDJSON**
 ## 10. Checklist (copy-paste)
 
 - [ ] Stdio MCP server builds and runs locally  
+- [ ] Stdio is NDJSON — validate: one `initialize` line in → one JSON line on stdout; nothing else on stdout  
 - [ ] Registry identity chosen (`io.github.*` **or** DNS domain)  
 - [ ] `Cargo.toml` · `package.json` · `server.json` versions match (**lockstep ×3**)  
 - [ ] README has **visible** `mcp-name: <identity>`  
@@ -382,7 +383,31 @@ See also: [wjttc Quick Start](https://github.com/Wolfe-Jam/wjttc/blob/main/READM
 
 ---
 
-## 12. What this is not
+## 12. Stdio wire hygiene
+
+MCP stdio uses **newline-delimited JSON-RPC** (one message per line). That is the standard binding — not LSP-style `Content-Length` headers.
+
+| Channel | Use |
+|---------|-----|
+| **stdout** | MCP messages only |
+| **stderr** | Logs and tracing |
+
+Do not write banners, `println!` debug lines, or progress text to stdout. Hosts and the certification bar read lines as JSON-RPC; anything else breaks the session.
+
+`rmcp`’s stdio transport and this dual-package path assume NDJSON. Prefer `\n` (LF) on the wire.
+
+Optional smoke:
+
+```bash
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2026-07-28","capabilities":{},"clientInfo":{"name":"probe","version":"0"}}}' \
+  | ./target/release/your-server
+```
+
+Expect a single JSON line on stdout. This check is independent of publishing to npm or the registry.
+
+---
+
+## 13. What this is not
 
 - Not a claim that cargo-only registry entries are wrong  
 - Not a requirement that every Rust MCP author publish to npm  
@@ -395,8 +420,8 @@ See also: [wjttc Quick Start](https://github.com/Wolfe-Jam/wjttc/blob/main/READM
 
 ## One-line
 
-> Publish the native binary to crates.io and GitHub Releases; publish a thin npm downloader with `mcpName`; keep three versions locked; publish cargo → npm → dual registry. **Node fetches; Rust runs.** Optional: score the binary with `wjttc certify --mcp ./path`.
+> Publish the native binary to crates.io and GitHub Releases; publish a thin npm downloader with `mcpName`; keep three versions locked; publish cargo → npm → dual registry. **Node fetches; Rust runs.** Stdio is NDJSON (stdout pure). Optional: score the binary with `wjttc certify --mcp ./path`.
 
 ---
 
-*Phase 3 public guide · teach loop closes with optional native score (4a) · canonical: [mcp-better/docs/DUAL-PACKAGE-RUST-MCP.md](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/DUAL-PACKAGE-RUST-MCP.md) · 2026-08-08*
+*Phase 3 public guide · teach loop + wire hygiene · canonical: [mcp-better/docs/DUAL-PACKAGE-RUST-MCP.md](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/DUAL-PACKAGE-RUST-MCP.md) · 2026-08-08*
