@@ -351,10 +351,38 @@ Implementation note for integrators: this server’s stdio framing is **NDJSON**
 - [ ] `mcp-publisher validate` · login · **publish**  
 - [ ] Smoke: `npx <npm-name>` (or package bin) **without** a Rust toolchain  
 - [ ] (Steady-state) Trusted Publishing configured for crates + npm so the next version needs no classic tokens  
+- [ ] (Optional) Score the native binary — [§11](#11-score-the-native-binary-optional)
 
 ---
 
-## 11. What this is not
+## 11. Score the native binary (optional)
+
+Dual-package is about **launch**. Quality is about the **binary**.
+
+After you have a release build (or an installed crate binary), you can score the **running process** with [`wjttc`](https://www.npmjs.com/package/wjttc) — path-like files are spawned **directly** (not `npx -y ./path`):
+
+```bash
+npx wjttc certify --mcp ./target/release/your-server
+npx wjttc certify --mcp /usr/local/bin/your-server
+```
+
+| Layer | Role |
+|-------|------|
+| **wjttc** | May run under Node |
+| **Server under test** | Native process — path spawned directly, not `npx -y ./path` |
+
+Still supported (npm launch path):
+
+```bash
+npx wjttc certify --mcp "npx -y your-server"
+```
+
+Optional. No registry change. No extra CLI beyond `wjttc`.  
+See also: [wjttc Quick Start](https://github.com/Wolfe-Jam/wjttc/blob/main/README.md#quick-start) (native binary examples).
+
+---
+
+## 12. What this is not
 
 - Not a claim that cargo-only registry entries are wrong  
 - Not a requirement that every Rust MCP author publish to npm  
@@ -367,8 +395,8 @@ Implementation note for integrators: this server’s stdio framing is **NDJSON**
 
 ## One-line
 
-> Publish the native binary to crates.io and GitHub Releases; publish a thin npm downloader with `mcpName`; keep three versions locked; publish cargo → npm → dual registry. **Node fetches; Rust runs.**
+> Publish the native binary to crates.io and GitHub Releases; publish a thin npm downloader with `mcpName`; keep three versions locked; publish cargo → npm → dual registry. **Node fetches; Rust runs.** Optional: score the binary with `wjttc certify --mcp ./path`.
 
 ---
 
-*Phase 3 public guide · canonical: [mcp-better/docs/DUAL-PACKAGE-RUST-MCP.md](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/DUAL-PACKAGE-RUST-MCP.md) · vault copy: `07-PROJECTS/rust-first/` · 2026-08-08*
+*Phase 3 public guide · teach loop closes with optional native score (4a) · canonical: [mcp-better/docs/DUAL-PACKAGE-RUST-MCP.md](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/DUAL-PACKAGE-RUST-MCP.md) · 2026-08-08*
