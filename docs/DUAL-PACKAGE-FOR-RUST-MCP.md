@@ -34,7 +34,7 @@ So Rust MCP servers are **easier to try** on paths hosts already document, witho
 
 Live examples (same pattern, different identity):
 
-- **mcp-better** — textbook · **AGENTS.md** ≪ the key · `io.github.Wolfe-Jam/mcp-better`
+- **mcp-better** — textbook · **AGENTS.md** · `io.github.Wolfe-Jam/mcp-better`
 - **rust-faf-mcp** — product · `one.faf/rust-faf-mcp` (DNS auth)
 
 Both ship cargo + npm + registry dual at one version.
