@@ -3,6 +3,7 @@
 **Audience:** Rust developers who already have a working MCP **stdio** server and want hosts to start it with **no Rust toolchain**.  
 **Status:** Public guide · 2026-08-08 · from lived n=2  
 **Canonical public path:** [`mcp-better/docs/DUAL-PACKAGE-RUST-MCP.md`](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/DUAL-PACKAGE-RUST-MCP.md)  
+**Why dual-package (short):** [`DUAL-PACKAGE-FOR-RUST-MCP.md`](./DUAL-PACKAGE-FOR-RUST-MCP.md) — positioning + FAQ · cargo stays first.  
 **What this is not:** a new CLI, a protocol change, or a claim that cargo-only publish is invalid.
 
 Lived examples (public):

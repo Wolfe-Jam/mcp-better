@@ -14,6 +14,13 @@ AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock 
 
 > **BEST** (persistent AI project context) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
 
+## Dual-package (optional)
+
+**Cargo stays first.** Optional npm is only an on-ramp to the same native binary for npx-style hosts.
+
+→ [Why dual-package](./docs/DUAL-PACKAGE-FOR-RUST-MCP.md) — positioning + FAQ  
+→ [Full guide (how)](./docs/DUAL-PACKAGE-RUST-MCP.md) — lockstep, publish order, OIDC, score + wire
+
 ## What is 7/28?
 
 | Name | What it is |
@@ -172,7 +179,8 @@ For persistent, versionable AI project context beyond a protocol textbook:
 - [docs/BETTER-BEST.md](./docs/BETTER-BEST.md) — BETTER vs BEST  
 - [GETTING-STARTED.md](./GETTING-STARTED.md)  
 - [docs/SDK-NOTES.md](./docs/SDK-NOTES.md) — `serve` vs Discover honesty  
-- [docs/DUAL-PACKAGE-RUST-MCP.md](./docs/DUAL-PACKAGE-RUST-MCP.md) — ship dual cargo+npm (canonical guide)  
+- [docs/DUAL-PACKAGE-FOR-RUST-MCP.md](./docs/DUAL-PACKAGE-FOR-RUST-MCP.md) — why dual-package (cargo first · FAQ)  
+- [docs/DUAL-PACKAGE-RUST-MCP.md](./docs/DUAL-PACKAGE-RUST-MCP.md) — how: full dual cargo+npm guide  
 - [docs/MCP-DIST-POST.md](./docs/MCP-DIST-POST.md) — lockstep post-step (does not publish)  
 - [SECURITY.md](./SECURITY.md) · [CONTRIBUTING.md](./CONTRIBUTING.md)
 
