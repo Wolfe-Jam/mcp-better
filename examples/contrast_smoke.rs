@@ -48,16 +48,25 @@ async fn probe(bin: &str) -> anyhow::Result<ListProbe> {
     Ok(probe)
 }
 
+fn better_names() -> [String; 3] {
+    [
+        "health".to_string(),
+        "echo".to_string(),
+        "confirm_echo".to_string(),
+    ]
+}
+
 fn is_better_contract(p: &ListProbe) -> bool {
-    p.names == ["health".to_string(), "echo".to_string()]
+    p.names == better_names()
         && matches!(p.ttl_ms, Some(ms) if ms > 0)
         && p.cache_scope == Some(CacheScope::Public)
 }
 
 fn is_lying_surface(p: &ListProbe) -> bool {
     // Unstamped and/or wrong order — either is enough to fail BETTER.
+    // mcp-worse keeps the two-tool reverse order (echo, health) on purpose.
     let unstamped = p.ttl_ms.is_none() || p.cache_scope.is_none();
-    let wrong_order = p.names != ["health".to_string(), "echo".to_string()];
+    let wrong_order = p.names != better_names();
     unstamped || wrong_order
 }
 

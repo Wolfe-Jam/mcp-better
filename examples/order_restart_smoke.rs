@@ -62,8 +62,14 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("process B: {bin}");
     let (names_b, ttl_b, scope_b) = list_names(&bin).await?;
 
-    if names_a != ["health".to_string(), "echo".to_string()] {
-        anyhow::bail!("process A order must be [health, echo], got {names_a:?}");
+    if names_a
+        != [
+            "health".to_string(),
+            "echo".to_string(),
+            "confirm_echo".to_string(),
+        ]
+    {
+        anyhow::bail!("process A order must be [health, echo, confirm_echo], got {names_a:?}");
     }
     if names_a != names_b {
         anyhow::bail!("order not restart-stable: A={names_a:?} B={names_b:?}");

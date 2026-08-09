@@ -59,11 +59,9 @@ async fn main() -> anyhow::Result<()> {
         list.cache_scope
     );
 
-    if !names.contains(&"health") || !names.contains(&"echo") {
-        anyhow::bail!("expected health + echo tools, got {names:?}");
-    }
-    if names != ["health", "echo"] {
-        anyhow::bail!("stable tool order must be [health, echo], got {names:?}");
+    // Must match BETTER_TOOL_ORDER (health → echo → confirm_echo).
+    if names != ["health", "echo", "confirm_echo"] {
+        anyhow::bail!("stable tool order must be [health, echo, confirm_echo], got {names:?}");
     }
 
     match list.ttl_ms {
@@ -113,6 +111,6 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("echo result: {echo:?}");
 
     client.cancel().await?;
-    println!("stdio-client: OK (Discover + stamped list ×6 + health + echo)");
+    println!("stdio-client: OK (Discover + stamped list ×6 + health + echo; catalog includes confirm_echo)");
     Ok(())
 }

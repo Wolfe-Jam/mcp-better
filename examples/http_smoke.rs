@@ -175,8 +175,8 @@ async fn run_checks(client: &reqwest::Client, base: &str) -> anyhow::Result<()> 
         .iter()
         .filter_map(|t| t.get("name").and_then(|n| n.as_str()))
         .collect();
-    if names != ["health", "echo"] {
-        anyhow::bail!("expected [health, echo], got {names:?}");
+    if names != ["health", "echo", "confirm_echo"] {
+        anyhow::bail!("expected [health, echo, confirm_echo], got {names:?}");
     }
 
     let ttl = result.get("ttlMs").and_then(|t| t.as_u64());
@@ -263,7 +263,7 @@ async fn run_checks(client: &reqwest::Client, base: &str) -> anyhow::Result<()> 
     }
 
     println!(
-        "http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · Mcp-Method/Mcp-Name)"
+        "http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · confirm_echo · Mcp-Method/Mcp-Name)"
     );
     Ok(())
 }
