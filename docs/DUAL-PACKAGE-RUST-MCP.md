@@ -10,7 +10,7 @@ Lived examples (public):
 
 | Example | Registry name | Version | crates + npm |
 |---------|---------------|---------|--------------|
-| Textbook | [`io.github.Wolfe-Jam/mcp-better`](https://github.com/Wolfe-Jam/mcp-better) | 0.4.2 | `mcp-better` |
+| Textbook · **AGENTS.md** ≪ the key | [`io.github.Wolfe-Jam/mcp-better`](https://github.com/Wolfe-Jam/mcp-better) | 0.4.2 | `mcp-better` |
 | Product | [`one.faf/rust-faf-mcp`](https://github.com/Wolfe-Jam/rust-faf-mcp) | 0.4.1 | `rust-faf-mcp` |
 
 Recipe notes in-repo: [`mcp-better/docs/MCP-DIST-POST.md`](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/MCP-DIST-POST.md) · [`rust-faf-mcp/docs/TRUSTED-PUBLISHING-NPM.md`](https://github.com/Wolfe-Jam/rust-faf-mcp/blob/main/docs/TRUSTED-PUBLISHING-NPM.md)
@@ -289,7 +289,7 @@ This is intentionally thinner than the OIDC tables above. For field-level DNS au
 
 Same **pattern**, different **layout**. Do not force one workflow shape.
 
-### A. Textbook — `mcp-better@0.4.2`
+### A. Textbook · AGENTS.md ≪ the key — `mcp-better@0.4.2`
 
 | | |
 |--|--|
