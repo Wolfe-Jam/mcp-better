@@ -118,10 +118,7 @@ impl BetterServer {
                                 "required": ["confirm"]
                             }))
                             .map_err(|e| {
-                                McpError::internal_error(
-                                    format!("elicitation schema: {e}"),
-                                    None,
-                                )
+                                McpError::internal_error(format!("elicitation schema: {e}"), None)
                             })?,
                         },
                     )),
@@ -188,10 +185,7 @@ impl BetterServer {
                     "mrtr": "confirm_echo",
                 });
 
-                Ok(CallToolResult::success(vec![ContentBlock::text(
-                    body.to_string(),
-                )])
-                .into())
+                Ok(CallToolResult::success(vec![ContentBlock::text(body.to_string())]).into())
             }
         }
     }
@@ -393,7 +387,9 @@ mod tests {
     #[test]
     fn confirm_echo_round1_input_required() {
         let server = BetterServer::new();
-        let resp = server.confirm_echo_call(confirm_args("hello-mrtr")).unwrap();
+        let resp = server
+            .confirm_echo_call(confirm_args("hello-mrtr"))
+            .unwrap();
         match resp {
             CallToolResponse::InputRequired(ir) => {
                 assert!(ir.result_type.is_input_required());
@@ -408,7 +404,9 @@ mod tests {
     #[test]
     fn confirm_echo_round2_complete_after_confirm() {
         let server = BetterServer::new();
-        let r1 = server.confirm_echo_call(confirm_args("hello-mrtr")).unwrap();
+        let r1 = server
+            .confirm_echo_call(confirm_args("hello-mrtr"))
+            .unwrap();
         let CallToolResponse::InputRequired(ir) = r1 else {
             panic!("round1");
         };
