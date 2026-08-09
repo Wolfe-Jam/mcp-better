@@ -2,7 +2,7 @@
 
 ## Scope
 
-This is a **BETTER** textbook MCP server. Prefer:
+This is a **BETTER** textbook for **AGENTS.md** on **NONE | GOOD | [BETTER] | BEST**. Prefer:
 
 - Protocol honesty (claim only what tests prove)
 - Small surface area on `main`

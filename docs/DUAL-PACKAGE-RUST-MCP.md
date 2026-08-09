@@ -10,7 +10,7 @@ Lived examples (public):
 
 | Example | Registry name | Version | crates + npm |
 |---------|---------------|---------|--------------|
-| Textbook · **AGENTS.md** | [`io.github.Wolfe-Jam/mcp-better`](https://github.com/Wolfe-Jam/mcp-better) | 0.4.2 | `mcp-better` |
+| Textbook · **AGENTS.md** on **NONE\|GOOD\|[BETTER]\|BEST** | [`io.github.Wolfe-Jam/mcp-better`](https://github.com/Wolfe-Jam/mcp-better) | 0.4.2 | `mcp-better` |
 | Product | [`one.faf/rust-faf-mcp`](https://github.com/Wolfe-Jam/rust-faf-mcp) | 0.4.1 | `rust-faf-mcp` |
 
 Recipe notes in-repo: [`mcp-better/docs/MCP-DIST-POST.md`](https://github.com/Wolfe-Jam/mcp-better/blob/main/docs/MCP-DIST-POST.md) · [`rust-faf-mcp/docs/TRUSTED-PUBLISHING-NPM.md`](https://github.com/Wolfe-Jam/rust-faf-mcp/blob/main/docs/TRUSTED-PUBLISHING-NPM.md)
@@ -289,7 +289,9 @@ This is intentionally thinner than the OIDC tables above. For field-level DNS au
 
 Same **pattern**, different **layout**. Do not force one workflow shape.
 
-### A. Textbook · AGENTS.md — `mcp-better@0.4.2`
+### A. Textbook · AGENTS.md on NONE|GOOD|[BETTER]|BEST — `mcp-better@0.4.2`
+
+Textbook for **AGENTS.md** at the **BETTER** step of the ladder (not BEST product DNA).
 
 | | |
 |--|--|
@@ -298,7 +300,7 @@ Same **pattern**, different **layout**. Do not force one workflow shape.
 | Registry auth | GitHub-linked `io.github.*` path |
 | Binaries | cargo-dist targets; hand-rolled `bin/mcp-better.js` |
 | CI shape | Primarily `release.yml` + Environment `release` (binaries + OIDC registries) |
-| Character | Textbook / BETTER purity — dual-package without product identity constraints |
+| Character | Textbook for **AGENTS.md** · **[BETTER]** purity — dual-package without product identity constraints |
 
 ```bash
 ./scripts/mcp-dist-post.sh \

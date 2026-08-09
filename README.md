@@ -2,6 +2,7 @@
 
 **NONE | GOOD | [BETTER] | BEST**
 
+Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER** step.  
 *(protocol **2026-07-28** — the modern MCP release)*
 
 ```text
@@ -12,7 +13,7 @@ AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock 
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
-> **BEST** (persistent AI project context) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
+> **BEST** (persistent project DNA for agents — **AGENTS.md** / FAF at scale) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
 
 ## Dual-package (optional)
 
