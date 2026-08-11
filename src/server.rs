@@ -1,4 +1,4 @@
-//! BETTER textbook MCP server — tools only, stamped list cache.
+//! BETTER textbook MCP server — tools + Agent Skills (J1).
 //!
 //! Protocol claim: **2026-07-28** (stdio default · Streamable HTTP via `--http`).
 //! List results stamp `ttlMs` + `cacheScope` (SEP-2549) — SDK defaults are unstamped.
@@ -6,6 +6,9 @@
 //! `confirm_echo` demonstrates SEP-2322 MRTR (`input_required` → client retry).
 //! Note: `rmcp` tool-router drops `inputResponses` / `requestState`, so MRTR tools
 //! are handled in an explicit `call_tool` override (see `confirm_echo_call`).
+//!
+//! Skills: extension `io.modelcontextprotocol/skills` via custom methods
+//! `skills/list` · `skills/get`; content via `resources/read` + digests.
 
 use rmcp::handler::server::router::tool::ToolRouter;
 use rmcp::handler::server::tool::ToolCallContext;
@@ -16,6 +19,8 @@ use rmcp::{tool, tool_handler, tool_router, ErrorData as McpError, RoleServer, S
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+
+use crate::skills::{handle_skills_method, SkillCatalog, SKILLS_EXTENSION_ID};
 
 /// Catalog is static → public cache with a one-minute freshness window.
 pub const LIST_TOOLS_TTL_MS: u64 = 60_000;
@@ -38,14 +43,25 @@ const CONFIRM_INPUT_KEY: &str = "confirm";
 pub struct BetterServer {
     tool_router: ToolRouter<Self>,
     state_codec: RequestStateCodec,
+    skills: SkillCatalog,
 }
 
 impl BetterServer {
     pub fn new() -> Self {
+        let skills = SkillCatalog::load_lab().unwrap_or_else(|e| {
+            // Textbook must ship with embedded skill; panic only if embed is broken.
+            panic!("failed to load mcp-better-lab skill: {e}");
+        });
         Self {
             tool_router: Self::tool_router(),
             state_codec: RequestStateCodec::new(MRTR_STATE_KEY),
+            skills,
         }
+    }
+
+    /// Skills catalog (for tests / smokes).
+    pub fn skills(&self) -> &SkillCatalog {
+        &self.skills
     }
 
     /// Stamped list result used by the handler and unit tests.
@@ -260,7 +276,17 @@ impl BetterServer {
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for BetterServer {
     fn get_info(&self) -> ServerInfo {
-        let mut info = ServerInfo::new(ServerCapabilities::builder().enable_tools().build());
+        let mut extensions = ExtensionCapabilities::new();
+        extensions.insert(
+            SKILLS_EXTENSION_ID.to_string(),
+            serde_json::from_value(json!({})).expect("empty object"),
+        );
+        let caps = ServerCapabilities::builder()
+            .enable_tools()
+            .enable_resources()
+            .enable_extensions_with(extensions)
+            .build();
+        let mut info = ServerInfo::new(caps);
         info.server_info = Implementation::new("mcp-better", env!("CARGO_PKG_VERSION"));
         // Advertise 7/28 so peers can negotiate SEP-2322 MRTR.
         info.protocol_version = ProtocolVersion::V_2026_07_28;
@@ -268,6 +294,8 @@ impl ServerHandler for BetterServer {
         info.instructions = Some(
             "BETTER textbook MCP server — protocol 2026-07-28. \
              Tools: health (liveness), echo (pure demo), confirm_echo (MRTR textbook). \
+             Skills: extension io.modelcontextprotocol/skills — skills/list · skills/get · \
+             resources/read skill://… (digests). \
              tools/list stamps ttlMs + cacheScope for Discover-compatible clients. \
              Transports: stdio (default) · Streamable HTTP (--http, local demo). \
              MRTR: confirm_echo needs negotiated ≥ 2026-07-28; older clients get a protocol error on input_required."
@@ -296,6 +324,43 @@ impl ServerHandler for BetterServer {
         }
         let tcc = ToolCallContext::new(self, request, context);
         self.tool_router.call(tcc).await
+    }
+
+    async fn list_resources(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListResourcesResult, McpError> {
+        Ok(ListResourcesResult {
+            resources: self.skills.list_resources_meta(),
+            ..Default::default()
+        })
+    }
+
+    async fn read_resource(
+        &self,
+        request: ReadResourceRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ReadResourceResponse, McpError> {
+        let uri = request.uri.as_ref();
+        let res = self.skills.find_resource(uri).ok_or_else(|| {
+            McpError::invalid_params(format!("unknown resource uri: {uri}"), None)
+        })?;
+        Ok(ReadResourceResult::new(vec![ResourceContents::text(
+            res.text.as_ref(),
+            res.uri.clone(),
+        )])
+        .into())
+    }
+
+    /// `skills/list` and `skills/get` — rmcp has no first-class skills methods yet.
+    async fn on_custom_request(
+        &self,
+        request: CustomRequest,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<CustomResult, McpError> {
+        let CustomRequest { method, params, .. } = request;
+        handle_skills_method(&self.skills, method.as_str(), params.as_ref())
     }
 }
 
@@ -457,6 +522,48 @@ mod tests {
         assert!(
             msg.contains("integrity") || msg.contains("requestState") || msg.contains("invalid"),
             "unexpected error: {msg}"
+        );
+    }
+
+    #[test]
+    fn skills_extension_advertised() {
+        let server = BetterServer::new();
+        let info = server.get_info();
+        let caps = info.capabilities;
+        let ext = caps.extensions.expect("extensions");
+        assert!(ext.contains_key(SKILLS_EXTENSION_ID));
+        assert!(caps.resources.is_some());
+    }
+
+    #[test]
+    fn skills_list_get_and_read_digest_match() {
+        use crate::skills::{handle_skills_method, LAB_SKILL_URI};
+        let server = BetterServer::new();
+        let list = handle_skills_method(server.skills(), "skills/list", None).unwrap();
+        let list_val = list.0;
+        let skills = list_val["skills"].as_array().unwrap();
+        assert_eq!(skills.len(), 1);
+        let digest = skills[0]["resources"][0]["digest"].as_str().unwrap();
+        let get = handle_skills_method(
+            server.skills(),
+            "skills/get",
+            Some(&json!({"uri": LAB_SKILL_URI})),
+        )
+        .unwrap();
+        assert_eq!(get.0["uri"], LAB_SKILL_URI);
+        assert_eq!(get.0["resources"][0]["digest"], digest);
+        let res = server.skills().find_resource(LAB_SKILL_URI).unwrap();
+        assert_eq!(res.digest, digest);
+        // resources/read body must match digest (same bytes as catalog)
+        assert_eq!(
+            format!("sha256:{}", {
+                use sha2::{Digest, Sha256};
+                Sha256::digest(res.text.as_bytes())
+                    .iter()
+                    .map(|b| format!("{b:02x}"))
+                    .collect::<String>()
+            }),
+            digest
         );
     }
 

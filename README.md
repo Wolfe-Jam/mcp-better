@@ -22,6 +22,12 @@ AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock 
 → [Why dual-package](./docs/DUAL-PACKAGE-FOR-RUST-MCP.md) — positioning + FAQ  
 → [Full guide (how)](./docs/DUAL-PACKAGE-RUST-MCP.md) — lockstep, publish order, OIDC, score + wire
 
+## Skills over MCP (optional · textbook)
+
+One Agent Skill (`mcp-better-lab`) on the same process as tools:
+
+→ [docs/SKILLS-OVER-MCP.md](./docs/SKILLS-OVER-MCP.md) — extension · `skills/list` · `skills/get` · digests
+
 ## What is 7/28?
 
 | Name | What it is |
