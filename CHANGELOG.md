@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.3] — 2026-08-11 — MRTR + Agent Skills over MCP
+
+**Lesson:** optional modern depth stays textbook — claim = wire.
+
+### Added
+
+- **`confirm_echo`** — SEP-2322 **MRTR** textbook tool (mid-call confirm · sealed `requestState` · `input_required` → retry). See [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md).
+- **Agent Skills over MCP (J1)** — extension `io.modelcontextprotocol/skills` · `skills/list` · `skills/get` · skill `mcp-better-lab` with digests. See [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md).
+- Tool order: **`health` → `echo` → `confirm_echo`** (restart-stable · stamped list).
+
+### Unchanged
+
+- Dual package cargo + npm · identity **`io.github.Wolfe-Jam/mcp-better`** (not `one.faf/*`)
+- Era **7/28** · wire **`2026-07-28`** · stdio default · Streamable HTTP `--http` local demo
+- BETTER purity — no `project.faf` on main
+
+---
+
 ## [0.4.2] — 2026-08-08 — OIDC Trusted Publishing proof
 
 - **OIDC ship path:** `v*` tag triggers crates.io (crates-io-auth-action) + npm Trusted Publishing via Environment `release` — zero long-lived registry tokens after bootstrap.
