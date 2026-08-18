@@ -20,7 +20,7 @@
 | Bind address | Default **`127.0.0.1:8787`**. Do **not** set `MCP_BETTER_HTTP_ADDR=0.0.0.0:…` (or a public interface) unless you fully understand you are exposing an **unauthenticated** MCP endpoint. |
 | Host guards | Loopback-oriented `Host` allowlist (localhost / 127.0.0.1 / ::1 + bound host:port). This is **not** a network ACL — it does not replace bind restriction or a reverse proxy. |
 | Session mode | Stateless for 7/28 (`legacy_session_mode(false)`). No multi-session isolation claim. |
-| SSRF / open proxy | Server does not fetch arbitrary URLs; tools are pure (`health`, `echo`). Still treat any non-loopback bind as hostile. |
+| SSRF / open proxy | Server does not fetch arbitrary URLs; tools are local (`health`, `echo`, `confirm_echo`). Still treat any non-loopback bind as hostile. |
 | Production use | **Out of v0.2.** Use a proper edge (TLS, auth, rate limits) if you front an MCP server for real clients. |
 
 ### Operator checklist (HTTP)

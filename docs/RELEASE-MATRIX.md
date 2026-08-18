@@ -138,6 +138,42 @@ Registry transport    ✅ stdio only by design (HTTP not a second Registry packa
 
 ---
 
+## v0.4.0–v0.4.3 — dual package then MRTR + Skills — **lived**
+
+Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH Releases.
+
+| Cut | Lesson | Registries | Notes |
+|-----|--------|------------|-------|
+| **0.4.0** | Dual package cargo + npm | ✅ | `npx` zero-toolchain |
+| **0.4.1** | npm `mcpName` | ✅ | Registry dual-package metadata |
+| **0.4.2** | OIDC Trusted Publishing | ✅ | tag = cargo + npm |
+| **0.4.3** | **`confirm_echo` MRTR** + Agent Skills | ✅ crates + npm + GH · Registry optional | Tool order **`health` → `echo` → `confirm_echo`** · [v0.4.3](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.4.3) |
+
+**M8 from 0.4.3:** three tools, restart-stable. Not “health + echo only.”
+
+---
+
+## v0.4.4 — book matches 0.4.3 wire (honesty / prep) — **2026-08-18**
+
+**Lesson:** no new tool. Book + GETTING-STARTED name the catalog 0.4.3 already shipped.  
+**Publish:** **not tagged.** crates.io / npm / GH Release stay **0.4.3** until explicit GO tag.
+
+| # | Surface | Required? | v0.4.4 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (Cargo/package.json/server.json/CHANGELOG = **0.4.4**) | **Yes** | ✅ | `scripts/doc-gate.sh` 2026-08-18 |
+| M2 | BETTER purity (`! project.faf` on main) | **Yes** | ✅ | |
+| M3–M4 | Identity `io.github.Wolfe-Jam/mcp-better` · not `one.faf/*` | **Yes** | ✅ | |
+| M5 | `scripts/ci.sh` | **Yes** | ✅ | fmt · clippy · 18 tests · all smokes |
+| M6–M7 | Discover + stamped list | **Yes** | ✅ | same as 0.4.3 |
+| **M8** | Tools = **`health` → `echo` → `confirm_echo`**, stable order | **Yes** | ✅ | wire unchanged; book now matches |
+| M9 | GH CI green on ship SHA | Soft this cut | — | land commit; no tag |
+| M10–M15 | dry-run · crates · npm · tag · Registry | **No this cut** | — | **do not publish** |
+| M17–M18 | HTTP + headers | **Yes** | ✅ | http-smoke catalog includes `confirm_echo` |
+
+**Next lesson cut is 0.5.0 — unnamed.** Do not invent the lesson here.
+
+---
+
 ## Version roadmap × matrix (advance here)
 
 | Gate | v0.1 stdio foundation | v0.2 HTTP + headers | v0.3 deeper correctness |

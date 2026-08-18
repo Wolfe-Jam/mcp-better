@@ -26,7 +26,7 @@ This is the entire BETTER rung in one inequality.
 | README protocol line | “Built for 7/28” | Discover smoke · version on wire |
 | README transports | “Streamable HTTP” | HTTP smoke + header asserts |
 | `tools/list` docs | “cacheable” | `ttlMs` / `cacheScope` asserts |
-| Tool list | “only health + echo” | Exact name vector in tests |
+| Tool list | `health` → `echo` → `confirm_echo` | Exact name vector in tests (`BETTER_TOOL_ORDER`) |
 | SECURITY.md | “local demo only” | Default bind loopback · no auth features advertised as prod |
 | Registry / crates blurb | Version pin | Published artifact matches tag |
 | Blog extract | “10-minute textbook” | Cold path still works |
@@ -98,7 +98,7 @@ v0.3 ships the restart + lying contrast legs. Missing-header HTTP edges remain f
 
 **Good:**
 
-> `tools/list` returns `ttlMs=60000` and `cacheScope=public`; order is `health`, `echo`.
+> `tools/list` returns `ttlMs=60000` and `cacheScope=public`; order is `health`, `echo`, `confirm_echo`.
 
 **Bad:**
 

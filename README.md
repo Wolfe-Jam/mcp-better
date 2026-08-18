@@ -51,6 +51,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.3** | Same era + **deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast |
 | **v0.4** | Same era + **dual package** — cargo + npm shim · `npx mcp-better` with **no Rust toolchain** |
 | **v0.4.3** | Same era + **`confirm_echo` MRTR** (SEP-2322) + **Agent Skills** (`mcp-better-lab`) — see [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
+| **v0.4.4** | Same era + **book matches 0.4.3 wire** — no new tool · catalogs named `health` → `echo` → `confirm_echo` |
 
 ## What BETTER means
 
@@ -96,6 +97,7 @@ cargo install mcp-better --version 0.4.3
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
 # cargo install mcp-better --version 0.4.3 --bin mcp-worse
+# this tree is 0.4.4 (docs honesty, same wire). Registries stay 0.4.3 until tagged.
 ```
 
 > First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.  
@@ -126,7 +128,7 @@ cargo run --release -- --http
 | `echo` | Pure demo — returns `message` unchanged. |
 | `confirm_echo` | Textbook **MRTR** (SEP-2322) — echo after mid-call confirm · sealed `requestState`. |
 
-## Protocol claims (v0.4.3 — same 7/28 era, dual package)
+## Protocol claims (v0.4.4 — same 7/28 era · same 0.4.3 wire)
 
 | Surface | Status |
 |---------|--------|

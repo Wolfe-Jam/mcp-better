@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.4.4] — 2026-08-18 — book matches the 0.4.3 wire
+
+**Lesson:** honesty cut — no new tool. The book names the catalog that already shipped.
+
+### Fixed / honesty
+
+- Textbook + GETTING-STARTED: catalog is **`health` → `echo` → `confirm_echo`** (matches `BETTER_TOOL_ORDER` + stdio-client OK line)
+- Ch 06: `confirm_echo` is one sealed MRTR retry — not a session, not a handle store
+- Ch 15: MRTR + Agent Skills are **on the wire since 0.4.3** — do not re-propose
+- README claims header + lesson table name **0.4.4**; crates.io / npm install pins stay **0.4.3** until this cut is tagged
+
+### Unchanged
+
+- Tools: **`health` → `echo` → `confirm_echo`** (no fourth tool)
+- Dual package cargo + npm · identity **`io.github.Wolfe-Jam/mcp-better`** (not `one.faf/*`)
+- Era **7/28** · wire **`2026-07-28`** · stdio default · Streamable HTTP `--http` local demo
+- BETTER purity — no `project.faf` on main
+
+### Prep
+
+- Surfaces cleared for the next **lesson** cut (**0.5.0** — unnamed). This version is not that lesson.
+
+---
+
 ## [0.4.3] — 2026-08-11 — MRTR + Agent Skills over MCP
 
 **Lesson:** optional modern depth stays textbook — claim = wire.

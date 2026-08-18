@@ -41,7 +41,7 @@ Applies in the same family to other list/read surfaces in the full protocol (`pr
 | **`public`** | Safe to reuse across users/instances when the catalog is the same (typical static demo server) |
 | **`private`** | Cache is not freely shareable (user- or tenant-specific catalog) |
 
-A two-tool textbook with fixed `health` + `echo` is a **public** catalog. Marking it private without reason teaches the wrong default.
+A small textbook catalog with fixed `health` → `echo` → `confirm_echo` is a **public** catalog. Marking it private without reason teaches the wrong default.
 
 ---
 

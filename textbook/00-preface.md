@@ -41,7 +41,7 @@ The goal of this book is **compounding knowledge volume**:
 | Stable vocabulary | Rebrand every minor version as a new “era” |
 | Lab that fails when you lie | Demo that always greets |
 
-The companion binary is **`mcp-better`**: two tools (`health`, `echo`), official Rust `rmcp` 3, Discover-compatible path, stamped `tools/list`, stdio by default, opt-in Streamable HTTP for local teaching. It is deliberately boring.
+The companion binary is **`mcp-better`**: three tools (`health` → `echo` → `confirm_echo`), official Rust `rmcp` 3, Discover-compatible path, stamped `tools/list`, stdio by default, opt-in Streamable HTTP for local teaching. It is deliberately boring. `confirm_echo` is the optional MRTR textbook — not a fourth product surface.
 
 ---
 

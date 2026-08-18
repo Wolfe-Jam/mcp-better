@@ -24,7 +24,7 @@ cargo run --example stdio-client
 Expected last line (exact wording from the example):
 
 ```text
-stdio-client: OK (Discover + stamped list ×6 + health + echo)
+stdio-client: OK (Discover + stamped list ×6 + health + echo; catalog includes confirm_echo)
 ```
 
 Optional: `MCP_BETTER_BIN=/path/to/mcp-better cargo run --example stdio-client`
@@ -51,7 +51,7 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 ```
 
 ```text
-http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · Mcp-Method/Mcp-Name)
+http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · confirm_echo · Mcp-Method/Mcp-Name)
 ```
 
 ## Wire as an MCP server (host smoke)
@@ -86,9 +86,10 @@ which mcp-better   # use this absolute path below
 ### Host smoke checklist
 
 1. Host starts the process (stdio JSON-RPC; logs on **stderr**).
-2. Tools list shows **`health`** then **`echo`** (stable order).
+2. Tools list shows **`health`** → **`echo`** → **`confirm_echo`** (stable order).
 3. Call **`health`** → JSON with `"protocol":"2026-07-28"`, `"tier":"BETTER"`.
 4. Call **`echo`** with `{"message":"hello"}` → `hello`.
+5. Optional: **`confirm_echo`** is the MRTR textbook — not required for the Discover smoke.
 
 Automated Discover smoke (no host UI):
 

@@ -3,7 +3,7 @@
 **Status:** SOLID  
 **Read time:** ~15 minutes hands-on  
 **Depends on:** [03](./03-interop.md)–[08](./08-claim-equals-wire.md) recommended  
-**Pins:** **mcp-better 0.3.0** · protocol **`2026-07-28`**  
+**Pins:** published crates **mcp-better 0.4.3** · this tree **0.4.4** (same wire) · protocol **`2026-07-28`**  
 **Repo:** https://github.com/Wolfe-Jam/mcp-better
 
 ---
@@ -16,7 +16,7 @@ In ≤10 minutes on a machine with Rust, prove:
 |-------|------------------------|
 | Built for 7/28 | Discover path negotiates `2026-07-28` |
 | Stamped list | Positive `ttlMs`, `cacheScope=public` |
-| Stable order | `health` then `echo` |
+| Stable order | `health` → `echo` → `confirm_echo` |
 | Dual transport road | stdio default; HTTP optional local demo |
 
 Copy the **operational contract**, not a megaserver.
@@ -34,8 +34,9 @@ Copy the **operational contract**, not a megaserver.
 ## Path A — Install from crates.io
 
 ```bash
-cargo install mcp-better --version 0.3.0
+cargo install mcp-better --version 0.4.3
 mcp-better --help
+# this tree is 0.4.4 (docs honesty). Registries stay 0.4.3 until tagged.
 ```
 
 First install compiles dependencies once. That wait is normal.
@@ -57,7 +58,7 @@ MCP_BETTER_BIN="$(command -v mcp-better)" cargo run --example stdio-client
 Expect the success line (exact wording from the example binary):
 
 ```text
-stdio-client: OK (Discover + stamped list ×6 + health + echo)
+stdio-client: OK (Discover + stamped list ×6 + health + echo; catalog includes confirm_echo)
 ```
 
 ### Louder proof (v0.3)
@@ -101,10 +102,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 Expect:
 
 ```text
-http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · Mcp-Method/Mcp-Name)
+http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · confirm_echo · Mcp-Method/Mcp-Name)
 ```
 
-What this smoke **proves:** stamped `tools/list`, `health` + `echo` over Streamable HTTP, with routing headers present on the requests it sends.
+What this smoke **proves:** stamped `tools/list` order `health` → `echo` → `confirm_echo`, plus `health` + `echo` calls over Streamable HTTP, with routing headers present on the requests it sends. It asserts `confirm_echo` in the catalog; it does not run the MRTR retry.
 
 What it does **not** prove (yet): Discover lifecycle on HTTP (that is the stdio example’s job), or failure when headers are **missing** (classroom / 0.3 work).
 
@@ -137,9 +138,10 @@ Install or build a binary; use the **absolute path** in host config.
 ### Host checklist
 
 1. Host starts the process (stdio; logs on **stderr**).  
-2. Tools list: **`health`**, then **`echo`**.  
+2. Tools list: **`health`**, then **`echo`**, then **`confirm_echo`**.  
 3. Call **`health`** → tool result text is a JSON object string including `"protocol":"2026-07-28"` and `"tier":"BETTER"` (plus `status`, `server`, `version`).  
-4. Call **`echo`** with `{"message":"hello"}` → the message echoed back (`hello`).
+4. Call **`echo`** with `{"message":"hello"}` → the message echoed back (`hello`).  
+5. Optional: **`confirm_echo`** is the MRTR textbook — not required for the Discover smoke.
 
 Automated Discover smoke remains the source of truth if the host UI is unclear about lifecycle.
 
@@ -151,7 +153,7 @@ Automated Discover smoke remains the source of truth if the host UI is unclear a
 |-------|--------|
 | Lifecycle | Discover client path |
 | List cache | Stamps present |
-| Catalog | Two tools, fixed order |
+| Catalog | `health` → `echo` → `confirm_echo`, fixed order |
 | Transports | stdio and/or HTTP as exercised |
 | Honesty | Smokes exit non-zero when broken |
 

@@ -107,9 +107,9 @@ The **`stdio-client`** example (not the HTTP smoke):
 
 1. Spawns the server binary as a child process.  
 2. Connects with `ClientLifecycleMode::Discover` and preferred version **`V_2026_07_28`**.  
-3. Lists tools twice; asserts stamps + stable order `health`, `echo`.  
-4. Calls `health` and `echo`.  
-5. Prints `stdio-client: OK (Discover + stamped list + health + echo)` and exits 0 only if all asserts pass.
+3. Lists tools (×6); asserts stamps + stable order `health`, `echo`, `confirm_echo`.  
+4. Calls `health` and `echo` (catalog includes `confirm_echo`; smoke does not have to invoke MRTR).  
+5. Prints `stdio-client: OK (Discover + stamped list ×6 + health + echo; catalog includes confirm_echo)` and exits 0 only if all asserts pass.
 
 If Discover or stamps fail, the example **bail!s** (non-zero) — not a soft warning.
 

@@ -72,8 +72,10 @@ Versions add **road inside 7/28**. They do not invent a new protocol era.
 | **0.1** | 7/28 over **stdio** — Discover path, stamped list, stable order, `health`+`echo` | Ch 04–05 · 09 (stdio) |
 | **0.2** | Same era + **Streamable HTTP** road — headers, local-demo honesty | Ch 07 · 09 (HTTP) |
 | **0.3** | **Deeper correctness** — multi-list + restart-order smokes · `mcp-worse` contrast | Ch 05 · 08 · 09 |
-| **0.4** | **Pedagogical tools** (≤2) — protocol concepts only | New micro-lessons + Ch 10 filter |
-| **0.5** | **Matching tiny client** — what a modern client expects | Lab + client chapter |
+| **0.4** | **Dual package** — cargo + npm shim (0.4.0–0.4.2 process road) | Dual-package docs |
+| **0.4.3** | **`confirm_echo` MRTR** + Agent Skills (`mcp-better-lab`) | Ch 06 · 15 · MRTR/Skills docs |
+| **0.4.4** | **Book matches 0.4.3 wire** — no new tool | Ch 00 · 04–09 · 15 · glossary |
+| **0.5** | Next lesson — **unnamed** until earned | — |
 | Later | Extension demos only if core stays pure | Ch 15 · marked extension |
 
 When you cut a version, you cut a **lesson release**:

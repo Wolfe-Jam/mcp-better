@@ -19,7 +19,7 @@
 | **GOOD** | Real MCP with value; often session-era operational habits. |
 | **Handle** | Explicit app-state token passed as tool args after sessions left the core. |
 | **InterOp** | Behaving as a 7/28 peer under a modern client — not merely sharing tool names. |
-| **mcp-better** | Runnable Rust textbook server (health + echo) for 7/28. |
+| **mcp-better** | Runnable Rust textbook server for 7/28 (`health` → `echo` → `confirm_echo`). |
 | **MRTR** | Mid-request tool result pattern (`input_required` / `complete` via `resultType`). |
 | **NONE** | No MCP (or non-protocol glue only). |
 | **Proof surface** | Tests, smokes, and checks that falsify claims when broken. |

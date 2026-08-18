@@ -56,7 +56,7 @@ We claim **everything in v0.1**, plus:
 - Same tools (`health`, `echo`), same stamps, same era string `2026-07-28`  
 - **SECURITY.md** posture: no auth/TLS — **local demo only**  
 
-### v0.3 — deeper correctness (current · 0.3.0)
+### v0.3 — deeper correctness
 
 We claim **everything in v0.2**, plus:
 
@@ -65,11 +65,32 @@ We claim **everything in v0.2**, plus:
 - **Lying companion** — `mcp-worse` + `contrast-smoke` (better passes · worse fails)  
 - Same tools on **mcp-better** (`health`, `echo`); worse is teaching-only  
 
-We do **not** claim on v0.2/v0.3:
+### v0.4 — dual package (cargo + npm)
+
+We claim **everything in v0.3**, plus:
+
+- **npm shim** `mcp-better` downloads the native binary from GitHub Releases (`npx` / no Rust toolchain)  
+- **`server.json` dual packages** — cargo + npm, both stdio, same version  
+- Identity still **`io.github.Wolfe-Jam/mcp-better`** (not `one.faf/*`)
+
+### v0.4.3 — MRTR + Agent Skills (live on registries)
+
+We claim **everything in v0.4**, plus:
+
+- Tool order **`health` → `echo` → `confirm_echo`**  
+- **`confirm_echo`** — SEP-2322 MRTR textbook (mid-call confirm · sealed `requestState`)  
+- Optional **Agent Skills** — extension `io.modelcontextprotocol/skills` · skill `mcp-better-lab`
+
+### v0.4.4 — book matches 0.4.3 wire (this tree · not tagged)
+
+Same claim surface as **v0.4.3**. No new tool. Docs / textbook name the catalog the wire already ships.  
+Published crates.io / npm remain **0.4.3** until an explicit tag.
+
+We do **not** claim on v0.4.3 / v0.4.4:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  
-- Resources, prompts, tasks, OAuth, MRTR demos  
+- Tasks, OAuth, or Skills as the product surface  
 - Server-side Discover “API product” beyond correct wire results under Discover clients  
 - That `mcp-worse` is a supported peer (it is intentionally dishonest)
 

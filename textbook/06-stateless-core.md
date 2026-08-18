@@ -62,7 +62,7 @@ server resolves H to app state (DB, memory map, object store)
 No handle, no shared workflow.  
 That is the post-session model in one diagram.
 
-Season 1 `mcp-better` has **no** multi-call state (health + echo are pure). A future pedagogical tool may demonstrate handles; until then, **document the pattern without shipping a fake session.**
+`health` and `echo` stay **pure** (no multi-call state). `confirm_echo` is the optional MRTR demo: one sealed `requestState` for a single retry — not session identity, not a handle store. Do not treat that retry token as a sticky session.
 
 ---
 

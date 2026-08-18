@@ -130,7 +130,7 @@ Season 2 chapters must still pass the peer test. Flavor is illustration, not pro
 
 | Artifact | Role |
 |----------|------|
-| [mcp-better](https://github.com/Wolfe-Jam/mcp-better) | Runnable BETTER server (health + echo) |
+| [mcp-better](https://github.com/Wolfe-Jam/mcp-better) | Runnable BETTER server (`health` → `echo` → `confirm_echo`) |
 | Spec [2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) | Authority on the wire |
 | [Changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog) | What changed vs prior |
 | Part I extract (live) | [dev.to InterOp](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) |
