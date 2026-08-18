@@ -34,7 +34,7 @@ Copy the **operational contract**, not a megaserver.
 
 ## Path A — Install from crates.io
 
-**Install** is `cargo install`. **Try** without compiling: `npx mcp-better` (the npm package — same binary, not a second server).
+**Install** is `cargo install`. We are Cargo. **Try** without compiling: `npx mcp-better`. We do **not** offer `npm install`.
 
 **First `cargo install` compiles Rust deps once** (often 100+ units — the crate graph, not 100 tools of ours). One-time.
 

@@ -69,8 +69,8 @@ Uses `call_tool_once` so the mid-call retry stays visible. `stdio-client` still 
 
 ## Wire as an MCP server (host smoke)
 
-**Install** is `cargo install` (or a local `cargo build --release` binary).  
-**Try** without compiling: `npx mcp-better` (npm package runs the same Release binary). npm is that package — not the install.
+**Install** is `cargo install` (or a local `cargo build --release` binary). We are Cargo.  
+**Try** without compiling: `npx mcp-better`. We do **not** offer `npm install`.
 
 **First `cargo install` compiles Rust deps once** (often 100+ units). One-time.
 

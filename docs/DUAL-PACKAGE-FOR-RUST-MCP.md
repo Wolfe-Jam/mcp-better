@@ -1,6 +1,6 @@
 # Dual-package for Rust MCP servers
 
-**Cargo stays first.** An optional npm package is only an on-ramp so more hosts can start the **same native binary**.
+**We are Cargo.** Install is `cargo install`. An npm package exists so `npx` / some hosts can start the **same native binary**. We do **not** offer `npm install` as an option.
 
 This page is the **why** (positioning + FAQ). Step-by-step publish: [Full guide — DUAL-PACKAGE-RUST-MCP.md](./DUAL-PACKAGE-RUST-MCP.md).
 
@@ -30,7 +30,7 @@ So Rust MCP servers are **easier to try** on paths hosts already document, witho
 |-----|----------------|
 | **Install** | `cargo install` — crates.io, native binary. **First hit compiles Rust deps once** (often 100+ units). |
 | **Try (suggested)** | `npx mcp-better` — same binary, no Rust, no compile |
-| **npm** | The package `npx` runs. Not a second implementation. Not the textbook install. |
+| **npm** | Shim so `npx` works. Same binary. **Not** `npm install`. Not a second implementation. |
 | Authors | Optional publish path — not required |
 
 Live examples (same pattern, different identity):

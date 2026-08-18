@@ -17,7 +17,7 @@ AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock 
 
 ## Dual-package (optional)
 
-**Cargo stays first.** Optional npm is only an on-ramp to the same native binary for npx-style hosts.
+**We are Cargo.** Install is `cargo install`. `npx` is a try path. We do **not** offer `npm install` as an option.
 
 → [Why dual-package](./docs/DUAL-PACKAGE-FOR-RUST-MCP.md) — positioning + FAQ  
 → [Full guide (how)](./docs/DUAL-PACKAGE-RUST-MCP.md) — lockstep, publish order, OIDC, score + wire
@@ -66,9 +66,9 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 | Path | What it is |
 |------|------------|
-| **`npx mcp-better`** | **Suggested try** — no Rust, no compile. Runs the npm shim once. |
-| **`cargo install mcp-better`** | **The install** — crates.io, native binary on PATH. |
-| **npm** | The **package** `npx` uses. Same GitHub Release binary. Not a second server. Not the textbook install. |
+| **`cargo install mcp-better`** | **The install** — we are Cargo. crates.io, native binary on PATH. |
+| **`npx mcp-better`** | **Suggested try** — no Rust, no compile. Not the install. |
+| **npm** | A published **shim** so `npx` / some hosts can start the same binary. We do **not** offer `npm install` / `npm i -g`. |
 
 ### Try (suggested) — `npx`
 
