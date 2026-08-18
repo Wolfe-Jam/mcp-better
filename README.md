@@ -64,13 +64,18 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 ## Quickstart (≤10 min)
 
-### Zero Rust — npm / npx (v0.4+)
+| Path | What it is |
+|------|------------|
+| **`npx mcp-better`** | **Suggested try** — no Rust, no compile. Runs the npm shim once. |
+| **`cargo install mcp-better`** | **The install** — crates.io, native binary on PATH. |
+| **npm** | The **package** `npx` uses. Same GitHub Release binary. Not a second server. Not the textbook install. |
+
+### Try (suggested) — `npx`
 
 ```bash
-# No Rust toolchain required. Downloads the native binary from GitHub Releases.
+# No Rust toolchain. Downloads the native binary from GitHub Releases.
 npx mcp-better --help
 npx mcp-better
-# hosts: point stdio command at `npx` / `mcp-better` from the npm package
 ```
 
 ### From source / crates.io (Rust 1.85+)
@@ -91,13 +96,13 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```
 
-**stdio** (default — Cursor / Claude Desktop):
+**Install** (crates.io) — stdio default (Cursor / Claude Desktop):
 
-**First `cargo install` compiles Rust deps once** (often 100+ units — `rmcp` / `tokio` / …, not 100 tools of ours). One-time; then the binary is instant. Skip the compile: `npx mcp-better`.
+**First `cargo install` compiles Rust deps once** (often 100+ units — `rmcp` / `tokio` / …, not 100 tools of ours). One-time; then the binary is instant. To skip that compile, **try** with `npx mcp-better` (above) — that is not the install.
 
 ```bash
 cargo run --release
-# or from crates.io — first hit compiles deps once (see above):
+# install from crates.io — first hit compiles deps once (see above):
 cargo install mcp-better --version 0.5.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):

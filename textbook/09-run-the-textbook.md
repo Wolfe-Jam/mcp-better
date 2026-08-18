@@ -34,7 +34,9 @@ Copy the **operational contract**, not a megaserver.
 
 ## Path A — Install from crates.io
 
-**First `cargo install` compiles Rust deps once** (often 100+ units — the crate graph, not 100 tools of ours). One-time. Skip the compile: `npx mcp-better`.
+**Install** is `cargo install`. **Try** without compiling: `npx mcp-better` (the npm package — same binary, not a second server).
+
+**First `cargo install` compiles Rust deps once** (often 100+ units — the crate graph, not 100 tools of ours). One-time.
 
 ```bash
 # first hit compiles deps once — then the binary is instant
