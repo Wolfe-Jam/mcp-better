@@ -1,6 +1,6 @@
 [package]
 name = "mcp-better"
-version = "0.4.4"
+version = "0.5.0"
 edition = "2021"
 rust-version = "1.85"
 authors = ["Wolfe-Jam <wolfejam@faf.one>"]
@@ -67,6 +67,10 @@ path = "examples/order_restart_smoke.rs"
 [[example]]
 name = "contrast-smoke"
 path = "examples/contrast_smoke.rs"
+
+[[example]]
+name = "mrtr-client"
+path = "examples/mrtr_client.rs"
 
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

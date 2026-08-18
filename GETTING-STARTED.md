@@ -54,6 +54,19 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 http-smoke: OK (Streamable HTTP · tools/list stamped · health · echo · confirm_echo · Mcp-Method/Mcp-Name)
 ```
 
+### Matching client (v0.5) — complete `confirm_echo`
+
+```bash
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
+```
+
+```text
+mrtr-client: OK (Discover + confirm_echo R1 input_required → R2 complete · reject wrong confirm · reject tampered state)
+```
+
+Uses `call_tool_once` so the mid-call retry stays visible. `stdio-client` still does not invoke MRTR.
+
 ## Wire as an MCP server (host smoke)
 
 Install from crates (or use a local `cargo build --release` binary):

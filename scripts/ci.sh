@@ -32,6 +32,9 @@ echo "==> Discover smoke (stdio)"
 cargo build --bins
 cargo run --example stdio-client
 
+echo "==> MRTR matching client (confirm_echo R1→R2)"
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
+
 echo "==> Order restart smoke (two processes)"
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example order-restart-smoke
 

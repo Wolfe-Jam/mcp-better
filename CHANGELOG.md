@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.5.0] — 2026-08-18 — matching client completes MRTR
+
+**Lesson:** the peer is two-sided. 0.4.3 proved the server can pause; this cut is the client that resumes.
+
+### Added
+
+- **`mrtr-client` example** — Discover `2026-07-28`, then `confirm_echo` R1 `input_required` → echo sealed `requestState` + `CONFIRM` → complete. Rejects wrong confirm text and tampered state. Uses `call_tool_once` so the retry stays visible.
+- CI: `scripts/ci.sh` runs the matching-client smoke after stdio-client.
+
+### Unchanged
+
+- Tools: **`health` → `echo` → `confirm_echo`** (no fourth tool)
+- Dual package cargo + npm · identity **`io.github.Wolfe-Jam/mcp-better`**
+- Era **7/28** · wire **`2026-07-28`**
+- BETTER purity — no `project.faf` on main
+- `stdio-client` Discover baseline (OK line unchanged)
+
+### Note
+
+- 0.4.4 honesty (book = 0.4.3 wire) rides in this tree. Registries stay **0.4.3** until `v0.5.0` is tagged.
+
+---
+
 ## [0.4.4] — 2026-08-18 — book matches the 0.4.3 wire
 
 **Lesson:** honesty cut — no new tool. The book names the catalog that already shipped.

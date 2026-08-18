@@ -52,6 +52,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.4** | Same era + **dual package** — cargo + npm shim · `npx mcp-better` with **no Rust toolchain** |
 | **v0.4.3** | Same era + **`confirm_echo` MRTR** (SEP-2322) + **Agent Skills** (`mcp-better-lab`) — see [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
 | **v0.4.4** | Same era + **book matches 0.4.3 wire** — no new tool · catalogs named `health` → `echo` → `confirm_echo` |
+| **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` finishes `confirm_echo` |
 
 ## What BETTER means
 
@@ -86,6 +87,8 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
   MCP_WORSE_BIN="$(pwd)/target/debug/mcp-worse" \
   cargo run --example contrast-smoke
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
+# 0.5 matching client (completes confirm_echo)
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```
 
 **stdio** (default — Cursor / Claude Desktop):
@@ -97,7 +100,7 @@ cargo install mcp-better --version 0.4.3
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
 # cargo install mcp-better --version 0.4.3 --bin mcp-worse
-# this tree is 0.4.4 (docs honesty, same wire). Registries stay 0.4.3 until tagged.
+# this tree is 0.5.0 (matching client). Registries stay 0.4.3 until tagged.
 ```
 
 > First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.  
@@ -128,7 +131,7 @@ cargo run --release -- --http
 | `echo` | Pure demo — returns `message` unchanged. |
 | `confirm_echo` | Textbook **MRTR** (SEP-2322) — echo after mid-call confirm · sealed `requestState`. |
 
-## Protocol claims (v0.4.4 — same 7/28 era · same 0.4.3 wire)
+## Protocol claims (v0.5.0 — same 7/28 era · matching client completes MRTR)
 
 | Surface | Status |
 |---------|--------|
@@ -138,7 +141,7 @@ cargo run --release -- --http
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
 | Capabilities | **tools** · **resources** (skill docs) · **experimental** skills extension |
 | List cache | **`ttlMs=60000`**, **`cacheScope=public`**, order **`health`→`echo`→`confirm_echo`** (restart-stable) |
-| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) |
+| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
 | Lying companion | **`mcp-worse`** — unstamped + reversed order (contrast-smoke only) |
 | OAuth / tasks | out of hero |

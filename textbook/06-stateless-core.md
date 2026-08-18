@@ -64,6 +64,8 @@ That is the post-session model in one diagram.
 
 `health` and `echo` stay **pure** (no multi-call state). `confirm_echo` is the optional MRTR demo: one sealed `requestState` for a single retry — not session identity, not a handle store. Do not treat that retry token as a sticky session.
 
+The **matching client** (`mrtr-client`, v0.5) is the other half: Discover, then echo that sealed token with `CONFIRM`. A client that only calls `health`/`echo` never touches mid-call. The retry is one POST with echoed state — not a held session.
+
 ---
 
 ## SDK plumbing vs protocol identity

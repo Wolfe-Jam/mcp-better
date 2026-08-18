@@ -75,7 +75,7 @@ Versions add **road inside 7/28**. They do not invent a new protocol era.
 | **0.4** | **Dual package** — cargo + npm shim (0.4.0–0.4.2 process road) | Dual-package docs |
 | **0.4.3** | **`confirm_echo` MRTR** + Agent Skills (`mcp-better-lab`) | Ch 06 · 15 · MRTR/Skills docs |
 | **0.4.4** | **Book matches 0.4.3 wire** — no new tool | Ch 00 · 04–09 · 15 · glossary |
-| **0.5** | Next lesson — **unnamed** until earned | — |
+| **0.5** | **Matching client completes MRTR** — `mrtr-client` | Ch 06 · 09 · MRTR doc |
 | Later | Extension demos only if core stays pure | Ch 15 · marked extension |
 
 When you cut a version, you cut a **lesson release**:

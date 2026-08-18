@@ -85,6 +85,32 @@ The `rmcp` SDK only delivers `InputRequiredResult` to peers that negotiated **`2
 - Upstream example (when present in your `rmcp` tree): `examples/servers/src/mrtr.rs` / crate tests `test_mrtr_behavior.rs`
 - Vault placement: PLANET-FAF `CHECKLIST-728-QUALITY.md` **A8** (conditional) · `MRTR-PLACEMENT.md`
 
+## Matching client (v0.5)
+
+The server half shipped in 0.4.3. The **client** half is `examples/mrtr_client.rs`.
+
+It uses `call_tool_once` (not auto-`call_tool`) so the retry stays visible:
+
+```text
+Discover 2026-07-28
+tools/list → health → echo → confirm_echo
+confirm_echo R1 → input_required + requestState
+confirm_echo R2 → CONFIRM + echoed state → complete
+wrong CONFIRM → -32602
+tampered state → -32602 integrity
+```
+
+```bash
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
+```
+
+```text
+mrtr-client: OK (Discover + confirm_echo R1 input_required → R2 complete · reject wrong confirm · reject tampered state)
+```
+
+`stdio-client` still lists `confirm_echo` and does not invoke it. That is the Discover baseline.
+
 ## What this is not
 
 - Not a dual-package requirement  

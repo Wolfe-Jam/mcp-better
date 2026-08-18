@@ -170,7 +170,24 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 | M10–M15 | dry-run · crates · npm · tag · Registry | **No this cut** | — | **do not publish** |
 | M17–M18 | HTTP + headers | **Yes** | ✅ | http-smoke catalog includes `confirm_echo` |
 
-**Next lesson cut is 0.5.0 — unnamed.** Do not invent the lesson here.
+**Next lesson cut is 0.5.0 — matching client completes MRTR.**
+
+---
+
+## v0.5.0 — matching client completes MRTR — **2026-08-18**
+
+**Lesson:** client resumes `confirm_echo` (R1 `input_required` → R2 complete). No new tool.  
+**Publish:** **not tagged** until explicit GO. crates.io / npm stay **0.4.3**.
+
+| # | Surface | Required? | v0.5.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (lockstep **0.5.0**) | **Yes** | ✅ | 2026-08-18 |
+| M2 | BETTER purity | **Yes** | ✅ | |
+| M5 | `scripts/ci.sh` (incl. **mrtr-client**) | **Yes** | ✅ | |
+| **M8** | Tools `health` → `echo` → `confirm_echo` | **Yes** | ✅ | no fourth tool |
+| **M25** | **mrtr-client** R1→R2 + reject paths | **Yes** | ✅ | `call_tool_once` |
+| M10–M15 | dry-run · crates · npm · tag · Registry | **No until GO tag** | — | |
+| M17–M18 | HTTP + headers | **Yes** | ✅ | retained |
 
 ---
 

@@ -81,12 +81,21 @@ We claim **everything in v0.4**, plus:
 - **`confirm_echo`** — SEP-2322 MRTR textbook (mid-call confirm · sealed `requestState`)  
 - Optional **Agent Skills** — extension `io.modelcontextprotocol/skills` · skill `mcp-better-lab`
 
-### v0.4.4 — book matches 0.4.3 wire (this tree · not tagged)
+### v0.4.4 — book matches 0.4.3 wire
 
-Same claim surface as **v0.4.3**. No new tool. Docs / textbook name the catalog the wire already ships.  
+Same claim surface as **v0.4.3**. No new tool. Docs / textbook name the catalog the wire already ships.
+
+### v0.5.0 — matching client completes MRTR (this tree · not tagged)
+
+We claim **everything in v0.4.3**, plus:
+
+- **`mrtr-client` example** — Discover + `confirm_echo` R1→R2 via `call_tool_once`  
+- Fail paths: wrong confirm text · tampered `requestState`  
+- No fourth tool. No new protocol era.
+
 Published crates.io / npm remain **0.4.3** until an explicit tag.
 
-We do **not** claim on v0.4.3 / v0.4.4:
+We do **not** claim on v0.4.3 / v0.5.0:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  

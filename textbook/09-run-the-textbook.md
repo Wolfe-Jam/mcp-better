@@ -3,7 +3,7 @@
 **Status:** SOLID  
 **Read time:** ~15 minutes hands-on  
 **Depends on:** [03](./03-interop.md)–[08](./08-claim-equals-wire.md) recommended  
-**Pins:** published crates **mcp-better 0.4.3** · this tree **0.4.4** (same wire) · protocol **`2026-07-28`**  
+**Pins:** published crates **mcp-better 0.4.3** · this tree **0.5.0** (matching client) · protocol **`2026-07-28`**  
 **Repo:** https://github.com/Wolfe-Jam/mcp-better
 
 ---
@@ -18,6 +18,7 @@ In ≤10 minutes on a machine with Rust, prove:
 | Stamped list | Positive `ttlMs`, `cacheScope=public` |
 | Stable order | `health` → `echo` → `confirm_echo` |
 | Dual transport road | stdio default; HTTP optional local demo |
+| Matching client | `mrtr-client` completes `confirm_echo` (v0.5) |
 
 Copy the **operational contract**, not a megaserver.
 
@@ -36,7 +37,7 @@ Copy the **operational contract**, not a megaserver.
 ```bash
 cargo install mcp-better --version 0.4.3
 mcp-better --help
-# this tree is 0.4.4 (docs honesty). Registries stay 0.4.3 until tagged.
+# this tree is 0.5.0 (matching client). Registries stay 0.4.3 until tagged.
 ```
 
 First install compiles dependencies once. That wait is normal.
@@ -77,6 +78,23 @@ contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it
 ```
 
 `mcp-worse` is a **lying companion** (teaching only): same tool names, unstamped list, reversed order. Do not point hosts at it.
+
+### Path C — matching client (v0.5)
+
+`stdio-client` lists `confirm_echo` and does **not** invoke it. The matching client finishes the mid-call:
+
+```bash
+cargo build --bins
+MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
+```
+
+Expect (exact wording from the example binary):
+
+```text
+mrtr-client: OK (Discover + confirm_echo R1 input_required → R2 complete · reject wrong confirm · reject tampered state)
+```
+
+What this smoke **proves:** Discover + stamped catalog, then `confirm_echo` round 1 `input_required` + sealed `requestState`, round 2 `CONFIRM` + echoed state → complete. Wrong confirm text and tampered state fail. It uses `call_tool_once` so the retry is visible (not hidden behind auto-MRTR).
 
 ---
 
