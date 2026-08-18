@@ -4,7 +4,8 @@
 .env
 .env.*
 !.env.example
-project.faf
+# project.faf intentionally NOT ignored on better-best/* branches — that's
+# the BEST print slice itself. Ignored again the moment this merges to main.
 .faf
 CLAUDE.md
 AGENTS.md

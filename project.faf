@@ -1,0 +1,51 @@
+faf_version: "3.0"
+project:
+  name: mcp-better
+  goal: AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook). npm shim downloads the native binary from GitHub Releases.
+  main_language: Rust
+  type: cli
+stack:
+  frontend: slotignored
+  css_framework: slotignored
+  ui_library: slotignored
+  state_management: slotignored
+  backend: slotignored
+  api_type: slotignored
+  runtime: slotignored
+  database: slotignored
+  connection: slotignored
+  hosting: crates.io + npm (dual package)
+  build: cargo
+  cicd: GitHub Actions
+  monorepo_tool: slotignored
+  package_manager: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+human_context:
+  who: MCP server builders and AAIF reviewers who want a working, honest reference for the 2026-07-28 protocol era
+  what: AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook). npm shim downloads the native binary from GitHub Releases.
+  why: Official SDK defaults ship unstamped tools/list results and legacy-only lifecycle support; mcp-better proves honest 7/28 claims (stamped list cache, Discover, MRTR) are achievable and tested, not aspirational
+  where: https://github.com/Wolfe-Jam/mcp-better
+  when: BETTER product on main/v0.4.3 (2026-08-11); BEST print slice on better-best/* branches
+  how: cargo build --release, cargo test, cargo run --release; npx mcp-better (no Rust toolchain)
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
+tech_stack:
+  - Rust
+key_files:
+  - package.json
+  - Cargo.toml
+  - src/main.rs
+  - src/lib.rs
+  - README.md
+commands:
+  build: cargo build --release
+  test: cargo test
+  lint: cargo clippy
