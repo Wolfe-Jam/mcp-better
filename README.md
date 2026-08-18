@@ -96,11 +96,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # or from crates.io:
-cargo install mcp-better --version 0.4.3
+cargo install mcp-better --version 0.5.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.4.3 --bin mcp-worse
-# this tree is 0.5.0 (matching client). Registries stay 0.4.3 until tagged.
+# cargo install mcp-better --version 0.5.0 --bin mcp-worse
 ```
 
 > First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.  

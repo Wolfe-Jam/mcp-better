@@ -177,7 +177,7 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 ## v0.5.0 — matching client completes MRTR — **2026-08-18**
 
 **Lesson:** client resumes `confirm_echo` (R1 `input_required` → R2 complete). No new tool.  
-**Publish:** **not tagged** until explicit GO. crates.io / npm stay **0.4.3**.
+**Publish:** **v0.5.0** tagged · crates + npm + GH Release live. MCP Registry separate.
 
 | # | Surface | Required? | v0.5.0 | Notes |
 |---|---------|:---------:|:------:|-------|
@@ -186,7 +186,10 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 | M5 | `scripts/ci.sh` (incl. **mrtr-client**) | **Yes** | ✅ | |
 | **M8** | Tools `health` → `echo` → `confirm_echo` | **Yes** | ✅ | no fourth tool |
 | **M25** | **mrtr-client** R1→R2 + reject paths | **Yes** | ✅ | `call_tool_once` |
-| M10–M15 | dry-run · crates · npm · tag · Registry | **No until GO tag** | — | |
+| M11 | crates.io | **Yes** | ✅ | **0.5.0** |
+| npm | npm `mcp-better` | **Yes** | ✅ | **0.5.0** · mcpName present |
+| M13–M14 | tag + GH Release | **Yes** | ✅ | [v0.5.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.5.0) |
+| M15 | MCP Registry | Soft | — | separate human step |
 | M17–M18 | HTTP + headers | **Yes** | ✅ | retained |
 
 ---

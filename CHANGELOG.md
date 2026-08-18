@@ -19,7 +19,7 @@
 
 ### Note
 
-- 0.4.4 honesty (book = 0.4.3 wire) rides in this tree. Registries stay **0.4.3** until `v0.5.0` is tagged.
+- 0.4.4 honesty (book = 0.4.3 wire) rides in this tree. **Published** `v0.5.0` (crates + npm + GH Release).
 
 ---
 

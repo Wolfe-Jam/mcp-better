@@ -85,7 +85,7 @@ We claim **everything in v0.4**, plus:
 
 Same claim surface as **v0.4.3**. No new tool. Docs / textbook name the catalog the wire already ships.
 
-### v0.5.0 — matching client completes MRTR (this tree · not tagged)
+### v0.5.0 — matching client completes MRTR (live)
 
 We claim **everything in v0.4.3**, plus:
 
@@ -93,7 +93,7 @@ We claim **everything in v0.4.3**, plus:
 - Fail paths: wrong confirm text · tampered `requestState`  
 - No fourth tool. No new protocol era.
 
-Published crates.io / npm remain **0.4.3** until an explicit tag.
+Published crates.io / npm / GH Release = **0.5.0**.
 
 We do **not** claim on v0.4.3 / v0.5.0:
 

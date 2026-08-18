@@ -3,7 +3,7 @@
 **Status:** SOLID  
 **Read time:** ~15 minutes hands-on  
 **Depends on:** [03](./03-interop.md)–[08](./08-claim-equals-wire.md) recommended  
-**Pins:** published crates **mcp-better 0.4.3** · this tree **0.5.0** (matching client) · protocol **`2026-07-28`**  
+**Pins:** **mcp-better 0.5.0** · protocol **`2026-07-28`**  
 **Repo:** https://github.com/Wolfe-Jam/mcp-better
 
 ---
@@ -35,9 +35,8 @@ Copy the **operational contract**, not a megaserver.
 ## Path A — Install from crates.io
 
 ```bash
-cargo install mcp-better --version 0.4.3
+cargo install mcp-better --version 0.5.0
 mcp-better --help
-# this tree is 0.5.0 (matching client). Registries stay 0.4.3 until tagged.
 ```
 
 First install compiles dependencies once. That wait is normal.

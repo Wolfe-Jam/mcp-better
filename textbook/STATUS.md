@@ -17,7 +17,7 @@
 | 06 | Stateless core | SOLID | `confirm_echo` = sealed retry; `mrtr-client` is the other half |
 | 07 | Transports | SOLID | Env precedence; http-smoke happy-path only |
 | 08 | Claim = wire | SOLID | Tool-list claim = `BETTER_TOOL_ORDER` |
-| 09 | Lab | SOLID | Path C = `mrtr-client` · pins 0.4.3 published / 0.5.0 this tree |
+| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.5.0** live |
 | 10 | What we resist | SOLID | |
 | A | Spec map | SOLID | Header precision |
 | B | Glossary | SOLID | mcp-better = three-tool catalog |
@@ -77,7 +77,7 @@ Binary remains source of truth if docs and wire disagree again.
 | Extract | Canonical chapter | Live URL | AAIF |
 |---------|-------------------|----------|------|
 | Part I InterOp | 03 (+ 09 lab slice) | [dev.to](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) | [#363](https://github.com/aaif/ambassadors/issues/363) **20 tutorial** ✅ |
-| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.4.3** (this tree 0.5.0) | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
+| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.5.0** | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
 
 **Policy:** teach points for protocol lessons; product once; no semver diary filings.
 
