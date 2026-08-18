@@ -28,7 +28,7 @@ So Rust MCP servers are **easier to try** on paths hosts already document, witho
 
 | Who | What they get |
 |-----|----------------|
-| Cargo users | Unchanged — `cargo install`, crates.io, native binary |
+| Cargo users | Unchanged — `cargo install`, crates.io, native binary. **First install compiles Rust deps once** (often 100+ units). |
 | npx-oriented users / hosts | Same binary, familiar start command |
 | Authors | Optional publish path — not required |
 

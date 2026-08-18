@@ -93,17 +93,16 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 
 **stdio** (default — Cursor / Claude Desktop):
 
+**First `cargo install` compiles Rust deps once** (often 100+ units — `rmcp` / `tokio` / …, not 100 tools of ours). One-time; then the binary is instant. Skip the compile: `npx mcp-better`.
+
 ```bash
 cargo run --release
-# or from crates.io:
+# or from crates.io — first hit compiles deps once (see above):
 cargo install mcp-better --version 0.5.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
 # cargo install mcp-better --version 0.5.0 --bin mcp-worse
 ```
-
-> First cargo install compiles the ecosystem once (not 100+ of our tools — just Rust deps). One-time wait; then you’re done.  
-> Prefer **no compile**? Use `npx mcp-better` (npm shim).
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
 

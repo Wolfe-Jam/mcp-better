@@ -34,12 +34,13 @@ Copy the **operational contract**, not a megaserver.
 
 ## Path A — Install from crates.io
 
+**First `cargo install` compiles Rust deps once** (often 100+ units — the crate graph, not 100 tools of ours). One-time. Skip the compile: `npx mcp-better`.
+
 ```bash
+# first hit compiles deps once — then the binary is instant
 cargo install mcp-better --version 0.5.0
 mcp-better --help
 ```
-
-First install compiles dependencies once. That wait is normal.
 
 ### Run stdio
 
