@@ -1,4 +1,6 @@
-//! Contrast smoke: mcp-better passes the BETTER list contract; mcp-worse deliberately fails it.
+//! Contrast smoke: mcp-better passes the BETTER list contract; mcp-worse fails
+//! **each** teaching clause (unstamped · names≠better). Partial companion decay
+//! fails closed and names the clause.
 //!
 //!   cargo build --bins
 //!   cargo run --example contrast-smoke
@@ -62,12 +64,12 @@ fn is_better_contract(p: &ListProbe) -> bool {
         && p.cache_scope == Some(CacheScope::Public)
 }
 
-fn is_lying_surface(p: &ListProbe) -> bool {
-    // Unstamped and/or wrong order — either is enough to fail BETTER.
-    // mcp-worse keeps the two-tool reverse order (echo, health) on purpose.
-    let unstamped = p.ttl_ms.is_none() || p.cache_scope.is_none();
-    let wrong_order = p.names != better_names();
-    unstamped || wrong_order
+fn is_unstamped(p: &ListProbe) -> bool {
+    p.ttl_ms.is_none() || p.cache_scope.is_none()
+}
+
+fn wrong_names(p: &ListProbe) -> bool {
+    p.names != better_names()
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -112,18 +114,26 @@ async fn main() -> anyhow::Result<()> {
         worse_probe.ttl_ms,
         worse_probe.cache_scope
     );
-    if !is_lying_surface(&worse_probe) {
+    if !is_unstamped(&worse_probe) {
         anyhow::bail!(
-            "mcp-worse must violate BETTER list contract for teaching, but it passed: names={:?} ttl={:?} scope={:?}",
-            worse_probe.names,
+            "mcp-worse stamp clause went green (must stay unstamped): ttl={:?} scope={:?}",
             worse_probe.ttl_ms,
             worse_probe.cache_scope
+        );
+    }
+    if !wrong_names(&worse_probe) {
+        anyhow::bail!(
+            "mcp-worse names clause went green (must stay ≠ {:?}): names={:?}",
+            better_names(),
+            worse_probe.names
         );
     }
     if is_better_contract(&worse_probe) {
         anyhow::bail!("mcp-worse unexpectedly satisfies BETTER contract — companion is broken");
     }
 
-    println!("contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it)");
+    println!(
+        "contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)"
+    );
     Ok(())
 }

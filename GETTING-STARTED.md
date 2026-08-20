@@ -41,7 +41,7 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
 
 ```text
 order-restart-smoke: OK (two processes · same order · same stamps)
-contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it)
+contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)
 ```
 
 HTTP happy-path (spawns the binary itself — build bins first):

@@ -76,7 +76,7 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
 
 ```text
 order-restart-smoke: OK (two processes · same order · same stamps)
-contrast-smoke: OK (mcp-better passes BETTER list contract · mcp-worse fails it)
+contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)
 ```
 
 `mcp-worse` is a **lying companion** (teaching only): same tool names, unstamped list, reversed order. Do not point hosts at it.
