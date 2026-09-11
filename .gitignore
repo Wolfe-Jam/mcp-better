@@ -4,10 +4,6 @@
 .env
 .env.*
 !.env.example
-project.faf
-.faf
-CLAUDE.md
-AGENTS.md
 
 # mcp-publisher local auth (never commit)
 .mcpregistry_github_token
