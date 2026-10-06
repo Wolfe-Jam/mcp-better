@@ -32,7 +32,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 | **NONE** | No MCP / no agent context discipline |
 | **GOOD** | MCP works (often legacy initialize, unstamped lists, mixed protocol claims) |
 | **BETTER** | Modern MCP **honestly** built for **7/28** — Discover, stamped lists, claimed = tested · **AGENTS.md**-ready protocol surface |
-| **BEST** | Persistent project DNA for agents (**AGENTS.md** / FAF) — **[faf.one/agents](https://faf.one/agents)** |
+| **BEST** | BETTER **plus** `project.faf` resident **and used** (persistent project context that authors the agent files) — **[faf.one/agents](https://faf.one/agents)** |
 
 ## mcp-better = BETTER textbook for AGENTS.md (7/28)
 

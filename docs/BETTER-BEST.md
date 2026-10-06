@@ -1,7 +1,7 @@
 # BETTER vs BEST
 
 **Scale:** `NONE | GOOD | [BETTER] | BEST`  
-**mcp-better** is the **BETTER** textbook for **AGENTS.md** — modern MCP honesty on the wire. **BEST** is persistent agent DNA (AGENTS.md / FAF), not this repo.
+**mcp-better** is the **BETTER** textbook for **AGENTS.md** — modern MCP honesty on the wire. **BEST** is BETTER plus `project.faf` resident **and used** (persistent project context that authors the agent files), not this repo.
 
 | | **BETTER** (this repo) | **BEST** |
 |--|------------------------|----------|
