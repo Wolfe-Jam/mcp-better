@@ -13,7 +13,7 @@ AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock 
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
-> **BEST** (persistent project DNA for agents — **AGENTS.md** / FAF at scale) lives at **[faf.one/agents](https://faf.one/agents)** — one hop up from this textbook.
+> **BEST** (BETTER **plus** `project.faf` that is resident **and used**: persistent project context that authors the agent files) lives at **[faf.one/agents](https://faf.one/agents)**, one hop up from this textbook.
 
 ## Dual-package (optional)
 
