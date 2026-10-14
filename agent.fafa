@@ -1,0 +1,36 @@
+version: "1.0"
+agent:
+  name: mcp-better
+  displayName: mcp-better
+  id: urn:air:wolfe-jam.github.io:agent:mcp-better
+  version: 0.5.0
+  description: A Rust MCP server (rmcp 3.0) for protocol 2026-07-28, with a stamped tools/list cache, mid-call confirmation (MRTR) and Skills over MCP, on stdio or Streamable HTTP.
+  homepage: https://wolfe-jam.github.io
+capabilities:
+  - name: health
+    type: tool
+    description: Liveness check that returns ok and the server version, with no side effects
+    tags:
+      - health
+  - name: echo
+    type: tool
+    description: Echo a message back; a pure function with no side effects
+    tags:
+      - echo
+  - name: confirm_echo
+    type: tool
+    description: Echo a message after a mid-call confirmation (SEP-2322 MRTR), on protocol 2026-07-28 or later
+    tags:
+      - confirm_echo
+endpoints:
+  - protocol: mcp
+    transport: stdio
+    location: mcp-better
+metadata:
+  cards:
+    domain: wolfe-jam.github.io
+    examples:
+      - What does an MCP server for protocol 2026-07-28 look like in Rust?
+      - How does mid-call confirmation (MRTR) work in MCP?
+      - How do I cache tools/list with ttlMs and cacheScope?
+      - How do I serve Agent Skills over MCP?
