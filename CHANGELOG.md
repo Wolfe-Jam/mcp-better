@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **`mcp-better-lab` carries a FAF Block** (also called a Context Block): its facts as YAML at the top of the body: what it needs, what it reads, that it writes nothing and publishes nothing, its network use (none on stdio; localhost over Streamable HTTP), and when it's done. The description now says when to use it. The skill is served over MCP, so the facts travel with it; the digest still matches `resources/read`.
+
 ## [0.5.0] — 2026-08-18 — matching client completes MRTR
 
 **Lesson:** the peer is two-sided. 0.4.3 proved the server can pause; this cut is the client that resumes.
