@@ -30,7 +30,7 @@
 | **`cacheScope`** | Who may share the cached list | **`public`** when the catalog is not user-private |
 | **Order** | Determinism of the tool array | **Stable** for the same process; static catalogs should survive restart |
 
-Applies in the same family to the other list/read surfaces (`prompts/list`, `resources/list`, `resources/read`, `skills/list`, `skills/get`). mcp-better stamps all of them; the official conformance suite checks them all (`caching` scenario).
+Applies in the same family to the other list/read surfaces. mcp-better stamps every one it serves: `resources/list`, `resources/templates/list`, `resources/read`, `skills/list`, `skills/get`. The official conformance suite checks the first three in its `caching` scenario (with `tools/list` and `prompts/list`), and `skills/list` and `skills/get` in `sep-2640-skills-enumeration`.
 
 ---
 

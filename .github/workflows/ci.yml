@@ -73,23 +73,39 @@ jobs:
           node-version: 22
 
       - name: official MCP conformance suite, textbook binary
+        env:
+          MCP_CONFORMANCE_OUT: ${{ runner.temp }}/conformance-textbook
         run: |
           # The textbook ships no suite fixtures and no Tasks: conformance-baseline.yml lists them
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" bash scripts/conformance.sh
 
-      - name: build the conformance build (mcp-better + suite fixtures)
+      - name: conformance build (mcp-better + suite fixtures) fmt, clippy, build, test
         working-directory: conformance
-        run: cargo build --locked && cargo test --locked
+        run: |
+          cargo fmt -- --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo build --locked
+          cargo test --locked
 
       - name: official MCP conformance suite, conformance build, no baseline (100%)
+        env:
+          MCP_CONFORMANCE_OUT: ${{ runner.temp }}/conformance-build
         run: |
           MCP_BETTER_BIN="${{ github.workspace }}/conformance/target/debug/mcp-better-conformance" \
             MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh
 
+      - name: keep conformance results when a run fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-results
+          path: ${{ runner.temp }}/conformance-*
+          if-no-files-found: ignore
+
       - name: Install rust-mcp-preflight
         uses: taiki-e/install-action@v2
         with:
-          tool: rust-mcp-preflight
+          tool: rust-mcp-preflight@0.2.3
 
       - name: Registry listing (rust-mcp-preflight server.json)
         run: bash scripts/preflight.sh

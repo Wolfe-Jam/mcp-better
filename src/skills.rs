@@ -19,6 +19,8 @@ pub const LAB_SKILL_NAME: &str = "mcp-better-lab";
 
 /// Canonical URI for the lab skill document.
 pub const LAB_SKILL_URI: &str = "skill://mcp-better-lab/SKILL.md";
+/// What `resources/list` says a SKILL.md is, and what `resources/read` returns (SEP-2640).
+pub const SKILL_MD_MIME_TYPE: &str = "text/markdown";
 
 /// Embedded skill body (crate-relative; always available for install + tests).
 const EMBEDDED_LAB_SKILL: &str = include_str!("../skills/mcp-better-lab/SKILL.md");
@@ -88,12 +90,19 @@ impl SkillCatalog {
     pub fn list_resources_meta(&self) -> Vec<Resource> {
         let mut out = Vec::new();
         for skill in self.skills.values() {
+            // SEP-2640: a SKILL.md resource carries the skill's frontmatter name and description.
+            let field = |k: &str| {
+                skill
+                    .frontmatter
+                    .get(k)
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+            };
             for r in &skill.resources {
-                let name = r.uri.rsplit('/').next().unwrap_or("SKILL.md").to_string();
                 out.push(
-                    Resource::new(r.uri.clone(), name)
-                        .with_description("Agent Skill document (mcp-better textbook)")
-                        .with_mime_type("text/markdown")
+                    Resource::new(r.uri.clone(), field("name"))
+                        .with_description(field("description"))
+                        .with_mime_type(SKILL_MD_MIME_TYPE)
                         .with_size(r.bytes.len() as u64),
                 );
             }

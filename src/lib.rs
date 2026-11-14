@@ -5,10 +5,12 @@
 //!
 //! Companion **`mcp-worse`** (lying demo) is a separate binary — see `src/bin/mcp_worse.rs`.
 
+pub mod http;
 pub mod server;
 pub mod skills;
 pub mod worse;
 
+pub use http::{http_addr, http_config};
 pub use server::{BetterServer, BETTER_TOOL_ORDER, CATALOG_TTL_MS, LIST_TOOLS_TTL_MS};
 pub use skills::{SkillCatalog, LAB_SKILL_NAME, LAB_SKILL_URI, SKILLS_EXTENSION_ID};
 pub use worse::WorseServer;

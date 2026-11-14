@@ -11,7 +11,7 @@ use std::sync::Arc;
 
 use mcp_better::BetterServer;
 use rmcp::transport::streamable_http_server::{
-    session::local::LocalSessionManager, StreamableHttpServerConfig, StreamableHttpService,
+    session::local::LocalSessionManager, StreamableHttpService,
 };
 use rmcp::ServiceExt;
 use tracing_subscriber::EnvFilter;
@@ -84,28 +84,8 @@ async fn run_stdio() -> anyhow::Result<()> {
 }
 
 async fn run_http() -> anyhow::Result<()> {
-    let addr: SocketAddr = std::env::var("MCP_BETTER_HTTP_ADDR")
-        .unwrap_or_else(|_| "127.0.0.1:8787".into())
-        .parse()
-        .map_err(|e| anyhow::anyhow!("bad MCP_BETTER_HTTP_ADDR: {e}"))?;
-
-    // Host header often includes port for non-80 binds
-    let host_port = format!("{}:{}", addr.ip(), addr.port());
-    let host_only = addr.ip().to_string();
-
-    let config = StreamableHttpServerConfig::default()
-        // 7/28 is always stateless; this flag only affects legacy peers
-        .with_legacy_session_mode(false)
-        .with_json_response(true)
-        .with_allowed_hosts([
-            "localhost".to_string(),
-            "127.0.0.1".to_string(),
-            "::1".to_string(),
-            host_only,
-            host_port.clone(),
-            format!("localhost:{}", addr.port()),
-            format!("[::1]:{}", addr.port()),
-        ]);
+    let addr: SocketAddr = mcp_better::http_addr()?;
+    let config = mcp_better::http_config(addr);
 
     let service = StreamableHttpService::new(
         || Ok(BetterServer::new()),

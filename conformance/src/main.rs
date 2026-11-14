@@ -14,29 +14,29 @@
 //! - completions are declared (the fixtures answer `completion/complete`)
 //! - server info names mcp-better-conformance
 //! - `main` serves Streamable HTTP with mcp-better's own transport settings
-//!   (stateless for 2026-07-28, JSON responses, local Host guards, MCP_BETTER_HTTP_ADDR)
+//!   (`mcp_better::http_config`: stateless for 2026-07-28, JSON responses, local Host
+//!   guards, MCP_BETTER_HTTP_ADDR), and fixture cache hints use `mcp_better::CATALOG_TTL_MS`
 
 #![allow(deprecated)]
 use std::{
     collections::{HashMap, HashSet},
     sync::{
-        Arc,
         atomic::{AtomicU64, Ordering},
+        Arc,
     },
 };
 
+use mcp_better::{BetterServer, BETTER_TOOL_ORDER};
 use rmcp::{
-    ErrorData, RoleServer, ServerHandler,
     model::*,
     service::{RequestContext, SubscriptionContext, SubscriptionSink},
     task_manager::{TaskExit, TaskManager, TaskOptions},
     transport::{
-        StreamableHttpServerConfig, StreamableHttpService,
-        streamable_http_server::session::local::LocalSessionManager,
+        streamable_http_server::session::local::LocalSessionManager, StreamableHttpService,
     },
+    ErrorData, RoleServer, ServerHandler,
 };
-use mcp_better::{BetterServer, BETTER_TOOL_ORDER};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::net::SocketAddr;
 use tokio::sync::Mutex;
 use tracing_subscriber::EnvFilter;
@@ -45,7 +45,8 @@ use tracing_subscriber::EnvFilter;
 const TEST_IMAGE_DATA: &str = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
 // Small base64-encoded WAV (silence)
 const TEST_AUDIO_DATA: &str = "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-const CACHE_TTL_MS: u64 = 60_000;
+/// The same freshness window mcp-better stamps on its own lists and reads.
+const CACHE_TTL_MS: u64 = mcp_better::CATALOG_TTL_MS;
 
 /// Helper to convert a serde_json::Value (must be an object) into a JsonObject
 fn json_object(v: Value) -> JsonObject {
@@ -1586,11 +1587,12 @@ impl ServerHandler for ConformanceServer {
         _cx: RequestContext<RoleServer>,
     ) -> Result<ListResourceTemplatesResult, ErrorData> {
         Ok(ListResourceTemplatesResult {
-            resource_templates: vec![
-                ResourceTemplate::new("test://template/{id}/data", "Dynamic Resource")
-                    .with_description("A dynamic resource with parameter substitution")
-                    .with_mime_type("application/json"),
-            ],
+            resource_templates: vec![ResourceTemplate::new(
+                "test://template/{id}/data",
+                "Dynamic Resource",
+            )
+            .with_description("A dynamic resource with parameter substitution")
+            .with_mime_type("application/json")],
             ..Default::default()
         }
         .with_ttl_ms(CACHE_TTL_MS)
@@ -1792,24 +1794,9 @@ async fn main() -> anyhow::Result<()> {
         .with_env_filter(EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()))
         .init();
 
-    // The same transport settings as `mcp-better --http` (src/main.rs).
-    let addr: SocketAddr = std::env::var("MCP_BETTER_HTTP_ADDR")
-        .unwrap_or_else(|_| "127.0.0.1:8787".into())
-        .parse()
-        .map_err(|e| anyhow::anyhow!("bad MCP_BETTER_HTTP_ADDR: {e}"))?;
-    let host_port = format!("{}:{}", addr.ip(), addr.port());
-    let config = StreamableHttpServerConfig::default()
-        .with_legacy_session_mode(false)
-        .with_json_response(true)
-        .with_allowed_hosts([
-            "localhost".to_string(),
-            "127.0.0.1".to_string(),
-            "::1".to_string(),
-            addr.ip().to_string(),
-            host_port,
-            format!("localhost:{}", addr.port()),
-            format!("[::1]:{}", addr.port()),
-        ]);
+    // The same transport settings as `mcp-better --http`: one function in the library.
+    let addr: SocketAddr = mcp_better::http_addr()?;
+    let config = mcp_better::http_config(addr);
 
     let server = ConformanceServer::new();
     let service = StreamableHttpService::new(

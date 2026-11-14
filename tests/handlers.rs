@@ -60,10 +60,6 @@ async fn every_list_and_read_carries_chosen_cache_hints() {
     let templates = client.list_resource_templates(None).await.unwrap();
     chosen(templates.ttl_ms, templates.cache_scope);
 
-    let prompts = client.list_prompts(None).await.unwrap();
-    assert!(prompts.prompts.is_empty());
-    chosen(prompts.ttl_ms, prompts.cache_scope);
-
     let skills = client.list_skills(None).await.unwrap();
     chosen(skills.ttl_ms, skills.cache_scope);
 
@@ -106,15 +102,48 @@ async fn skill_manifest_size_matches_the_read_bytes() {
 }
 
 #[tokio::test]
-async fn declared_prompts_answer_unknown_names_with_invalid_params() {
+async fn undeclared_prompts_answer_method_not_found() {
     let client = connect().await;
+    let caps = client.peer_info().expect("discover").capabilities.clone();
+    assert!(caps.prompts.is_none(), "prompts are not declared");
+    assert!(caps.completions.is_none(), "completions are not declared");
+    let err = client.list_prompts(None).await.unwrap_err();
+    assert_eq!(error_code(err).0, ErrorCode::METHOD_NOT_FOUND);
     let err = client
         .get_prompt(GetPromptRequestParams::new("nope"))
         .await
         .unwrap_err();
-    let (code, data) = error_code(err);
-    assert_eq!(code, ErrorCode::INVALID_PARAMS);
-    assert_eq!(data.unwrap()["name"], "nope");
+    assert_eq!(error_code(err).0, ErrorCode::METHOD_NOT_FOUND);
+    client.cancel().await.unwrap();
+}
+
+#[tokio::test]
+async fn skill_md_lists_and_reads_as_the_same_thing() {
+    let client = connect().await;
+    let listed = client.list_resources(None).await.unwrap().resources;
+    let skill = &listed[0];
+    assert_eq!(skill.name, "mcp-better-lab", "name = frontmatter name");
+    assert_eq!(skill.mime_type.as_deref(), Some("text/markdown"));
+    let got = client
+        .get_skill(GetSkillRequestParams::new(LAB_SKILL_URI))
+        .await
+        .unwrap()
+        .skill;
+    assert_eq!(
+        skill.description.as_deref(),
+        Some(got.frontmatter.description.as_str()),
+        "description = frontmatter description"
+    );
+    let read = client
+        .read_resource(ReadResourceRequestParams::new(LAB_SKILL_URI))
+        .await
+        .unwrap();
+    match &read.contents[0] {
+        rmcp::model::ResourceContents::TextResourceContents { mime_type, .. } => {
+            assert_eq!(mime_type.as_deref(), Some("text/markdown"));
+        }
+        other => panic!("expected text, got {other:?}"),
+    }
     client.cancel().await.unwrap();
 }
 

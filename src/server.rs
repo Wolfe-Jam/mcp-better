@@ -10,8 +10,9 @@
 //!
 //! Skills: extension `io.modelcontextprotocol/skills` (SEP-2640) via rmcp's native
 //! `list_skills` · `get_skill`; content via `resources/read` + digests.
-//! Prompts: declared, none served. rmcp's default `list_prompts` answers an empty list even
-//! when prompts are not declared; BETTER declares what it answers (SEP-2575).
+//! Prompts and completions: not declared, so not answered. rmcp's defaults answer
+//! `prompts/list` and `completion/complete` with empty results even when undeclared;
+//! BETTER answers method-not-found instead (SEP-2575: declare what you answer).
 
 use rmcp::handler::server::router::tool::ToolRouter;
 use rmcp::handler::server::tool::ToolCallContext;
@@ -293,7 +294,6 @@ impl ServerHandler for BetterServer {
         let caps = ServerCapabilities::builder()
             .enable_tools()
             .enable_resources()
-            .enable_prompts()
             .enable_extensions_with(extensions)
             .build();
         let mut info = ServerConfig::new(caps);
@@ -361,13 +361,18 @@ impl ServerHandler for BetterServer {
                 Some(json!({ "uri": uri })),
             )
         })?;
-        Ok(ReadResourceResult::new(vec![ResourceContents::text(
-            res.text.as_ref(),
-            res.uri.clone(),
-        )])
-        .with_ttl_ms(CATALOG_TTL_MS)
-        .with_cache_scope(CacheScope::Public)
-        .into())
+        // Same mimeType as resources/list: claim = wire.
+        Ok(
+            ReadResourceResult::new(vec![ResourceContents::TextResourceContents {
+                uri: res.uri.clone(),
+                mime_type: Some(crate::skills::SKILL_MD_MIME_TYPE.into()),
+                text: res.text.to_string(),
+                meta: None,
+            }])
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public)
+            .into(),
+        )
     }
 
     /// SEP-2640 `skills/list` (rmcp native since 3.9).
@@ -418,27 +423,22 @@ impl ServerHandler for BetterServer {
         Err(McpError::method_not_found::<CompleteRequestMethod>())
     }
 
-    /// Prompts are declared and none exist: every name is unknown (invalid params, not "no such method").
+    /// Prompts are not declared, so there is no prompt to get.
     async fn get_prompt(
         &self,
-        request: GetPromptRequestParams,
+        _request: GetPromptRequestParams,
         _context: RequestContext<RoleServer>,
     ) -> Result<GetPromptResponse, McpError> {
-        Err(McpError::invalid_params(
-            format!("unknown prompt: {}", request.name),
-            Some(json!({ "name": request.name })),
-        ))
+        Err(McpError::method_not_found::<GetPromptRequestMethod>())
     }
 
-    /// Prompts are declared, and the list is empty: answer it like any other list.
+    /// Prompts are not declared: say so (rmcp's default would answer an empty list).
     async fn list_prompts(
         &self,
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
     ) -> Result<ListPromptsResult, McpError> {
-        Ok(ListPromptsResult::with_all_items(Vec::new())
-            .with_ttl_ms(CATALOG_TTL_MS)
-            .with_cache_scope(CacheScope::Public))
+        Err(McpError::method_not_found::<ListPromptsRequestMethod>())
     }
 }
 

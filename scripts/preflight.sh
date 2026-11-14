@@ -18,12 +18,18 @@ fi
 VER=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
 if [ "${1:-}" != "--strict" ]; then
   CODE=$(curl -s -o /dev/null -w '%{http_code}' -A "mcp-better-ci (github.com/Wolfe-Jam/mcp-better)" \
-    "https://crates.io/api/v1/crates/mcp-better/$VER")
-  if [ "$CODE" = "404" ]; then
-    echo "preflight: mcp-better $VER is not on crates.io yet (a release in progress)."
-    echo "           The full check runs in scripts/registry-publish.sh after cargo publish."
-    exit 0
-  fi
+    "https://crates.io/api/v1/crates/mcp-better/$VER" || true)
+  case "$CODE" in
+    200) ;;
+    404)
+      echo "preflight: mcp-better $VER is not on crates.io yet (a release in progress)."
+      echo "           The full check runs in scripts/registry-publish.sh after cargo publish."
+      exit 0 ;;
+    *)
+      echo "preflight: crates.io answered '${CODE:-no response}' for mcp-better $VER; can't tell" >&2
+      echo "           whether this version is published, so the check didn't run. Re-run the job." >&2
+      exit 1 ;;
+  esac
 fi
 
 rust-mcp-preflight server.json

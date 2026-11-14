@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# mcp-better local ship bar — same gates as .github/workflows/ci.yml
+# mcp-better local ship bar — the gates of .github/workflows/ci.yml's `check` job.
+# The `msrv` job (cargo check on Rust 1.88, the declared rust-version) runs in CI only.
 # Usage: bash scripts/ci.sh
 set -euo pipefail
 
@@ -51,7 +52,8 @@ echo "==> Official MCP conformance suite: textbook binary (baseline: conformance
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" bash scripts/conformance.sh
 
 echo "==> Official MCP conformance suite: conformance build, no baseline (must be 100%)"
-(cd conformance && cargo build --locked && cargo test --locked)
+(cd conformance && cargo fmt -- --check && cargo clippy --locked --all-targets -- -D warnings \
+  && cargo build --locked && cargo test --locked)
 MCP_BETTER_BIN="$(pwd)/conformance/target/debug/mcp-better-conformance" \
   MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh
 

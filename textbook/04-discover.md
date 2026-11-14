@@ -87,7 +87,9 @@ Discover is also where capability negotiation lives. A modern client may filter 
 
 **Claim fewer capabilities. Implement them fully.**
 
-The other half is the SDK's defaults. `rmcp` answers `prompts/list` and `completion/complete` with empty results even when the server declares neither, so a server can answer a method it never claimed. mcp-better closes both: it declares prompts and serves them fully (an empty, stamped list; `prompts/get` says the name is unknown, `-32602`), and it does not declare completions, so `completion/complete` answers method-not-found (`-32601`). Either answer is honest. Answering without declaring is not.
+The other half is the SDK's defaults. `rmcp` answers `prompts/list` and `completion/complete` with empty results even when the server declares neither, so a server can answer a method it never claimed. mcp-better closes both the same way: it declares neither, so `prompts/list`, `prompts/get` and `completion/complete` answer method-not-found (`-32601`). The other honest answer is to declare a capability and serve it fully. Answering without declaring is not honest.
+
+The conformance suite assumes a server that has everything, so three of its checks fail on mcp-better for this reason (`prompts-list`, the prompts check in `caching`, `completion-complete`). They are listed in `conformance-baseline.yml` as `not declared`. Declaring prompts with nothing behind them would turn those checks green and break the rule above; a textbook should not bend its server to a test.
 
 ---
 

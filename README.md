@@ -11,7 +11,7 @@ Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER**
 the book is the app is the book
 ```
 
-Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · passes the official MCP conformance suite, 100% of the 2026-07-28 requirements, as the [conformance build](#conformance).  
+Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · the official MCP conformance suite in CI: [100% for the conformance build](#conformance), every scored check that needs no suite fixture for the textbook binary.  
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
@@ -60,7 +60,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 1. **Protocol honesty** — claim 7/28 / `2026-07-28` only for surfaces you implement and test.
 2. **Discover-compatible** — clients should use `ClientLifecycleMode::Discover` (or Auto → 7/28), not only legacy initialize.
-3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/templates/list`, `resources/read`, `prompts/list`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
+3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/templates/list`, `resources/read`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
 4. **Stable tool order** — same process, same order across N list calls.
 5. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
 
@@ -144,7 +144,7 @@ cargo run --release -- --http
 | Transport | **stdio** (default) · **Streamable HTTP** (`--http`) |
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
-| Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · **prompts** (declared, none defined: empty stamped list, `prompts/get` → unknown prompt) · completions not declared (`completion/complete` → method not found) |
+| Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · prompts and completions **not declared** (`prompts/*`, `completion/complete` → method not found) |
 | Cache hints | tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
 | MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
@@ -153,22 +153,22 @@ cargo run --release -- --http
 
 ## Conformance
 
-CI runs the official MCP conformance suite ([`@modelcontextprotocol/conformance`](https://github.com/modelcontextprotocol/conformance), pinned, `--requirements 2026-07-28`) twice:
+CI runs the official MCP conformance suite ([`@modelcontextprotocol/conformance`](https://github.com/modelcontextprotocol/conformance), pinned) against two binaries. Each run covers `--requirements 2026-07-28` (50 scenarios: 37 the suite scores, 13 it runs but does not score) and the two Skills scenarios (`sep-2640-skills-enumeration`, `sep-2640-skills-manifest`, an extension outside that set).
 
-| Run | Binary | Result |
-|-----|--------|--------|
-| Conformance build | [`conformance/`](./conformance/): `mcp-better-conformance`, mcp-better's own server plus the suite's test fixtures | **100%**, no baseline (63 scenarios, 196 checks) |
-| Textbook | `mcp-better`, what you install | every scenario that doesn't need a fixture; [`conformance-baseline.yml`](./conformance-baseline.yml) lists the rest, each labelled |
+| Run | Binary | 2026-07-28 requirements | Skills |
+|-----|--------|-------------------------|--------|
+| Conformance build | [`conformance/`](./conformance/): `mcp-better-conformance` | **100%, no baseline:** every check of all 50 scenarios, 196 checks, no failure, no warning | 38 of 38 |
+| Textbook | `mcp-better`, what you install | the 37 scored scenarios: 74 checks pass; 33 fail or warn, each listed in [`conformance-baseline.yml`](./conformance-baseline.yml) as `fixture` or `not declared` | 38 of 38 |
 
-Many scenarios call tools, prompts and resources that only exist in the suite's reference server (`test_*`, `test://…`), and several need the Tasks extension. The official SDKs pass those the same way: a separate server that carries the fixtures. In `mcp-better-conformance`, mcp-better's tools, skill resources, Skills and cache hints are served by `BetterServer` itself; the fixtures and Tasks are adapted from the Rust MCP SDK's conformance server (Apache-2.0, [`conformance/NOTICE`](./conformance/NOTICE)). The textbook binary stays clean.
+**What each run measures.** Most scenarios call tools, prompts and resources that exist only in the suite's reference server (`test_*`, `test://…`), and the 13 unscored ones are the Tasks extension and three pending scenarios. The official SDKs pass those with a separate server that carries the fixtures; `mcp-better-conformance` is that server for mcp-better. Its fixtures, capabilities and Tasks are adapted from the Rust MCP SDK's conformance server (Apache-2.0, [`conformance/NOTICE`](./conformance/NOTICE)); `BetterServer` serves mcp-better's three tools, the skill resource and Skills. So the 100% mostly measures the fixtures and the shared transport (`mcp_better::http_config`). The textbook run and the Skills scenarios measure mcp-better's own code.
 
-The suite's MRTR scenarios use its own fixture tools, so `confirm_echo` is checked by the matching client (`examples/mrtr-client`) in CI instead.
+**Reading the textbook run.** `caching` is 7 of 8: the eighth check calls `prompts/list`, and mcp-better doesn't declare prompts, so it answers method-not-found (`not declared` in the baseline). `prompts-list` and `completion-complete` fail for the same reason. Every other failure is a missing suite fixture. The suite's MRTR scenarios use its own fixture tools, so `confirm_echo` is checked by the matching client (`examples/mrtr-client`) in CI.
 
 ```bash
 bash scripts/conformance.sh                                             # textbook + baseline
 (cd conformance && cargo build) && \
   MCP_BETTER_BIN="$(pwd)/conformance/target/debug/mcp-better-conformance" \
-  MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh                # conformance build, 100%
+  MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh                # conformance build, strict
 ```
 
 ## Textbook
