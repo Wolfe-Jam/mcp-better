@@ -59,3 +59,12 @@ jobs:
         run: |
           # http-smoke spawns the bin; example alone does not build [[bin]]
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example http-smoke
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: official MCP conformance suite (2026-07-28 requirements)
+        run: |
+          # Known failures (suite fixtures, Tasks) are listed in conformance-baseline.yml
+          MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" bash scripts/conformance.sh
