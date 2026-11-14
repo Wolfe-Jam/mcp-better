@@ -2,13 +2,13 @@
 
 ## `serve` vs Discover (naming collision)
 
-In `rmcp` 3.0:
+In `rmcp` 3.10 (`ClientConfig` is the current name; `ClientInfo` is a deprecated alias):
 
 | Call | Side | Meaning |
 |------|------|---------|
 | `service.serve(transport)` | **Server** entrypoint | Attach handler to stdio/HTTP transport and run. **Not** lifecycle Discover. |
-| `ClientInfo::serve(transport)` | **Client** | **Legacy** lifecycle: `initialize` + `notifications/initialized`. GOOD-era default. |
-| `ClientInfo::serve_with_lifecycle(..., Discover { .. })` | **Client** | **BETTER** path: `server/discover`, preferred `V_2026_07_28`. |
+| `ClientConfig::serve(transport)` | **Client** | **Legacy** lifecycle: `initialize` + `notifications/initialized`. GOOD-era default. |
+| `ClientConfig::serve_with_lifecycle(..., Discover { .. })` | **Client** | **BETTER** path: `server/discover`, preferred `V_2026_07_28`. |
 
 Official samples still often show `Calculator.serve(stdio())` on the **server**. That is correct for the server process. BETTER pairs it with a **Discover client** example and **stamped** list results — do not copy client `serve()` alone and call the setup modern.
 

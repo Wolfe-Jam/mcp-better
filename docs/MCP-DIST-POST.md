@@ -9,7 +9,7 @@ It only owns the MCP-specific dual-package surface.
 **Author guide (Phase 3):** [DUAL-PACKAGE-RUST-MCP.md](./DUAL-PACKAGE-RUST-MCP.md) — stranger-path dual cargo+npm publish.
 
 **Receipt (2026-08-08):** dual-package + OIDC steady-state proven on **`mcp-better@0.4.2`**.  
-Post-ship brief: [`GB-BRIEF-POST-0.4.2.md`](./GB-BRIEF-POST-0.4.2.md).
+The post-ship notes are kept outside this repository.
 
 ---
 
@@ -109,7 +109,7 @@ chmod +x scripts/mcp-dist-post.sh
 ## OIDC Trusted Publishing (lived path)
 
 Goal: **zero long-lived registry tokens** after bootstrap.  
-Brief: [`OIDC-TRUSTED-PUBLISHING-BRIEF.md`](./OIDC-TRUSTED-PUBLISHING-BRIEF.md).
+The setup steps are in [`.github/workflows/release.yml`](../.github/workflows/release.yml).
 
 ### Proven on mcp-better@0.4.2
 

@@ -60,7 +60,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 1. **Protocol honesty** — claim 7/28 / `2026-07-28` only for surfaces you implement and test.
 2. **Discover-compatible** — clients should use `ClientLifecycleMode::Discover` (or Auto → 7/28), not only legacy initialize.
-3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/read`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
+3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/templates/list`, `resources/read`, `prompts/list`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
 4. **Stable tool order** — same process, same order across N list calls.
 5. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
 
@@ -80,7 +80,7 @@ npx mcp-better --help
 npx mcp-better
 ```
 
-### From source / crates.io (Rust 1.85+)
+### From source / crates.io (Rust 1.88+)
 
 ```bash
 git clone https://github.com/Wolfe-Jam/mcp-better.git
@@ -144,11 +144,11 @@ cargo run --release -- --http
 | Transport | **stdio** (default) · **Streamable HTTP** (`--http`) |
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
-| Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · **prompts** (declared, empty list: declare what you answer) |
+| Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · **prompts** (declared, none defined: empty stamped list, `prompts/get` → unknown prompt) · completions not declared (`completion/complete` → method not found) |
 | Cache hints | tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
 | MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
-| Lying companion | **`mcp-worse`** — no chosen cache hints (wire shows the SDK default `ttlMs: 0` + `private`) + reversed order (contrast-smoke only) |
+| Lying companion | **`mcp-worse`** — reversed tool order (the lie) + no cache hints of its own (the wire shows the SDK default `ttlMs: 0` + `private`, valid but uninformative) · contrast-smoke only |
 | OAuth / tasks | out of hero |
 
 ## Textbook
@@ -185,6 +185,8 @@ Ship process: **`/pubbetter`** (skill) · short form [`docs/PUBBETTER.md`](./doc
 export PATH="$HOME/.cargo/bin:$PATH"
 bash scripts/ci.sh
 ```
+
+The ship bar needs Node 18+ and network: it fetches the official MCP conformance suite with `npx` (pinned version) and, if installed, runs [`rust-mcp-preflight`](https://github.com/Wolfe-Jam/rust-mcp-preflight) on `server.json` (it reads crates.io and the MCP Registry).
 
 ## BEST
 

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Rust **stable** ≥ 1.85 (`rustup default stable`)
+- Rust **stable** ≥ 1.88 (`rustup default stable`)
 - Prefer **rustup** toolchain (`~/.cargo/bin` before Homebrew `/usr/local/bin` if both exist)
 
 ## Build & test
@@ -41,7 +41,7 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
 
 ```text
 order-restart-smoke: OK (two processes · same order · same stamps)
-contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)
+contrast-smoke: OK (better contract · worse no chosen cache hints · worse names≠health,echo,confirm_echo)
 ```
 
 HTTP happy-path (spawns the binary itself — build bins first):

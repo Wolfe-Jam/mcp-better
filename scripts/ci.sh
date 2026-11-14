@@ -50,4 +50,7 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 echo "==> Official MCP conformance suite (2026-07-28 requirements, baseline: conformance-baseline.yml)"
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" bash scripts/conformance.sh
 
+echo "==> Registry listing (rust-mcp-preflight server.json)"
+bash scripts/preflight.sh
+
 echo "✅ scripts/ci.sh green"

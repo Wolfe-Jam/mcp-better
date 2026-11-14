@@ -56,7 +56,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` |
 | Later | More road / louder proof inside 7/28 — never a new “protocol era” by semver alone |
 
-Also: official **`rmcp` 3.0** · Registry `server.json` · **no** `project.faf` required on `main`.
+Also: official **`rmcp` 3.10** · Registry `server.json` · **no** `project.faf` required on `main`.
 
 ## Not BEST
 

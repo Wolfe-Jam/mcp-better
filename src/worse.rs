@@ -88,7 +88,8 @@ impl ServerHandler for WorseServer {
         info.server_info = Implementation::new("mcp-worse", env!("CARGO_PKG_VERSION"));
         info.instructions = Some(
             "LYING DEMO — not BETTER. Same tool names as mcp-better but tools/list \
-             omits ttlMs/cacheScope and reverses order. For contrast-smoke only. \
+             sets no cache hints of its own (the SDK sends ttlMs 0 + private) and \
+             reverses order. For contrast-smoke only. \
              Do not use in production or as a template."
                 .into(),
         );

@@ -13,7 +13,8 @@ This is a **BETTER** textbook for **AGENTS.md** on **NONE | GOOD | [BETTER] | BE
 ```bash
 export PATH="$HOME/.cargo/bin:$PATH"
 bash scripts/ci.sh
-# equivalent: fmt · clippy -D · test · purity · Discover smoke
+# fmt · clippy -D · test · purity · smokes · official MCP conformance suite
+# (needs Node 18+ and network) · rust-mcp-preflight on server.json if installed
 ```
 
 ## Releases

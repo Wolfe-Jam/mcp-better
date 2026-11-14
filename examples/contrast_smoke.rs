@@ -135,7 +135,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     println!(
-        "contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)"
+        "contrast-smoke: OK (better contract · worse no chosen cache hints · worse names≠health,echo,confirm_echo)"
     );
     Ok(())
 }

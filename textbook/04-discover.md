@@ -87,6 +87,8 @@ Discover is also where capability negotiation lives. A modern client may filter 
 
 **Claim fewer capabilities. Implement them fully.**
 
+The other half is the SDK's defaults. `rmcp` answers `prompts/list` and `completion/complete` with empty results even when the server declares neither, so a server can answer a method it never claimed. mcp-better closes both: it declares prompts and serves them fully (an empty, stamped list; `prompts/get` says the name is unknown, `-32602`), and it does not declare completions, so `completion/complete` answers method-not-found (`-32601`). Either answer is honest. Answering without declaring is not.
+
 ---
 
 ## Relation to stateless core

@@ -388,11 +388,46 @@ impl ServerHandler for BetterServer {
         _context: RequestContext<RoleServer>,
     ) -> Result<GetSkillResult, McpError> {
         let skill = self.skills.skill(&request.uri).ok_or_else(|| {
-            McpError::invalid_params(format!("unknown skill uri: {}", request.uri), None)
+            McpError::invalid_params(
+                format!("unknown skill uri: {}", request.uri),
+                Some(json!({ "uri": request.uri })),
+            )
         })?;
         Ok(GetSkillResult::new(skill)
             .with_ttl_ms(CATALOG_TTL_MS)
             .with_cache_scope(CacheScope::Public))
+    }
+
+    /// Templates fall under the declared resources capability: an empty list, stamped by choice.
+    async fn list_resource_templates(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListResourceTemplatesResult, McpError> {
+        Ok(ListResourceTemplatesResult::with_all_items(Vec::new())
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public))
+    }
+
+    /// Completions are not declared, so say so (rmcp's default answers an empty completion).
+    async fn complete(
+        &self,
+        _request: CompleteRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<CompleteResult, McpError> {
+        Err(McpError::method_not_found::<CompleteRequestMethod>())
+    }
+
+    /// Prompts are declared and none exist: every name is unknown (invalid params, not "no such method").
+    async fn get_prompt(
+        &self,
+        request: GetPromptRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<GetPromptResponse, McpError> {
+        Err(McpError::invalid_params(
+            format!("unknown prompt: {}", request.name),
+            Some(json!({ "name": request.name })),
+        ))
     }
 
     /// Prompts are declared, and the list is empty: answer it like any other list.

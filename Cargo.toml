@@ -2,7 +2,7 @@
 name = "mcp-better"
 version = "0.5.0"
 edition = "2021"
-rust-version = "1.85"
+rust-version = "1.88"
 authors = ["Wolfe-Jam <wolfejam@faf.one>"]
 description = "Modern MCP setup for the 2026-07-28 spec (BETTER textbook). AAIF Ambassador contribution."
 license = "MIT"

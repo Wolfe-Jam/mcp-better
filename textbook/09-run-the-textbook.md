@@ -26,7 +26,7 @@ Copy the **operational contract**, not a megaserver.
 
 ## Prerequisites
 
-- Rust stable ≥ 1.85 (`rustup`)  
+- Rust stable ≥ 1.88 (`rustup`)  
 - Network for first crate download  
 - Optional: git for clone path  
 
@@ -76,10 +76,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" \
 
 ```text
 order-restart-smoke: OK (two processes · same order · same stamps)
-contrast-smoke: OK (better contract · worse unstamped · worse names≠health,echo,confirm_echo)
+contrast-smoke: OK (better contract · worse no chosen cache hints · worse names≠health,echo,confirm_echo)
 ```
 
-`mcp-worse` is a **lying companion** (teaching only): same tool names, unstamped list, reversed order. Do not point hosts at it.
+`mcp-worse` is a **lying companion** (teaching only): same tool names, no cache hints of its own, reversed order. Since `rmcp` 3.5 the SDK fills its lists with `ttlMs: 0` + `private`, a valid "don't cache" answer, so the lie that remains is the order. Do not point hosts at it.
 
 ### Path C — matching client (v0.5)
 

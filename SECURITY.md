@@ -8,7 +8,7 @@
 | Path / exec tools | **Out of scope** — no shell, no filesystem tools |
 | Session assumptions | stdio process-local; no multi-session correctness claim |
 | Secrets in logs | Logs on stderr only; tools return no secrets |
-| Supply chain | Pin `rmcp` 3.0 · commit `Cargo.lock` · CI |
+| Supply chain | Pin `rmcp` 3.10 · commit `Cargo.lock` · CI |
 
 ## v0.2 Streamable HTTP (local demo)
 
