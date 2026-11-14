@@ -3,7 +3,7 @@
 # (2026-07-28 requirements).
 #
 #   bash scripts/conformance.sh                 # textbook binary, baseline conformance-baseline.yml
-#   MCP_CONFORMANCE_BASELINE= bash scripts/...  # no baseline: every failure fails the run
+#   MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh  # no baseline: every failure fails
 #
 # Needs a built binary and Node/npx (the suite is fetched at the pinned version).
 set -euo pipefail

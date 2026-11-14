@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-**Lesson:** a textbook that claims a spec should pass that spec's own tests. This cut runs the official MCP conformance suite (2026-07-28 requirements) in the local ship bar.
+**Lesson:** a textbook that claims a spec should pass that spec's own tests. The conformance build passes the official MCP conformance suite, 100% of the 2026-07-28 requirements, in CI.
 
 ### Fixed
 
@@ -15,7 +15,10 @@
 
 - **rmcp 3.0.1 → 3.10.0.** Deprecated names updated (`ServerConfig`, `ClientConfig`, `RequestStateCodec::try_new`). rustls 0.23.46 in the lock.
 - **Skills on rmcp's native API:** `list_skills` / `get_skill` (rmcp ≥ 3.9) replace the custom-request handler.
-- **Conformance in the ship bar:** `scripts/conformance.sh` runs `@modelcontextprotocol/conformance` with `--requirements 2026-07-28`; `conformance-baseline.yml` lists the known failures, each a suite test fixture a textbook doesn't ship or the Tasks extension (out of scope). `scripts/ci.sh` runs it.
+- **Official MCP conformance suite, 100%:** `conformance/` builds `mcp-better-conformance`, mcp-better's own server plus the suite's test fixtures and Tasks (adapted from the Rust MCP SDK's conformance server, Apache-2.0). It passes every 2026-07-28 scenario with no baseline (63 scenarios, 196 checks). The textbook binary runs too, with `conformance-baseline.yml` listing what needs a fixture, Tasks or an undeclared capability. Both run in `scripts/ci.sh` and GitHub CI (`scripts/conformance.sh`).
+- **Declare what you answer:** `prompts/get` answers an unknown name with `-32602`; completions aren't declared, so `completion/complete` answers method-not-found instead of the SDK's undeclared empty answer. `resources/templates/list` is stamped. `skills/get` not-found carries `data.uri`.
+- **rust-mcp-preflight** checks the Registry listing (`scripts/preflight.sh`): in CI, and strict in `scripts/registry-publish.sh` before the Registry publish.
+- **GitHub CI:** the MRTR matching client, Preflight, and an msrv job. `rust-version` is now 1.88 (1.85 was false: the dependencies need 1.88).
 - **Install lines use `--locked`**, so `cargo install` builds with the tested lockfile.
 - **Wording:** "AAIF-verified" → "reviewed and approved as an AAIF Ambassador contribution" (README) / "AAIF Ambassador contribution" (package descriptions).
 - **Docs:** two internal release briefs left the public `docs/` folder; `docs/PUBBETTER.md` no longer points at a local skill path.

@@ -47,8 +47,13 @@ echo "==> Streamable HTTP smoke"
 # http-smoke spawns the bin — must exist; example alone does not build [[bin]]
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example http-smoke
 
-echo "==> Official MCP conformance suite (2026-07-28 requirements, baseline: conformance-baseline.yml)"
+echo "==> Official MCP conformance suite: textbook binary (baseline: conformance-baseline.yml)"
 MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" bash scripts/conformance.sh
+
+echo "==> Official MCP conformance suite: conformance build, no baseline (must be 100%)"
+(cd conformance && cargo build --locked && cargo test --locked)
+MCP_BETTER_BIN="$(pwd)/conformance/target/debug/mcp-better-conformance" \
+  MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh
 
 echo "==> Registry listing (rust-mcp-preflight server.json)"
 bash scripts/preflight.sh

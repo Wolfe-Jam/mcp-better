@@ -21,6 +21,10 @@ jobs:
           components: rustfmt, clippy
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            conformance
 
       - name: three-file lockstep (doc-gate)
         run: bash scripts/doc-gate.sh
@@ -68,10 +72,19 @@ jobs:
         with:
           node-version: 22
 
-      - name: official MCP conformance suite (2026-07-28 requirements)
+      - name: official MCP conformance suite, textbook binary
         run: |
-          # Known failures (suite fixtures, Tasks) are listed in conformance-baseline.yml
+          # The textbook ships no suite fixtures and no Tasks: conformance-baseline.yml lists them
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" bash scripts/conformance.sh
+
+      - name: build the conformance build (mcp-better + suite fixtures)
+        working-directory: conformance
+        run: cargo build --locked && cargo test --locked
+
+      - name: official MCP conformance suite, conformance build, no baseline (100%)
+        run: |
+          MCP_BETTER_BIN="${{ github.workspace }}/conformance/target/debug/mcp-better-conformance" \
+            MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh
 
       - name: Install rust-mcp-preflight
         uses: taiki-e/install-action@v2

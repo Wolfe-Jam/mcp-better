@@ -11,7 +11,7 @@ Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER**
 the book is the app is the book
 ```
 
-Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · checked in CI against the official MCP conformance suite (2026-07-28 requirements).  
+Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · passes the official MCP conformance suite, 100% of the 2026-07-28 requirements, as the [conformance build](#conformance).  
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
@@ -150,6 +150,26 @@ cargo run --release -- --http
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
 | Lying companion | **`mcp-worse`** — reversed tool order (the lie) + no cache hints of its own (the wire shows the SDK default `ttlMs: 0` + `private`, valid but uninformative) · contrast-smoke only |
 | OAuth / tasks | out of hero |
+
+## Conformance
+
+CI runs the official MCP conformance suite ([`@modelcontextprotocol/conformance`](https://github.com/modelcontextprotocol/conformance), pinned, `--requirements 2026-07-28`) twice:
+
+| Run | Binary | Result |
+|-----|--------|--------|
+| Conformance build | [`conformance/`](./conformance/): `mcp-better-conformance`, mcp-better's own server plus the suite's test fixtures | **100%**, no baseline (63 scenarios, 196 checks) |
+| Textbook | `mcp-better`, what you install | every scenario that doesn't need a fixture; [`conformance-baseline.yml`](./conformance-baseline.yml) lists the rest, each labelled |
+
+Many scenarios call tools, prompts and resources that only exist in the suite's reference server (`test_*`, `test://…`), and several need the Tasks extension. The official SDKs pass those the same way: a separate server that carries the fixtures. In `mcp-better-conformance`, mcp-better's tools, skill resources, Skills and cache hints are served by `BetterServer` itself; the fixtures and Tasks are adapted from the Rust MCP SDK's conformance server (Apache-2.0, [`conformance/NOTICE`](./conformance/NOTICE)). The textbook binary stays clean.
+
+The suite's MRTR scenarios use its own fixture tools, so `confirm_echo` is checked by the matching client (`examples/mrtr-client`) in CI instead.
+
+```bash
+bash scripts/conformance.sh                                             # textbook + baseline
+(cd conformance && cargo build) && \
+  MCP_BETTER_BIN="$(pwd)/conformance/target/debug/mcp-better-conformance" \
+  MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh                # conformance build, 100%
+```
 
 ## Textbook
 

@@ -1,0 +1,30 @@
+[package]
+name = "mcp-better-conformance"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.88"
+publish = false
+license = "Apache-2.0"
+description = "mcp-better plus the official MCP conformance suite's test fixtures (not published)."
+
+[[bin]]
+name = "mcp-better-conformance"
+path = "src/main.rs"
+
+[dependencies]
+mcp-better = { path = ".." }
+rmcp = { version = "3.10", features = [
+    "server",
+    "elicitation",
+    "request-state",
+    "transport-streamable-http-server",
+] }
+anyhow = "1"
+axum = "0.8"
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[package.metadata.dist]
+dist = false
