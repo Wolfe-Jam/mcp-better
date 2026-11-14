@@ -5,7 +5,7 @@
 //!   cargo build --bins
 //!   cargo run --example contrast-smoke
 
-use rmcp::model::{CacheScope, ClientInfo, ProtocolVersion};
+use rmcp::model::{CacheScope, ClientConfig, ProtocolVersion};
 use rmcp::transport::{ConfigureCommandExt, TokioChildProcess};
 use rmcp::{ClientLifecycleMode, ClientServiceExt};
 use tokio::process::Command;
@@ -32,7 +32,7 @@ fn resolve_bin(env_key: &str, default_name: &str) -> String {
 
 async fn probe(bin: &str) -> anyhow::Result<ListProbe> {
     let transport = TokioChildProcess::new(Command::new(bin).configure(|_c| {}))?;
-    let client = ClientInfo::default()
+    let client = ClientConfig::default()
         .serve_with_lifecycle(
             transport,
             ClientLifecycleMode::Discover {
@@ -64,8 +64,10 @@ fn is_better_contract(p: &ListProbe) -> bool {
         && p.cache_scope == Some(CacheScope::Public)
 }
 
+/// The worse clause: no cache hint chosen. On the wire that is either no stamps
+/// (older SDKs) or the SDK's safe fill-in, `ttlMs: 0` + `private` (rmcp ≥ 3.5).
 fn is_unstamped(p: &ListProbe) -> bool {
-    p.ttl_ms.is_none() || p.cache_scope.is_none()
+    matches!(p.ttl_ms, None | Some(0)) && matches!(p.cache_scope, None | Some(CacheScope::Private))
 }
 
 fn wrong_names(p: &ListProbe) -> bool {

@@ -1,4 +1,4 @@
-//! mcp-better — AAIF-verified modern MCP (BETTER textbook)
+//! mcp-better — modern MCP (BETTER textbook)
 //!
 //! **v0.2** — same 7/28 era, more road:
 //! - default: **stdio**

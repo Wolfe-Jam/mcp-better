@@ -22,8 +22,8 @@ Also advertises `capabilities.resources` so `resources/read` is in-band.
 
 | Method | How |
 |--------|-----|
-| `skills/list` | Custom request (rmcp has no first-class skills API yet) |
-| `skills/get` | Custom request · params `{ "uri": "skill://…" }` |
+| `skills/list` | rmcp native `list_skills` (since rmcp 3.9) |
+| `skills/get` | rmcp native `get_skill` · params `{ "uri": "skill://…" }` |
 | `resources/list` | Lists skill file URIs |
 | `resources/read` | Returns SKILL.md text · SHA-256 matches `resources[].digest` |
 

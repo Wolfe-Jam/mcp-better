@@ -11,7 +11,7 @@ Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER**
 the book is the app is the book
 ```
 
-AAIF-verified modern MCP textbook **that runs**. Rust · `rmcp` **3.0.x** (lock **3.0.1**, Tier 1 assessed) · Discover · stamped list cache.  
+Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · checked in CI against the official MCP conformance suite (2026-07-28 requirements).  
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
@@ -42,7 +42,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 ## What to expect
 
-1. **Built for 7/28** — not bolted onto a legacy server (official `rmcp` 3.0.x / Tier-1 assessed cut).
+1. **Built for 7/28** — not bolted onto a legacy server (official `rmcp` 3.10).
 2. **Honest surface** — transport and capabilities match docs and CI.
 3. **Roadmap expands the era** — versions add road; they do not “become” 7/28 later.
 
@@ -60,7 +60,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 
 1. **Protocol honesty** — claim 7/28 / `2026-07-28` only for surfaces you implement and test.
 2. **Discover-compatible** — clients should use `ClientLifecycleMode::Discover` (or Auto → 7/28), not only legacy initialize.
-3. **List cache stamps** — `tools/list` returns positive `ttlMs` and `cacheScope` (static catalog → `public`). SDK defaults are unstamped.
+3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/read`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
 4. **Stable tool order** — same process, same order across N list calls.
 5. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
 
@@ -105,10 +105,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # install from crates.io — first hit compiles deps once (see above):
-cargo install mcp-better --version 0.5.0
+cargo install mcp-better --version 0.5.0 --locked
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.5.0 --bin mcp-worse
+# cargo install mcp-better --version 0.5.0 --locked --bin mcp-worse
 ```
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
@@ -144,11 +144,11 @@ cargo run --release -- --http
 | Transport | **stdio** (default) · **Streamable HTTP** (`--http`) |
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
-| Capabilities | **tools** · **resources** (skill docs) · **experimental** skills extension |
-| List cache | **`ttlMs=60000`**, **`cacheScope=public`**, order **`health`→`echo`→`confirm_echo`** (restart-stable) |
+| Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · **prompts** (declared, empty list: declare what you answer) |
+| Cache hints | tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
 | MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
-| Lying companion | **`mcp-worse`** — unstamped + reversed order (contrast-smoke only) |
+| Lying companion | **`mcp-worse`** — no chosen cache hints (wire shows the SDK default `ttlMs: 0` + `private`) + reversed order (contrast-smoke only) |
 | OAuth / tasks | out of hero |
 
 ## Textbook

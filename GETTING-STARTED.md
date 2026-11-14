@@ -76,7 +76,7 @@ Uses `call_tool_once` so the mid-call retry stays visible. `stdio-client` still 
 
 ```bash
 # first hit: cargo compiles the crate graph once — not 100 of our tools
-cargo install mcp-better --version 0.5.0
+cargo install mcp-better --version 0.5.0 --locked
 which mcp-better   # use this absolute path below
 ```
 

@@ -30,7 +30,7 @@
 | **`cacheScope`** | Who may share the cached list | **`public`** when the catalog is not user-private |
 | **Order** | Determinism of the tool array | **Stable** for the same process; static catalogs should survive restart |
 
-Applies in the same family to other list/read surfaces in the full protocol (`prompts/list`, `resources/list`, …). Season 1 textbook focuses on **`tools/list`**.
+Applies in the same family to the other list/read surfaces (`prompts/list`, `resources/list`, `resources/read`, `skills/list`, `skills/get`). mcp-better stamps all of them; the official conformance suite checks them all (`caching` scenario).
 
 ---
 
@@ -61,7 +61,7 @@ A small textbook catalog with fixed `health` → `echo` → `confirm_echo` is a 
 
 ## SDK trap
 
-Many SDK defaults / macro paths return a list **without** stamps. Wire omission is fine for old peers. For **BETTER** claims, **stamp explicitly**.
+Older SDK paths return a list **without** stamps. Newer ones fill the gap with the safe answer: `rmcp` ≥ 3.5 sends `ttlMs: 0` + `cacheScope: private` ("don't cache") when the handler sets nothing. Both are valid on the wire; neither says what *your* data allows. For **BETTER** claims, **stamp explicitly** with what you know (a static catalog is `public` for a while).
 
 Conceptual shape (Rust `rmcp` 3 style):
 

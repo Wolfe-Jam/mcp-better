@@ -2,8 +2,23 @@
 
 ## [Unreleased]
 
+**Lesson:** a textbook that claims a spec should pass that spec's own tests. This cut runs the official MCP conformance suite (2026-07-28 requirements) in the local ship bar.
+
+### Fixed
+
+- **Cache hints on every list and read** (SEP-2549): `resources/list`, `resources/read`, `prompts/list`, `skills/list` and `skills/get` now stamp `ttlMs=60000` + `cacheScope=public`, like `tools/list`. Before, only `tools/list` did, and the conformance suite's `caching` scenario failed 5 of 8.
+- **Prompts declared:** the server answered `prompts/list` without declaring prompts (`sep-2575-server-declares-prompts-in-discover`). It now declares prompts and answers an empty, stamped list.
+- **Skills manifest has `size`** (SEP-2640): each file in `skills/list` / `skills/get` now carries `size` next to `uri` and `digest`.
+- **Resource-not-found names the URI** (SEP-2164): the error carries `data.uri`.
+
 ### Changed
 
+- **rmcp 3.0.1 → 3.10.0.** Deprecated names updated (`ServerConfig`, `ClientConfig`, `RequestStateCodec::try_new`). rustls 0.23.46 in the lock.
+- **Skills on rmcp's native API:** `list_skills` / `get_skill` (rmcp ≥ 3.9) replace the custom-request handler.
+- **Conformance in the ship bar:** `scripts/conformance.sh` runs `@modelcontextprotocol/conformance` with `--requirements 2026-07-28`; `conformance-baseline.yml` lists the known failures, each a suite test fixture a textbook doesn't ship or the Tasks extension (out of scope). `scripts/ci.sh` runs it.
+- **Install lines use `--locked`**, so `cargo install` builds with the tested lockfile.
+- **Wording:** "AAIF-verified" → "reviewed and approved as an AAIF Ambassador contribution" (README) / "AAIF Ambassador contribution" (package descriptions).
+- **Docs:** two internal release briefs left the public `docs/` folder; `docs/PUBBETTER.md` no longer points at a local skill path.
 - **`mcp-better-lab` carries a FAF Block** (also called a Context Block): its facts as YAML at the top of the body: what it needs, what it reads, that it writes nothing and publishes nothing, its network use (none on stdio; localhost over Streamable HTTP), and when it's done. The description now says when to use it. The skill is served over MCP, so the facts travel with it; the digest still matches `resources/read`.
 
 ## [0.5.0] — 2026-08-18 — matching client completes MRTR

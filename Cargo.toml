@@ -4,7 +4,7 @@ version = "0.5.0"
 edition = "2021"
 rust-version = "1.85"
 authors = ["Wolfe-Jam <wolfejam@faf.one>"]
-description = "AAIF-verified modern MCP setup optimised to the 2026-07-28 model (BETTER textbook)."
+description = "Modern MCP setup for the 2026-07-28 spec (BETTER textbook). AAIF Ambassador contribution."
 license = "MIT"
 repository = "https://github.com/Wolfe-Jam/mcp-better"
 homepage = "https://github.com/Wolfe-Jam/mcp-better"
@@ -16,7 +16,7 @@ exclude = ["target/", ".git/"]
 [dependencies]
 anyhow = "1"
 axum = "0.8"
-rmcp = { version = "3.0", features = [
+rmcp = { version = "3.10", features = [
     "server",
     "client",
     "macros",

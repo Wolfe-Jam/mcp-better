@@ -9,7 +9,7 @@
 //!
 //! Or point MCP_BETTER_BIN at a built binary.
 
-use rmcp::model::{CacheScope, CallToolRequestParams, ClientInfo, ProtocolVersion};
+use rmcp::model::{CacheScope, CallToolRequestParams, ClientConfig, ProtocolVersion};
 use rmcp::transport::{ConfigureCommandExt, TokioChildProcess};
 use rmcp::{ClientLifecycleMode, ClientServiceExt};
 use tokio::process::Command;
@@ -39,7 +39,7 @@ async fn main() -> anyhow::Result<()> {
 
     let transport = TokioChildProcess::new(Command::new(&bin).configure(|_c| {}))?;
 
-    let client = ClientInfo::default()
+    let client = ClientConfig::default()
         .serve_with_lifecycle(
             transport,
             ClientLifecycleMode::Discover {

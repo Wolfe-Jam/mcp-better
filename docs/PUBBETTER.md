@@ -1,8 +1,6 @@
 # PUBBETTER — how this repo ships
 
-Canonical skill: **`/pubbetter`** → `~/.claude/skills/pubbetter/SKILL.md`
-
-This doc is the human short form. Agents run the skill end-to-end.
+This is the release protocol in short form.
 
 ## Ship bar (local ≡ CI)
 
