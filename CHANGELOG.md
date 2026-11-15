@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.6.0] — 2026-11-15 — the official MCP conformance suite in CI
 
 **Lesson:** a textbook that claims a spec should pass that spec's own tests. CI runs the official MCP conformance suite against two binaries: the conformance build passes every check, and the textbook binary passes every scored check that needs no suite fixture.
 

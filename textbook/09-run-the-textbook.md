@@ -3,7 +3,7 @@
 **Status:** SOLID  
 **Read time:** ~15 minutes hands-on  
 **Depends on:** [03](./03-interop.md)–[08](./08-claim-equals-wire.md) recommended  
-**Pins:** **mcp-better 0.5.0** · protocol **`2026-07-28`**  
+**Pins:** **mcp-better 0.6.0** · protocol **`2026-07-28`**  
 **Repo:** https://github.com/Wolfe-Jam/mcp-better
 
 ---
@@ -40,7 +40,7 @@ Copy the **operational contract**, not a megaserver.
 
 ```bash
 # first hit compiles deps once — then the binary is instant
-cargo install mcp-better --version 0.5.0
+cargo install mcp-better --version 0.6.0 --locked
 mcp-better --help
 ```
 

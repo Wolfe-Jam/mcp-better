@@ -55,6 +55,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.4.3** | Same era + **`confirm_echo` MRTR** (SEP-2322) + **Agent Skills** (`mcp-better-lab`) — see [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md) · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
 | **v0.4.4** | Same era + **book matches 0.4.3 wire** — no new tool · catalogs named `health` → `echo` → `confirm_echo` |
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` finishes `confirm_echo` |
+| **v0.6** | Same era + **the spec's own tests** — the official MCP conformance suite in CI ([Conformance](#conformance)) · cache hints on every list and read · declare what you answer · `rmcp` 3.10 |
 
 ## What BETTER means
 
@@ -105,10 +106,10 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # install from crates.io — first hit compiles deps once (see above):
-cargo install mcp-better --version 0.5.0 --locked
+cargo install mcp-better --version 0.6.0 --locked
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.5.0 --locked --bin mcp-worse
+# cargo install mcp-better --version 0.6.0 --locked --bin mcp-worse
 ```
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
@@ -136,7 +137,7 @@ cargo run --release -- --http
 | `echo` | Pure demo — returns `message` unchanged. |
 | `confirm_echo` | Textbook **MRTR** (SEP-2322) — echo after mid-call confirm · sealed `requestState`. |
 
-## Protocol claims (v0.5.0 — same 7/28 era · matching client completes MRTR)
+## Protocol claims (v0.6.0 — same 7/28 era · the official conformance suite in CI)
 
 | Surface | Status |
 |---------|--------|
@@ -227,4 +228,4 @@ For persistent, versionable AI project context beyond a protocol textbook:
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE). Except [`conformance/`](./conformance/) (the unpublished conformance build), which is Apache-2.0: see [`conformance/NOTICE`](./conformance/NOTICE).
