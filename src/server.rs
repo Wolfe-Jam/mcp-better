@@ -1,14 +1,18 @@
 //! BETTER textbook MCP server — tools + Agent Skills (J1).
 //!
 //! Protocol claim: **2026-07-28** (stdio default · Streamable HTTP via `--http`).
-//! List results stamp `ttlMs` + `cacheScope` (SEP-2549) — SDK defaults are unstamped.
+//! List and read results stamp `ttlMs` + `cacheScope` (SEP-2549) by choice — the SDK default
+//! (rmcp ≥ 3.5) is `ttlMs: 0` + `private`: correct, but it tells clients not to cache.
 //!
 //! `confirm_echo` demonstrates SEP-2322 MRTR (`input_required` → client retry).
 //! Note: `rmcp` tool-router drops `inputResponses` / `requestState`, so MRTR tools
 //! are handled in an explicit `call_tool` override (see `confirm_echo_call`).
 //!
-//! Skills: extension `io.modelcontextprotocol/skills` via custom methods
-//! `skills/list` · `skills/get`; content via `resources/read` + digests.
+//! Skills: extension `io.modelcontextprotocol/skills` (SEP-2640) via rmcp's native
+//! `list_skills` · `get_skill`; content via `resources/read` + digests.
+//! Prompts and completions: not declared, so not answered. rmcp's defaults answer
+//! `prompts/list` and `completion/complete` with empty results even when undeclared;
+//! BETTER answers method-not-found instead (SEP-2575: declare what you answer).
 
 use rmcp::handler::server::router::tool::ToolRouter;
 use rmcp::handler::server::tool::ToolCallContext;
@@ -20,10 +24,15 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::skills::{handle_skills_method, SkillCatalog, SKILLS_EXTENSION_ID};
+use crate::skills::{SkillCatalog, SKILLS_EXTENSION_ID};
 
 /// Catalog is static → public cache with a one-minute freshness window.
 pub const LIST_TOOLS_TTL_MS: u64 = 60_000;
+
+/// Skill documents are embedded at build time → same choice as tools.
+/// (rmcp ≥ 3.5 fills missing hints with `ttlMs: 0` + `private`, i.e. "don't cache";
+/// BETTER stamps what this server actually knows about its own data.)
+pub const CATALOG_TTL_MS: u64 = LIST_TOOLS_TTL_MS;
 
 /// Fixed tool order for stable `tools/list` across calls and process restarts.
 /// Public so smokes and the lying companion can name the BETTER contract.
@@ -54,7 +63,8 @@ impl BetterServer {
         });
         Self {
             tool_router: Self::tool_router(),
-            state_codec: RequestStateCodec::new(MRTR_STATE_KEY),
+            state_codec: RequestStateCodec::try_new(MRTR_STATE_KEY)
+                .expect("MRTR_STATE_KEY meets RequestStateCodec::MIN_KEY_LENGTH"),
             skills,
         }
     }
@@ -275,7 +285,7 @@ impl BetterServer {
 
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for BetterServer {
-    fn get_info(&self) -> ServerInfo {
+    fn get_info(&self) -> ServerConfig {
         let mut extensions = ExtensionCapabilities::new();
         extensions.insert(
             SKILLS_EXTENSION_ID.to_string(),
@@ -286,7 +296,7 @@ impl ServerHandler for BetterServer {
             .enable_resources()
             .enable_extensions_with(extensions)
             .build();
-        let mut info = ServerInfo::new(caps);
+        let mut info = ServerConfig::new(caps);
         info.server_info = Implementation::new("mcp-better", env!("CARGO_PKG_VERSION"));
         // Advertise 7/28 so peers can negotiate SEP-2322 MRTR.
         info.protocol_version = ProtocolVersion::V_2026_07_28;
@@ -296,7 +306,7 @@ impl ServerHandler for BetterServer {
              Tools: health (liveness), echo (pure demo), confirm_echo (MRTR textbook). \
              Skills: extension io.modelcontextprotocol/skills — skills/list · skills/get · \
              resources/read skill://… (digests). \
-             tools/list stamps ttlMs + cacheScope for Discover-compatible clients. \
+             Lists and reads stamp ttlMs + cacheScope (public, 60 s). \
              Transports: stdio (default) · Streamable HTTP (--http, local demo). \
              MRTR: confirm_echo needs negotiated ≥ 2026-07-28; older clients get a protocol error on input_required."
                 .into(),
@@ -331,10 +341,11 @@ impl ServerHandler for BetterServer {
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
     ) -> Result<ListResourcesResult, McpError> {
-        Ok(ListResourcesResult {
-            resources: self.skills.list_resources_meta(),
-            ..Default::default()
-        })
+        Ok(
+            ListResourcesResult::with_all_items(self.skills.list_resources_meta())
+                .with_ttl_ms(CATALOG_TTL_MS)
+                .with_cache_scope(CacheScope::Public),
+        )
     }
 
     async fn read_resource(
@@ -343,24 +354,91 @@ impl ServerHandler for BetterServer {
         _context: RequestContext<RoleServer>,
     ) -> Result<ReadResourceResponse, McpError> {
         let uri = request.uri.as_ref();
+        // SEP-2164: name the missing resource in `data.uri`.
         let res = self.skills.find_resource(uri).ok_or_else(|| {
-            McpError::invalid_params(format!("unknown resource uri: {uri}"), None)
+            McpError::invalid_params(
+                format!("unknown resource uri: {uri}"),
+                Some(json!({ "uri": uri })),
+            )
         })?;
-        Ok(ReadResourceResult::new(vec![ResourceContents::text(
-            res.text.as_ref(),
-            res.uri.clone(),
-        )])
-        .into())
+        // Same mimeType as resources/list: claim = wire.
+        Ok(
+            ReadResourceResult::new(vec![ResourceContents::TextResourceContents {
+                uri: res.uri.clone(),
+                mime_type: Some(crate::skills::SKILL_MD_MIME_TYPE.into()),
+                text: res.text.to_string(),
+                meta: None,
+            }])
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public)
+            .into(),
+        )
     }
 
-    /// `skills/list` and `skills/get` — rmcp has no first-class skills methods yet.
-    async fn on_custom_request(
+    /// SEP-2640 `skills/list` (rmcp native since 3.9).
+    async fn list_skills(
         &self,
-        request: CustomRequest,
+        _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
-    ) -> Result<CustomResult, McpError> {
-        let CustomRequest { method, params, .. } = request;
-        handle_skills_method(&self.skills, method.as_str(), params.as_ref())
+    ) -> Result<ListSkillsResult, McpError> {
+        Ok(ListSkillsResult::with_all_items(self.skills.skills())
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public))
+    }
+
+    /// SEP-2640 `skills/get`.
+    async fn get_skill(
+        &self,
+        request: GetSkillRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<GetSkillResult, McpError> {
+        let skill = self.skills.skill(&request.uri).ok_or_else(|| {
+            McpError::invalid_params(
+                format!("unknown skill uri: {}", request.uri),
+                Some(json!({ "uri": request.uri })),
+            )
+        })?;
+        Ok(GetSkillResult::new(skill)
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public))
+    }
+
+    /// Templates fall under the declared resources capability: an empty list, stamped by choice.
+    async fn list_resource_templates(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListResourceTemplatesResult, McpError> {
+        Ok(ListResourceTemplatesResult::with_all_items(Vec::new())
+            .with_ttl_ms(CATALOG_TTL_MS)
+            .with_cache_scope(CacheScope::Public))
+    }
+
+    /// Completions are not declared, so say so (rmcp's default answers an empty completion).
+    async fn complete(
+        &self,
+        _request: CompleteRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<CompleteResult, McpError> {
+        Err(McpError::method_not_found::<CompleteRequestMethod>())
+    }
+
+    /// Prompts are not declared, so there is no prompt to get.
+    async fn get_prompt(
+        &self,
+        _request: GetPromptRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<GetPromptResponse, McpError> {
+        Err(McpError::method_not_found::<GetPromptRequestMethod>())
+    }
+
+    /// Prompts are not declared: say so (rmcp's default would answer an empty list).
+    async fn list_prompts(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListPromptsResult, McpError> {
+        Err(McpError::method_not_found::<ListPromptsRequestMethod>())
     }
 }
 
@@ -537,21 +615,17 @@ mod tests {
 
     #[test]
     fn skills_list_get_and_read_digest_match() {
-        use crate::skills::{handle_skills_method, LAB_SKILL_URI};
+        use crate::skills::LAB_SKILL_URI;
         let server = BetterServer::new();
-        let list = handle_skills_method(server.skills(), "skills/list", None).unwrap();
-        let list_val = list.0;
-        let skills = list_val["skills"].as_array().unwrap();
+        let skills = server.skills().skills();
         assert_eq!(skills.len(), 1);
-        let digest = skills[0]["resources"][0]["digest"].as_str().unwrap();
-        let get = handle_skills_method(
-            server.skills(),
-            "skills/get",
-            Some(&json!({"uri": LAB_SKILL_URI})),
-        )
-        .unwrap();
-        assert_eq!(get.0["uri"], LAB_SKILL_URI);
-        assert_eq!(get.0["resources"][0]["digest"], digest);
+        let SkillResources::Files(files) = &skills[0].resources else {
+            panic!("lab skill has a file manifest");
+        };
+        let digest = files[0].digest.as_str();
+        let got = server.skills().skill(LAB_SKILL_URI).expect("skills/get");
+        assert_eq!(got.uri, LAB_SKILL_URI);
+        assert_eq!(got, skills[0]);
         let res = server.skills().find_resource(LAB_SKILL_URI).unwrap();
         assert_eq!(res.digest, digest);
         // resources/read body must match digest (same bytes as catalog)

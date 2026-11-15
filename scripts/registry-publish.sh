@@ -20,6 +20,9 @@ fi
 # optional registry token cache
 rm -f "$HOME/.mcpregistry_registry_token" 2>/dev/null || true
 
+echo "==> preflight (rust-mcp-preflight): stop here on any FAIL"
+bash scripts/preflight.sh --strict
+
 echo "==> mcp-publisher login github"
 echo "    Open https://github.com/login/device and enter the code shown."
 mcp-publisher login github

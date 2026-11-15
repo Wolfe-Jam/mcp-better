@@ -21,6 +21,10 @@ jobs:
           components: rustfmt, clippy
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            conformance
 
       - name: three-file lockstep (doc-gate)
         run: bash scripts/doc-gate.sh
@@ -45,6 +49,10 @@ jobs:
           cargo build --bins
           cargo run --example stdio-client
 
+      - name: MRTR matching client (confirm_echo R1 to R2)
+        run: |
+          MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example mrtr-client
+
       - name: order restart smoke (two processes)
         run: |
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example order-restart-smoke
@@ -59,3 +67,59 @@ jobs:
         run: |
           # http-smoke spawns the bin; example alone does not build [[bin]]
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example http-smoke
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: official MCP conformance suite, textbook binary
+        env:
+          MCP_CONFORMANCE_OUT: ${{ runner.temp }}/conformance-textbook
+        run: |
+          # The textbook ships no suite fixtures and no Tasks: conformance-baseline.yml lists them
+          MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" bash scripts/conformance.sh
+
+      - name: conformance build (mcp-better + suite fixtures) fmt, clippy, build, test
+        working-directory: conformance
+        run: |
+          cargo fmt -- --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo build --locked
+          cargo test --locked
+
+      - name: official MCP conformance suite, conformance build, no baseline (100%)
+        env:
+          MCP_CONFORMANCE_OUT: ${{ runner.temp }}/conformance-build
+        run: |
+          MCP_BETTER_BIN="${{ github.workspace }}/conformance/target/debug/mcp-better-conformance" \
+            MCP_CONFORMANCE_BASELINE='' bash scripts/conformance.sh
+
+      - name: keep conformance results when a run fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-results
+          path: ${{ runner.temp }}/conformance-*
+          if-no-files-found: ignore
+
+      - name: Install rust-mcp-preflight
+        uses: taiki-e/install-action@v2
+        with:
+          tool: rust-mcp-preflight@0.2.3
+
+      - name: Registry listing (rust-mcp-preflight server.json)
+        run: bash scripts/preflight.sh
+
+  msrv:
+    # rust-version in Cargo.toml must stay true: build on exactly that toolchain.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust 1.88
+        uses: dtolnay/rust-toolchain@1.88
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo check --locked on the declared minimum
+        run: cargo check --locked --all-targets

@@ -1,15 +1,14 @@
 //! J1 Agent Skills over MCP (textbook).
 //!
 //! Extension: `io.modelcontextprotocol/skills`
-//! Methods: `skills/list`, `skills/get` (via custom request)
+//! Methods: `skills/list`, `skills/get` (rmcp 3.10 native `ServerHandler` methods)
 //! Content: `resources/read` on `skill://…` URIs with sha256 digests.
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use rmcp::model::*;
-use rmcp::ErrorData as McpError;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 
 /// Extension id advertised in `capabilities.extensions`.
@@ -20,6 +19,8 @@ pub const LAB_SKILL_NAME: &str = "mcp-better-lab";
 
 /// Canonical URI for the lab skill document.
 pub const LAB_SKILL_URI: &str = "skill://mcp-better-lab/SKILL.md";
+/// What `resources/list` says a SKILL.md is, and what `resources/read` returns (SEP-2640).
+pub const SKILL_MD_MIME_TYPE: &str = "text/markdown";
 
 /// Embedded skill body (crate-relative; always available for install + tests).
 const EMBEDDED_LAB_SKILL: &str = include_str!("../skills/mcp-better-lab/SKILL.md");
@@ -67,12 +68,14 @@ impl SkillCatalog {
         Ok(Self { skills })
     }
 
-    pub fn list_entries(&self) -> Vec<Value> {
-        self.skills.values().map(skill_entry_json).collect()
+    /// Every skill as SEP-2640 `Skill` (frontmatter + file manifest with digest and size).
+    pub fn skills(&self) -> Vec<Skill> {
+        self.skills.values().map(to_skill).collect()
     }
 
-    pub fn get_by_uri(&self, uri: &str) -> Option<Value> {
-        self.skills.get(uri).map(skill_entry_json)
+    /// One skill by the URI of its `SKILL.md`.
+    pub fn skill(&self, uri: &str) -> Option<Skill> {
+        self.skills.get(uri).map(to_skill)
     }
 
     pub fn find_resource(&self, uri: &str) -> Option<&SkillResource> {
@@ -87,12 +90,19 @@ impl SkillCatalog {
     pub fn list_resources_meta(&self) -> Vec<Resource> {
         let mut out = Vec::new();
         for skill in self.skills.values() {
+            // SEP-2640: a SKILL.md resource carries the skill's frontmatter name and description.
+            let field = |k: &str| {
+                skill
+                    .frontmatter
+                    .get(k)
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+            };
             for r in &skill.resources {
-                let name = r.uri.rsplit('/').next().unwrap_or("SKILL.md").to_string();
                 out.push(
-                    Resource::new(r.uri.clone(), name)
-                        .with_description("Agent Skill document (mcp-better textbook)")
-                        .with_mime_type("text/markdown")
+                    Resource::new(r.uri.clone(), field("name"))
+                        .with_description(field("description"))
+                        .with_mime_type(SKILL_MD_MIME_TYPE)
                         .with_size(r.bytes.len() as u64),
                 );
             }
@@ -101,22 +111,31 @@ impl SkillCatalog {
     }
 }
 
-fn skill_entry_json(entry: &SkillEntry) -> Value {
-    let resources: Vec<Value> = entry
+fn to_skill(entry: &SkillEntry) -> Skill {
+    let name = entry
+        .frontmatter
+        .get("name")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+    let description = entry
+        .frontmatter
+        .get("description")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+    let mut frontmatter = SkillFrontmatter::new(name, description);
+    for (k, v) in &entry.frontmatter {
+        if k != "name" && k != "description" {
+            frontmatter = frontmatter.with_field(k.clone(), v.clone());
+        }
+    }
+    let files = entry
         .resources
         .iter()
         .map(|r| {
-            json!({
-                "uri": r.uri,
-                "digest": r.digest,
-            })
+            rmcp::model::SkillResource::new(r.uri.clone(), r.digest.clone(), r.bytes.len() as u64)
         })
         .collect();
-    json!({
-        "uri": entry.uri,
-        "frontmatter": Value::Object(entry.frontmatter.clone()),
-        "resources": resources,
-    })
+    Skill::new(entry.uri.clone(), frontmatter, SkillResources::Files(files))
 }
 
 fn load_skill_from_markdown(md: &str) -> Result<SkillEntry, String> {
@@ -180,37 +199,6 @@ fn hex_sha256(bytes: &[u8]) -> String {
     hash.iter().map(|b| format!("{b:02x}")).collect()
 }
 
-/// Handle `skills/list` and `skills/get` custom methods.
-pub fn handle_skills_method(
-    catalog: &SkillCatalog,
-    method: &str,
-    params: Option<&Value>,
-) -> Result<CustomResult, McpError> {
-    match method {
-        "skills/list" => {
-            let skills = catalog.list_entries();
-            Ok(CustomResult::new(json!({
-                "skills": skills,
-            })))
-        }
-        "skills/get" => {
-            let uri = params
-                .and_then(|p| p.get("uri"))
-                .and_then(|u| u.as_str())
-                .ok_or_else(|| McpError::invalid_params("skills/get requires params.uri", None))?;
-            let entry = catalog.get_by_uri(uri).ok_or_else(|| {
-                McpError::invalid_params(format!("unknown skill uri: {uri}"), None)
-            })?;
-            Ok(CustomResult::new(entry))
-        }
-        other => Err(McpError::new(
-            ErrorCode::METHOD_NOT_FOUND,
-            other.to_string(),
-            None,
-        )),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -218,29 +206,26 @@ mod tests {
     #[test]
     fn lab_skill_loads_with_matching_digest() {
         let cat = SkillCatalog::load_lab().expect("load");
-        let list = cat.list_entries();
+        let list = cat.skills();
         assert_eq!(list.len(), 1);
         let entry = &list[0];
-        assert_eq!(entry["uri"], LAB_SKILL_URI);
-        assert_eq!(entry["frontmatter"]["name"], LAB_SKILL_NAME);
-        let digest = entry["resources"][0]["digest"].as_str().unwrap();
+        assert_eq!(entry.uri, LAB_SKILL_URI);
+        assert_eq!(entry.frontmatter.name, LAB_SKILL_NAME);
+        let SkillResources::Files(files) = &entry.resources else {
+            panic!("lab skill has a file manifest");
+        };
+        let digest = files[0].digest.as_str();
         assert!(digest.starts_with("sha256:"));
         let res = cat.find_resource(LAB_SKILL_URI).unwrap();
+        assert_eq!(files[0].size, res.bytes.len() as u64);
         assert_eq!(res.digest, digest);
         let recomputed = format!("sha256:{}", hex_sha256(res.bytes.as_ref()));
         assert_eq!(recomputed, digest);
     }
 
     #[test]
-    fn skills_get_unknown_errors() {
+    fn skills_get_unknown_is_none() {
         let cat = SkillCatalog::load_lab().unwrap();
-        let err = handle_skills_method(
-            &cat,
-            "skills/get",
-            Some(&json!({"uri": "skill://nope/SKILL.md"})),
-        )
-        .unwrap_err();
-        let s = format!("{err:?}");
-        assert!(s.contains("unknown") || s.contains("invalid") || s.contains("nope"));
+        assert!(cat.skill("skill://nope/SKILL.md").is_none());
     }
 }

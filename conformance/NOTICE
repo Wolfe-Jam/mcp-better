@@ -1,0 +1,8 @@
+mcp-better-conformance
+
+src/main.rs is adapted from the Rust MCP SDK's conformance server
+(https://github.com/modelcontextprotocol/rust-sdk, conformance/src/bin/server.rs),
+licensed under the Apache License, Version 2.0 (LICENSE-APACHE-2.0 in this folder).
+The changes are listed at the top of src/main.rs.
+
+This folder is not part of the published mcp-better crate or npm package.

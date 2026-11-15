@@ -1,0 +1,52 @@
+# Official MCP conformance suite: known failures for the textbook binary (mcp-better).
+# Run: bash scripts/conformance.sh  (--requirements 2026-07-28, per-check entries).
+#
+# The conformance build (mcp-better-conformance: the same server plus the suite's
+# fixtures and Tasks) runs with no baseline, and every check of all 50 scenarios must
+# pass: see scripts/conformance.sh.
+#
+# Scope of this file: the 37 scenarios the suite scores for 2026-07-28. The suite also
+# runs 13 scenarios it does not score (the Tasks extension and three pending ones); it
+# does not apply a baseline to them and they do not affect its exit code, so they are
+# not listed here.
+#
+# Every entry is one of two kinds, nothing else:
+#   fixture:      the check calls a test tool, prompt or resource from the suite's own
+#                 reference server (test_*, test://…), which a textbook server does not ship.
+#   not declared: mcp-better does not declare prompts or completions, so those methods
+#                 answer method-not-found. The suite's checks assume both are served.
+# A new failure that is neither fails CI; an entry that starts passing fails CI as stale.
+server:
+  - input-required-result-basic-elicitation:sep-2322-elicitation-incomplete # fixture
+  - input-required-result-basic-list-roots:sep-2322-list-roots-incomplete # fixture
+  - input-required-result-basic-sampling:sep-2322-sampling-incomplete # fixture
+  - input-required-result-capability-check:sep-2322-respect-client-capabilities # fixture
+  - input-required-result-multi-round:sep-2322-multi-round-r1 # fixture
+  - input-required-result-multiple-input-requests:sep-2322-multiple-inputs-incomplete # fixture
+  - input-required-result-non-tool-request:sep-2322-non-tool-incomplete # fixture
+  - input-required-result-request-state:sep-2322-request-state-incomplete # fixture
+  - input-required-result-result-type:sep-2322-result-type-included # fixture
+  - input-required-result-tampered-state:sep-2322-reject-tampered-state # fixture
+  - prompts-get-embedded-resource:prompts-get-embedded-resource # fixture
+  - prompts-get-simple:prompts-get-simple # fixture
+  - prompts-get-with-args:prompts-get-with-args # fixture
+  - prompts-get-with-image:prompts-get-with-image # fixture
+  - resources-read-binary:resources-read-binary # fixture
+  - resources-read-text:resources-read-text # fixture
+  - resources-templates-read:resources-templates-read # fixture
+  - server-stateless:sep-2575-http-server-no-independent-requests-on-stream # fixture
+  - server-stateless:sep-2575-missing-capability-http-400 # fixture
+  - server-stateless:sep-2575-server-no-log-without-loglevel # fixture
+  - server-stateless:sep-2575-server-rejects-undeclared-capability # fixture
+  - tools-call-audio:tools-call-audio # fixture
+  - tools-call-embedded-resource:tools-call-embedded-resource # fixture
+  - tools-call-error:tools-call-error # fixture
+  - tools-call-image:tools-call-image # fixture
+  - tools-call-mixed-content:tools-call-mixed-content # fixture
+  - tools-call-simple-text:tools-call-simple-text # fixture
+  - tools-call-with-progress:tools-call-with-progress # fixture
+  - input-required-result-missing-input-response:sep-2322-missing-response-rerequests # fixture
+  - input-required-result-ignore-extra-params:sep-2322-ignore-unexpected-params # fixture
+  - completion-complete:completion-complete # not declared
+  - prompts-list:prompts-list # not declared
+  - caching:sep-2549-prompts-list-caching-hints # not declared

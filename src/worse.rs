@@ -1,7 +1,7 @@
 //! **Lying companion** — deliberately violates the BETTER list contract.
 //!
 //! Teaching only. Same tool *names* as mcp-better, wrong operational surface:
-//! - **no** `ttlMs` / `cacheScope` stamps
+//! - **no** chosen `ttlMs` / `cacheScope` (rmcp ≥ 3.5 fills the wire with `0` + `private`)
 //! - **reversed** tool order (`echo` then `health`)
 //!
 //! Use with `examples/contrast-smoke` so learners see claim ≠ wire.
@@ -83,12 +83,13 @@ impl WorseServer {
 
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for WorseServer {
-    fn get_info(&self) -> ServerInfo {
-        let mut info = ServerInfo::new(ServerCapabilities::builder().enable_tools().build());
+    fn get_info(&self) -> ServerConfig {
+        let mut info = ServerConfig::new(ServerCapabilities::builder().enable_tools().build());
         info.server_info = Implementation::new("mcp-worse", env!("CARGO_PKG_VERSION"));
         info.instructions = Some(
             "LYING DEMO — not BETTER. Same tool names as mcp-better but tools/list \
-             omits ttlMs/cacheScope and reverses order. For contrast-smoke only. \
+             sets no cache hints of its own (the SDK sends ttlMs 0 + private) and \
+             reverses order. For contrast-smoke only. \
              Do not use in production or as a template."
                 .into(),
         );

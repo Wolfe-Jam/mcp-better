@@ -8,7 +8,7 @@
 #   - npm Trusted Publisher → same
 #   - GitHub Environment `release` (protection optional: reviewers / v* tags)
 #
-# See docs/OIDC-TRUSTED-PUBLISHING-BRIEF.md and docs/MCP-DIST-POST.md
+# See docs/MCP-DIST-POST.md
 #
 # cargo-dist config: dist-workspace.toml (durable path).
 # mcp-dist-post stays a local post-step (does not publish).

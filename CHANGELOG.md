@@ -2,8 +2,26 @@
 
 ## [Unreleased]
 
+**Lesson:** a textbook that claims a spec should pass that spec's own tests. CI runs the official MCP conformance suite against two binaries: the conformance build passes every check, and the textbook binary passes every scored check that needs no suite fixture.
+
+### Fixed
+
+- **Cache hints on every list and read** (SEP-2549): `resources/list`, `resources/templates/list`, `resources/read`, `skills/list` and `skills/get` now stamp `ttlMs=60000` + `cacheScope=public`, like `tools/list`. Before, only `tools/list` did.
+- **Declare what you answer:** the server answered `prompts/list` and `completion/complete` without declaring either (rmcp's defaults). Neither is declared, and both now answer method-not-found.
+- **Skills manifest has `size`** (SEP-2640): each file in `skills/list` / `skills/get` now carries `size` next to `uri` and `digest`.
+- **Not-found errors name the URI** (SEP-2164): `resources/read` and `skills/get` carry `data.uri`.
+- **The skill document lists and reads as the same thing** (SEP-2640): `resources/read` returns `text/markdown`, as `resources/list` says, and the listed name and description are the skill's frontmatter.
+
 ### Changed
 
+- **rmcp 3.0.1 → 3.10.0.** Deprecated names updated (`ServerConfig`, `ClientConfig`, `RequestStateCodec::try_new`). rustls 0.23.46 in the lock.
+- **Skills on rmcp's native API:** `list_skills` / `get_skill` (rmcp ≥ 3.9) replace the custom-request handler.
+- **Official MCP conformance suite in CI** (`scripts/conformance.sh`, `--requirements 2026-07-28`: 50 scenarios, 37 scored and 13 run but not scored; plus the two Skills scenarios). `conformance/` builds `mcp-better-conformance`: mcp-better's tools, skill resource and Skills, with the suite's fixtures, capabilities and Tasks adapted from the Rust MCP SDK's conformance server (Apache-2.0). It passes every check with no baseline: 196 checks, no failure, no warning, enforced by the script over all 50 scenarios, plus Skills 38 of 38. The textbook binary passes the 37 scored scenarios except 33 checks listed in `conformance-baseline.yml` (`fixture` or `not declared`), and Skills 38 of 38. Results are kept as a CI artifact when a run fails.
+- **rust-mcp-preflight** checks the Registry listing (`scripts/preflight.sh`): in CI, and strict in `scripts/registry-publish.sh` before the Registry publish.
+- **GitHub CI:** the MRTR matching client, Preflight, and an msrv job. `rust-version` is now 1.88 (1.85 was false: the dependencies need 1.88).
+- **Install lines use `--locked`**, so `cargo install` builds with the tested lockfile.
+- **Wording:** "AAIF-verified" → "reviewed and approved as an AAIF Ambassador contribution" (README) / "AAIF Ambassador contribution" (package descriptions).
+- **Docs:** two internal release briefs left the public `docs/` folder; `docs/PUBBETTER.md` no longer points at a local skill path.
 - **`mcp-better-lab` carries a FAF Block** (also called a Context Block): its facts as YAML at the top of the body: what it needs, what it reads, that it writes nothing and publishes nothing, its network use (none on stdio; localhost over Streamable HTTP), and when it's done. The description now says when to use it. The skill is served over MCP, so the facts travel with it; the digest still matches `resources/read`.
 
 ## [0.5.0] — 2026-08-18 — matching client completes MRTR

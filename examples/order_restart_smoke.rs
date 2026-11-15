@@ -5,7 +5,7 @@
 //!   cargo build --bins
 //!   cargo run --example order-restart-smoke
 
-use rmcp::model::{CacheScope, ClientInfo, ProtocolVersion};
+use rmcp::model::{CacheScope, ClientConfig, ProtocolVersion};
 use rmcp::transport::{ConfigureCommandExt, TokioChildProcess};
 use rmcp::{ClientLifecycleMode, ClientServiceExt};
 use tokio::process::Command;
@@ -26,7 +26,7 @@ fn resolve_better_bin() -> String {
 
 async fn list_names(bin: &str) -> anyhow::Result<(Vec<String>, Option<u64>, Option<CacheScope>)> {
     let transport = TokioChildProcess::new(Command::new(bin).configure(|_c| {}))?;
-    let client = ClientInfo::default()
+    let client = ClientConfig::default()
         .serve_with_lifecycle(
             transport,
             ClientLifecycleMode::Discover {
