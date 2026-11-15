@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-14
+          - runner: macos-15
             target: aarch64-apple-darwin
           # macos-13 retired — cross-compile x86_64 on arm64 macOS
           - runner: macos-15
