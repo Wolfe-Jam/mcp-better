@@ -95,7 +95,17 @@ We claim **everything in v0.4.3**, plus:
 
 Published crates.io / npm / GH Release = **0.5.0**.
 
-We do **not** claim on v0.4.3 / v0.5.0:
+### v0.6.0 — the official MCP conformance suite in CI
+
+We claim **everything in v0.5.0**, plus:
+
+- Cache hints by choice on every list and read the server answers (tools, resources, templates, `resources/read`, skills)
+- Prompts and completions not declared, so not answered (`-32601`); rmcp's defaults answered both
+- Skills on rmcp's native API (3.9+), `size` per file, `text/markdown` read as listed
+- CI runs the official conformance suite: the conformance build (`conformance/`) passes every check; the textbook binary passes every scored check that needs no suite fixture
+- `rmcp` 3.10 · `rust-version` 1.88
+
+We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  

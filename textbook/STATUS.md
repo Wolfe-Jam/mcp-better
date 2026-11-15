@@ -2,7 +2,7 @@
 
 # Textbook status ledger
 
-**Last refresh:** 2026-08-18 (0.5.0 — matching client completes MRTR)  
+**Last refresh:** 2026-11-15 (0.6.0 — the official MCP conformance suite in CI; ch. 04 + 05 updated)  
 **Season 1 goal:** All core chapters **SOLID** before heavy Season 2 writing.  
 **Shipped home:** `mcp-better/textbook/` — the book is the app is the book.
 
@@ -17,7 +17,7 @@
 | 06 | Stateless core | SOLID | `confirm_echo` = sealed retry; `mrtr-client` is the other half |
 | 07 | Transports | SOLID | Env precedence; http-smoke happy-path only |
 | 08 | Claim = wire | SOLID | Tool-list claim = `BETTER_TOOL_ORDER` |
-| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.5.0** live |
+| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.6.0** |
 | 10 | What we resist | SOLID | |
 | A | Spec map | SOLID | Header precision |
 | B | Glossary | SOLID | mcp-better = three-tool catalog |
