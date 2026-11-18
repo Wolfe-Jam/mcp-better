@@ -9,7 +9,7 @@ Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER**
 the book is the app is the book
 ```
 
-Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · the official MCP conformance suite in CI: [100% for the conformance build](#conformance), every scored check that needs no suite fixture for the textbook binary.  
+Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador contribution. Rust · `rmcp` **3.10** · Discover · stamped cache hints · the official MCP conformance suite in CI: [100% for the conformance build](#conformance), and for the textbook binary every scored check except those that need a suite fixture or an undeclared method.  
 **Book:** [`textbook/`](./textbook/) — what · why · how · [doctrine](./textbook/DOCTRINE-book-is-app.md).  
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
@@ -54,7 +54,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.4.4** | Same era + **book matches 0.4.3 wire** — no new tool · catalogs named `health` → `echo` → `confirm_echo` |
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` finishes `confirm_echo` |
 | **v0.6** | Same era + **the spec's own tests** — the official MCP conformance suite in CI ([Conformance](#conformance)) · cache hints on every list and read · declare what you answer · `rmcp` 3.10 |
-| **v0.7** | Same era + **tools say what they do** — every tool carries all four annotation hints (read-only, not destructive, idempotent, closed world) · `server/discover` stamped like the lists · a strict command line (`--version`, unknown arguments exit 2) |
+| **v0.7** | Same era + **tools say what they do** — every tool carries all four annotation hints (read-only, not destructive, idempotent, closed world) · `confirm_echo` asks only clients that declare elicitation (else `-32021`) · `server/discover` stamped like the lists · a strict command line (`--version`, unknown arguments exit 2) |
 
 ## What BETTER means
 
@@ -154,7 +154,7 @@ All three are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempot
 | Tool annotations | all four hints on every tool: read-only · not destructive · idempotent · closed world (`tests/handlers.rs`) |
 | MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · asked only of clients that declare elicitation (else `-32021`) · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
-| Lying companion | **`mcp-worse`** — reversed tool order (the lie) + no cache hints of its own (the wire shows the SDK default `ttlMs: 0` + `private`, valid but uninformative) · stdio only · same `--version` · contrast-smoke only |
+| Lying companion | **`mcp-worse`** — reversed tool order (the lie) + the SDK defaults left in place: no cache hints of its own (the wire shows `ttlMs: 0` + `private`, valid but uninformative), no tool annotations, and `prompts/list` / `completion/complete` answered without being declared · stdio only · same `--version` · contrast-smoke only |
 | OAuth / tasks | out of hero |
 
 ## Conformance
