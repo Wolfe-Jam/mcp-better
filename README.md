@@ -54,14 +54,16 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.4.4** | Same era + **book matches 0.4.3 wire** — no new tool · catalogs named `health` → `echo` → `confirm_echo` |
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` finishes `confirm_echo` |
 | **v0.6** | Same era + **the spec's own tests** — the official MCP conformance suite in CI ([Conformance](#conformance)) · cache hints on every list and read · declare what you answer · `rmcp` 3.10 |
+| **v0.7** | Same era + **tools say what they do** — every tool carries all four annotation hints (read-only, not destructive, idempotent, closed world) · `server/discover` stamped like the lists · a strict command line (`--version`, unknown arguments exit 2) |
 
 ## What BETTER means
 
 1. **Protocol honesty** — claim 7/28 / `2026-07-28` only for surfaces you implement and test.
 2. **Discover-compatible** — clients should use `ClientLifecycleMode::Discover` (or Auto → 7/28), not only legacy initialize.
-3. **Cache hints by choice** — `tools/list`, `resources/list`, `resources/templates/list`, `resources/read`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
+3. **Cache hints by choice** — `server/discover`, `tools/list`, `resources/list`, `resources/templates/list`, `resources/read`, `skills/list` and `skills/get` return a positive `ttlMs` and `cacheScope` (static catalog → `public`). The SDK default is `ttlMs: 0` + `private`: valid, but it tells every client not to cache.
 4. **Stable tool order** — same process, same order across N list calls.
-5. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
+5. **Annotated tools** — every tool sets `readOnlyHint`, `destructiveHint`, `idempotentHint` and `openWorldHint`. A tool with no hints gets the spec's defaults: it may write, may destroy, and reaches the outside world.
+6. **Transports** — **stdio** (default) and **Streamable HTTP** (`--http`) in the **same 7/28 era**.
 
 ## Quickstart (≤10 min)
 
@@ -104,10 +106,11 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # install from crates.io — first hit compiles deps once (see above):
-cargo install mcp-better --version 0.6.0 --locked
+cargo install mcp-better --version 0.7.0 --locked
+mcp-better --version   # mcp-better 0.7.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.6.0 --locked --bin mcp-worse
+# cargo install mcp-better --version 0.7.0 --locked --bin mcp-worse
 ```
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
@@ -122,9 +125,10 @@ cargo run --release -- --http
 
 | How | Value |
 |-----|--------|
-| CLI | `mcp-better` (stdio) · `mcp-better --http` · `mcp-better --stdio` |
+| CLI | `mcp-better` (stdio) · `mcp-better --http` · `mcp-better --stdio` · `--version` / `--help` win wherever they appear |
 | Bare args | `http` / `stdio` (same meaning as flags) |
 | Env | `MCP_TRANSPORT` or `MCP_BETTER_TRANSPORT` → `stdio` \| `http` (**`MCP_TRANSPORT` first** if both set) |
+| Anything else | An unknown argument or transport value prints the error and exits **2**; nothing falls back to stdio silently |
 | HTTP bind | `MCP_BETTER_HTTP_ADDR` — default **`127.0.0.1:8787`**. Do **not** use `0.0.0.0` unless you accept an unauthenticated open endpoint. |
 
 ## Tools
@@ -135,7 +139,9 @@ cargo run --release -- --http
 | `echo` | Pure demo — returns `message` unchanged. |
 | `confirm_echo` | Textbook **MRTR** (SEP-2322) — echo after mid-call confirm · sealed `requestState`. |
 
-## Protocol claims (v0.6.0 — same 7/28 era · the official conformance suite in CI)
+All three are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`: they read only, change nothing and stay in the process.
+
+## Protocol claims (v0.7.0 — same 7/28 era · the official conformance suite in CI)
 
 | Surface | Status |
 |---------|--------|
@@ -144,10 +150,11 @@ cargo run --release -- --http
 | HTTP mode | Stateless for 7/28 · `json_response` · local **Host** guards |
 | Routing headers | Streamable HTTP POSTs use **`Mcp-Method`** and **`Mcp-Name`** when naming a tool (SEP-2243); `http-smoke` asserts this happy path |
 | Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · prompts and completions **not declared** (`prompts/*`, `completion/complete` → method not found) |
-| Cache hints | tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
-| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
+| Cache hints | discover, tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
+| Tool annotations | all four hints on every tool: read-only · not destructive · idempotent · closed world (`tests/handlers.rs`) |
+| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · asked only of clients that declare elicitation (else `-32021`) · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
 | Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
-| Lying companion | **`mcp-worse`** — reversed tool order (the lie) + no cache hints of its own (the wire shows the SDK default `ttlMs: 0` + `private`, valid but uninformative) · contrast-smoke only |
+| Lying companion | **`mcp-worse`** — reversed tool order (the lie) + no cache hints of its own (the wire shows the SDK default `ttlMs: 0` + `private`, valid but uninformative) · stdio only · same `--version` · contrast-smoke only |
 | OAuth / tasks | out of hero |
 
 ## Conformance
@@ -156,12 +163,12 @@ CI runs the official MCP conformance suite ([`@modelcontextprotocol/conformance`
 
 | Run | Binary | 2026-07-28 requirements | Skills |
 |-----|--------|-------------------------|--------|
-| Conformance build | [`conformance/`](./conformance/): `mcp-better-conformance` | **100%, no baseline:** every check of all 50 scenarios, 196 checks, no failure, no warning | 38 of 38 |
+| Conformance build | [`conformance/`](./conformance/): `mcp-better-conformance` | **100%, no baseline:** 196 checks pass across the 50 scenarios, none fail or warn; the suite itself skips one scenario (`tasks-status-notifications`, 0 checks) | 38 of 38 |
 | Textbook | `mcp-better`, what you install | the 37 scored scenarios: 74 checks pass; 33 fail or warn, each listed in [`conformance-baseline.yml`](./conformance-baseline.yml) as `fixture` or `not declared` | 38 of 38 |
 
 **What each run measures.** Most scenarios call tools, prompts and resources that exist only in the suite's reference server (`test_*`, `test://…`), and the 13 unscored ones are the Tasks extension and three pending scenarios. The official SDKs pass those with a separate server that carries the fixtures; `mcp-better-conformance` is that server for mcp-better. Its fixtures, capabilities and Tasks are adapted from the Rust MCP SDK's conformance server (Apache-2.0, [`conformance/NOTICE`](./conformance/NOTICE)); `BetterServer` serves mcp-better's three tools, the skill resource and Skills. So the 100% mostly measures the fixtures and the shared transport (`mcp_better::http_config`). The textbook run and the Skills scenarios measure mcp-better's own code.
 
-**Reading the textbook run.** `caching` is 7 of 8: the eighth check calls `prompts/list`, and mcp-better doesn't declare prompts, so it answers method-not-found (`not declared` in the baseline). `prompts-list` and `completion-complete` fail for the same reason. Every other failure is a missing suite fixture. The suite's MRTR scenarios use its own fixture tools, so `confirm_echo` is checked by the matching client (`examples/mrtr-client`) in CI.
+**Reading the textbook run.** `caching` is 7 of 8: the eighth check calls `prompts/list`, and mcp-better doesn't declare prompts, so it answers method-not-found (`not declared` in the baseline). `prompts-list` and `completion-complete` fail for the same reason. Every other failure is a missing suite fixture. The suite's MRTR scenarios use its own fixture tools, so `confirm_echo` is checked by the matching client (`examples/mrtr-client`), which declares elicitation, and by a handler test that a client without it gets `-32021` (missing required client capability).
 
 ```bash
 bash scripts/conformance.sh                                             # textbook + baseline

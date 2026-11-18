@@ -39,7 +39,7 @@ Agent skill for the **mcp-better** textbook server (protocol **2026-07-28** / 7/
 ## Flow
 
 ```text
-initialize → skills/list → resources/read(skill://…) → tools/call
+server/discover → skills/list → resources/read(skill://…) → tools/call
 ```
 
 Same process as tools. Skills guide; tools act.

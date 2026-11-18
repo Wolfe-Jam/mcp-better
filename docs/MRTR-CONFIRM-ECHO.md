@@ -76,6 +76,10 @@ The demo signing key is a **constant for the textbook binary only**. Real deploy
 
 The `rmcp` SDK only delivers `InputRequiredResult` to peers that negotiated **`2026-07-28` or newer**. Older clients get a **protocol error** on that result (not a silent fallback). Document that honestly: MRTR is a **7/28** surface.
 
+## Declared capabilities (v0.7)
+
+Round 1 asks for an **elicitation**, so it is asked only of a client that declared `elicitation` (in `_meta` on 7/28, or the legacy `initialize`). A client that didn't gets `-32021` (missing required client capability), with `requiredCapabilities.elicitation` in the error data, instead of a request it can't answer. The matching client declares elicitation; `tests/handlers.rs` checks both sides.
+
 `health` and `echo` never need mid-call input — checklist **A8 = N/A** for them. Only tools that elicit/sample mid-call implement MRTR.
 
 ## Links
@@ -83,7 +87,6 @@ The `rmcp` SDK only delivers `InputRequiredResult` to peers that negotiated **`2
 - Pattern: [SEP-2322 / Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports) (see also MCP SEP index for SEP-2322)
 - SDK types: `rmcp` `model/mrtr.rs` · `RequestStateCodec` (`request-state` feature)
 - Upstream example (when present in your `rmcp` tree): `examples/servers/src/mrtr.rs` / crate tests `test_mrtr_behavior.rs`
-- Vault placement: PLANET-FAF `CHECKLIST-728-QUALITY.md` **A8** (conditional) · `MRTR-PLACEMENT.md`
 
 ## Matching client (v0.5)
 

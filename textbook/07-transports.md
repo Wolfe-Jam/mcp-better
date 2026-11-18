@@ -92,7 +92,7 @@ Claiming “remote MCP” because `--http` exists is a **claim > proof** failure
 | Bare args | `http` / `stdio` (same meaning as flags) |
 | Env | `MCP_TRANSPORT` or `MCP_BETTER_TRANSPORT` → `stdio` \| `http` |
 
-**Precedence (current binary):** CLI flags/args win. If no CLI transport flag, env is read as **`MCP_TRANSPORT` first**, then **`MCP_BETTER_TRANSPORT`**. If neither is set → **stdio**.
+**Precedence (current binary):** CLI flags/args win. If no CLI transport flag, env is read as **`MCP_TRANSPORT` first**, then **`MCP_BETTER_TRANSPORT`**. If neither is set → **stdio**. An unknown argument or transport value (`--bogus`, `MCP_TRANSPORT=htp`) exits **2** with the reason instead of starting a server (since 0.7.0): a typo should never quietly pick a transport for you.
 
 ---
 

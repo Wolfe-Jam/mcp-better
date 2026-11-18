@@ -192,6 +192,36 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 | M15 | MCP Registry | Soft | — | separate human step |
 | M17–M18 | HTTP + headers | **Yes** | ✅ | retained |
 
+## v0.6.0 — the official MCP conformance suite in CI — **2026-11-15**
+
+**Lesson:** a textbook that claims a spec should pass that spec's own tests.  
+**Publish:** **v0.6.0** tagged · crates + npm (OIDC, from the Release workflow) · GH Release with 9 assets · MCP Registry **0.6.0** active.
+
+| # | Surface | Required? | v0.6.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (lockstep **0.6.0**) | **Yes** | ✅ | |
+| M5 | `scripts/ci.sh` (smokes + conformance + preflight) | **Yes** | ✅ | CI on the tag commit |
+| C1 | Conformance build, no baseline | **Yes** | ✅ | 196 checks pass, none fail or warn; suite skips `tasks-status-notifications` |
+| C2 | Textbook binary vs `conformance-baseline.yml` | **Yes** | ✅ | 74 scored checks pass; 33 baselined (`fixture` / `not declared`); Skills 38 of 38 |
+| msrv | Rust 1.88 | **Yes** | ✅ | CI |
+| M11 | crates.io | **Yes** | ✅ | **0.6.0**, matches the tag |
+| npm | npm `mcp-better` | **Yes** | ✅ | **0.6.0**, provenance |
+| M13–M14 | tag + GH Release | **Yes** | ✅ | [v0.6.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.6.0) |
+| M15 | MCP Registry | **Yes** | ✅ | **0.6.0** active |
+
+## v0.7.0 — tools say what they do — **unreleased**
+
+**Lesson:** a tool with no annotations gets the spec's defaults; a server should ask only for what the client declared.
+
+| # | Surface | Required? | v0.7.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (lockstep **0.7.0**, every README / guide pin) | **Yes** | | |
+| M5 | `scripts/ci.sh` | **Yes** | | |
+| A1 | Every tool annotated (4 hints) | **Yes** | | handler test |
+| A2 | `confirm_echo` without declared elicitation → `-32021` | **Yes** | | unit + handler test |
+| A3 | `--version` / unknown arguments | **Yes** | | `tests/cli.rs` |
+| M11 · npm · M13–M15 | crates.io · npm · tag + GH Release · MCP Registry | **Yes** | | |
+
 ---
 
 ## Version roadmap × matrix (advance here)
@@ -237,7 +267,7 @@ v0.2 is **same era, more road** — not “when we become 7/28.”
 
 ```bash
 export PATH="$HOME/.cargo/bin:$PATH"
-cd ~/FAF/mcp-better
+cd mcp-better   # your clone
 
 bash scripts/doc-gate.sh
 bash scripts/ci.sh

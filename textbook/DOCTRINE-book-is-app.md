@@ -76,6 +76,8 @@ Versions add **road inside 7/28**. They do not invent a new protocol era.
 | **0.4.3** | **`confirm_echo` MRTR** + Agent Skills (`mcp-better-lab`) | Ch 06 · 15 · MRTR/Skills docs |
 | **0.4.4** | **Book matches 0.4.3 wire** — no new tool | Ch 00 · 04–09 · 15 · glossary |
 | **0.5** | **Matching client completes MRTR** — `mrtr-client` | Ch 06 · 09 · MRTR doc |
+| **0.6** | **Official MCP conformance suite in CI** — conformance build + baseline | README Conformance · Ch 08 |
+| **0.7** | **Tools say what they do** — annotations · strict command line · declared-capability MRTR | Ch 05 · 07 · 08 · MRTR doc |
 | Later | Extension demos only if core stays pure | Ch 15 · marked extension |
 
 When you cut a version, you cut a **lesson release**:
@@ -112,10 +114,9 @@ Private drafts may lead.
 
 | Tree | Role |
 |------|------|
-| **`~/FAF/mcp-better/textbook/`** | **Public compounding home** — book face of the app |
-| **`PLANET-FAF/AAIF/MCP/textbook/`** | Editorial / STATUS / series ops — keep in sync |
+| **`textbook/`** (this repo) | **Public compounding home** — book face of the app |
 
-When they drift, **reconcile toward the binary**, then update both textbook trees.
+When a draft and the shipped book drift, **reconcile toward the binary**.
 
 ---
 

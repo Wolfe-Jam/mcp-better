@@ -30,7 +30,7 @@
 | **`cacheScope`** | Who may share the cached list | **`public`** when the catalog is not user-private |
 | **Order** | Determinism of the tool array | **Stable** for the same process; static catalogs should survive restart |
 
-Applies in the same family to the other list/read surfaces. mcp-better stamps every one it serves: `resources/list`, `resources/templates/list`, `resources/read`, `skills/list`, `skills/get`. The official conformance suite checks the first three in its `caching` scenario (with `tools/list` and `prompts/list`), and `skills/list` and `skills/get` in `sep-2640-skills-enumeration`.
+Applies in the same family to the other list/read surfaces. mcp-better stamps every one it serves, and `server/discover` too (since 0.7.0): `resources/list`, `resources/templates/list`, `resources/read`, `skills/list`, `skills/get`. The official conformance suite checks the first three in its `caching` scenario (with `tools/list` and `prompts/list`), and `skills/list` and `skills/get` in `sep-2640-skills-enumeration`.
 
 ---
 
@@ -49,13 +49,13 @@ A small textbook catalog with fixed `health` → `echo` → `confirm_echo` is a 
 
 **SHOULD** in the spirit of prompt-cache friendliness; **MUST** for BETTER pedagogy.
 
-| Guarantee | Level |
+| Promise | Level |
 |-----------|--------|
 | Same process, N consecutive `tools/list` | Same order |
 | Process restart, static catalog | Same order when the catalog is code-fixed (`BETTER_TOOL_ORDER`). **v0.3:** `order-restart-smoke` proves two processes; unit tests prove multi-instance |
 | Dynamic catalogs | Document when order may change; bump understanding of ttl |
 
-**mcp-better** order: `health`, then `echo`. Always.
+**mcp-better** order: `health`, `echo`, then `confirm_echo`. Always.
 
 ---
 

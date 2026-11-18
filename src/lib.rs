@@ -5,6 +5,7 @@
 //!
 //! Companion **`mcp-worse`** (lying demo) is a separate binary — see `src/bin/mcp_worse.rs`.
 
+pub mod cli;
 pub mod http;
 pub mod server;
 pub mod skills;

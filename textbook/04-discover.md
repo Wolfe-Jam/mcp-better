@@ -47,7 +47,7 @@ In Rust `rmcp` 3, names collide carefully:
 | Call | Side | Meaning |
 |------|------|---------|
 | `service.serve(transport)` | **Server** | Attach handler and run — **not** Discover |
-| `ClientInfo::serve(transport)` | **Client** | Often **legacy** lifecycle |
+| `ClientConfig::serve(transport)` | **Client** | **Legacy** lifecycle (`ClientInfo` is a deprecated alias) |
 | `serve_with_lifecycle(..., Discover { .. })` | **Client** | **BETTER** path — preferred `V_2026_07_28` |
 
 Do not copy a server `serve()` example, run a legacy client, and call the setup modern.

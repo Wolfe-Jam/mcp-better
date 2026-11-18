@@ -98,9 +98,15 @@ impl BetterServer {
     ///
     /// Round 1 — no `inputResponses`: `input_required` + sealed `requestState`.  
     /// Round 2 — open seal, require form content `confirm == "CONFIRM"`, complete.
+    ///
+    /// `client_capabilities` are the ones the client declared for this request
+    /// (`_meta` on 7/28, or the legacy initialize). Round 1 asks for an elicitation,
+    /// so a client that did not declare `elicitation` gets
+    /// `MissingRequiredClientCapability` (-32021) instead of a request it can't answer.
     pub fn confirm_echo_call(
         &self,
         request: CallToolRequestParams,
+        client_capabilities: &ClientCapabilities,
     ) -> Result<CallToolResponse, McpError> {
         let args = request.arguments.unwrap_or_default();
         let message = args
@@ -113,7 +119,13 @@ impl BetterServer {
 
         match request.input_responses.as_ref() {
             None => {
-                // Round 1: seal message into requestState; ask client to confirm.
+                // Round 1: only ask for what the client declared (SEP-2322, SEP-2575).
+                if client_capabilities.elicitation.is_none() {
+                    return Err(McpError::missing_required_client_capability(
+                        ClientCapabilities::builder().enable_elicitation().build(),
+                    ));
+                }
+                // Seal message into requestState; ask client to confirm.
                 let sealed = self
                     .state_codec
                     .seal_json_with(
@@ -166,16 +178,12 @@ impl BetterServer {
                     .open_json_with(sealed, MRTR_AAD)
                     .map_err(|_| {
                         McpError::invalid_params(
-                            "requestState failed integrity check (tampered, expired, or wrong tool)",
+                            "requestState failed integrity check (tampered or wrong tool)",
                             None,
                         )
                     })?;
 
-                // Prefer sealed message over re-sent args (client must not mutate sealed work).
-                if state.message != message {
-                    // Soft: still use sealed message; surface honesty in result.
-                    // Hard reject if args diverge wildly? Prefer sealed as source of truth.
-                }
+                // The sealed message is the source of truth; a re-sent `message` is ignored.
                 let message = state.message;
 
                 let elicit = responses.get(CONFIRM_INPUT_KEY).ok_or_else(|| {
@@ -248,7 +256,15 @@ struct ConfirmState {
 #[tool_router]
 impl BetterServer {
     /// No-side-effect liveness probe. Not a k8s/HTTP health contract — a normal MCP tool.
-    #[tool(description = "Liveness check. Returns ok + server version. No side effects.")]
+    #[tool(
+        description = "Liveness check. Returns ok + server version. No side effects.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
+    )]
     fn health(&self) -> String {
         serde_json::json!({
             "status": "ok",
@@ -261,7 +277,15 @@ impl BetterServer {
     }
 
     /// Pure demo tool — validates argument round-trip without I/O or shell.
-    #[tool(description = "Echo a message back. Pure function; no side effects.")]
+    #[tool(
+        description = "Echo a message back. Pure function; no side effects.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
+    )]
     fn echo(&self, Parameters(EchoParams { message }): Parameters<EchoParams>) -> String {
         message
     }
@@ -269,7 +293,13 @@ impl BetterServer {
     /// Textbook MRTR tool — schema only via router; execution is `call_tool` override
     /// (router context does not carry `inputResponses` / `requestState`).
     #[tool(
-        description = "Echo a message after mid-call confirmation (SEP-2322 MRTR). Round 1 returns input_required; retry with inputResponses + echoed requestState. Requires negotiated protocol ≥ 2026-07-28."
+        description = "Echo a message after mid-call confirmation (SEP-2322 MRTR). Round 1 returns input_required; retry with inputResponses + echoed requestState. Requires negotiated protocol ≥ 2026-07-28.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
     )]
     fn confirm_echo(
         &self,
@@ -306,12 +336,27 @@ impl ServerHandler for BetterServer {
              Tools: health (liveness), echo (pure demo), confirm_echo (MRTR textbook). \
              Skills: extension io.modelcontextprotocol/skills — skills/list · skills/get · \
              resources/read skill://… (digests). \
-             Lists and reads stamp ttlMs + cacheScope (public, 60 s). \
+             Discover, lists and reads stamp ttlMs + cacheScope (public, 60 s). \
              Transports: stdio (default) · Streamable HTTP (--http, local demo). \
              MRTR: confirm_echo needs negotiated ≥ 2026-07-28; older clients get a protocol error on input_required."
                 .into(),
         );
         info
+    }
+
+    /// `server/discover` describes capabilities that never change while the process
+    /// runs, so it carries the same chosen hints as the lists (the SDK default is 0 + private).
+    async fn discover(
+        &self,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<DiscoverResult, McpError> {
+        let mut result = DiscoverResult::from_server_info(
+            self.supported_protocol_versions().into_owned(),
+            self.get_info(),
+        );
+        result.ttl_ms = CATALOG_TTL_MS;
+        result.cache_scope = CacheScope::Public;
+        Ok(result)
     }
 
     /// Override generated list_tools so BETTER stamps cache hints (Gap 4 / C3).
@@ -330,7 +375,8 @@ impl ServerHandler for BetterServer {
         context: RequestContext<RoleServer>,
     ) -> Result<CallToolResponse, McpError> {
         if request.name.as_ref() == "confirm_echo" {
-            return self.confirm_echo_call(request);
+            let client_capabilities = context.client_capabilities().unwrap_or_default();
+            return self.confirm_echo_call(request, &client_capabilities);
         }
         let tcc = ToolCallContext::new(self, request, context);
         self.tool_router.call(tcc).await
@@ -521,6 +567,29 @@ mod tests {
         assert_eq!(b.ttl_ms, Some(LIST_TOOLS_TTL_MS));
     }
 
+    fn elicit_caps() -> ClientCapabilities {
+        ClientCapabilities::builder().enable_elicitation().build()
+    }
+
+    #[test]
+    fn confirm_echo_round1_rejects_client_without_elicitation() {
+        let server = BetterServer::new();
+        let err = server
+            .confirm_echo_call(confirm_args("hello-mrtr"), &ClientCapabilities::default())
+            .unwrap_err();
+        assert_eq!(err.code, ErrorCode::MISSING_REQUIRED_CLIENT_CAPABILITY);
+        assert_eq!(err.code.0, -32021);
+        let required = err
+            .data
+            .as_ref()
+            .and_then(|d| d.get("requiredCapabilities"));
+        assert!(
+            required.and_then(|r| r.get("elicitation")).is_some(),
+            "error names elicitation as required: {:?}",
+            err.data
+        );
+    }
+
     fn confirm_args(message: &str) -> CallToolRequestParams {
         let mut args = Map::new();
         args.insert("message".into(), json!(message));
@@ -531,7 +600,7 @@ mod tests {
     fn confirm_echo_round1_input_required() {
         let server = BetterServer::new();
         let resp = server
-            .confirm_echo_call(confirm_args("hello-mrtr"))
+            .confirm_echo_call(confirm_args("hello-mrtr"), &elicit_caps())
             .unwrap();
         match resp {
             CallToolResponse::InputRequired(ir) => {
@@ -548,7 +617,7 @@ mod tests {
     fn confirm_echo_round2_complete_after_confirm() {
         let server = BetterServer::new();
         let r1 = server
-            .confirm_echo_call(confirm_args("hello-mrtr"))
+            .confirm_echo_call(confirm_args("hello-mrtr"), &elicit_caps())
             .unwrap();
         let CallToolResponse::InputRequired(ir) = r1 else {
             panic!("round1");
@@ -568,7 +637,7 @@ mod tests {
             .with_input_responses(responses)
             .with_request_state(sealed);
 
-        let r2 = server.confirm_echo_call(req).unwrap();
+        let r2 = server.confirm_echo_call(req, &elicit_caps()).unwrap();
         match r2 {
             CallToolResponse::Complete(result) => {
                 let text = format!("{:?}", result.content);
@@ -581,7 +650,9 @@ mod tests {
     #[test]
     fn confirm_echo_rejects_tampered_state() {
         let server = BetterServer::new();
-        let r1 = server.confirm_echo_call(confirm_args("secret")).unwrap();
+        let r1 = server
+            .confirm_echo_call(confirm_args("secret"), &elicit_caps())
+            .unwrap();
         let CallToolResponse::InputRequired(_) = r1 else {
             panic!("round1");
         };
@@ -595,7 +666,7 @@ mod tests {
             .with_input_responses(responses)
             .with_request_state("not-a-valid-seal");
 
-        let err = server.confirm_echo_call(req).unwrap_err();
+        let err = server.confirm_echo_call(req, &elicit_caps()).unwrap_err();
         let msg = format!("{err:?}");
         assert!(
             msg.contains("integrity") || msg.contains("requestState") || msg.contains("invalid"),
@@ -644,7 +715,9 @@ mod tests {
     #[test]
     fn confirm_echo_rejects_wrong_confirm_text() {
         let server = BetterServer::new();
-        let r1 = server.confirm_echo_call(confirm_args("x")).unwrap();
+        let r1 = server
+            .confirm_echo_call(confirm_args("x"), &elicit_caps())
+            .unwrap();
         let CallToolResponse::InputRequired(ir) = r1 else {
             panic!("round1");
         };
@@ -659,6 +732,6 @@ mod tests {
             .with_input_responses(responses)
             .with_request_state(sealed);
 
-        assert!(server.confirm_echo_call(req).is_err());
+        assert!(server.confirm_echo_call(req, &elicit_caps()).is_err());
     }
 }

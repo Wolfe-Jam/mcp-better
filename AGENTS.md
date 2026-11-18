@@ -33,7 +33,11 @@ Full gate, in the order CI actually runs it:
 ```bash
 bash scripts/ci.sh
 # doc-gate → fmt → clippy -D warnings → test → release build →
-# BETTER-purity check → all four example-based contract smokes above
+# BETTER-purity check → five example-based smokes (stdio, mrtr-client,
+# order-restart, contrast, http) → official MCP conformance suite on the
+# textbook binary (baseline) and on the conformance build (no baseline) →
+# Registry listing check (rust-mcp-preflight)
+# The msrv job (Rust 1.88) runs in CI only.
 ```
 
 ## Code style

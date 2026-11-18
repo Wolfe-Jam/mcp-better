@@ -162,7 +162,7 @@ fi
 echo "✓ mcpName:  $MCP_NAME"
 
 # ── 4. emit dual-package server.json ────────────────────────────────────────
-# Minimal dual-package shape. Authors can extend; we only guarantee both packages.
+# Minimal dual-package shape. Authors can extend; this step only writes both packages.
 NEW_SERVER_JSON=$(python3 - <<PY
 import json, os
 

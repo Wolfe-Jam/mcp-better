@@ -16,7 +16,10 @@ bash scripts/ci.sh
 | clippy | `-D warnings` |
 | test | unit + integration |
 | purity | no `project.faf` |
-| smoke | Discover client · stamped list · health · echo |
+| smoke | stdio Discover client · mrtr-client · order-restart · contrast · Streamable HTTP |
+| conformance | official MCP conformance suite: textbook binary vs `conformance-baseline.yml`; conformance build with no baseline |
+| preflight | `rust-mcp-preflight` on `server.json` (Registry listing) |
+| msrv | `cargo check` on Rust 1.88 (CI only) |
 | cargo-dist | `dist-workspace.toml` present |
 
 ## Full publish motion (atomic · dual package)
@@ -29,10 +32,12 @@ bump to X.Y.Z (Cargo.toml · package.json · server.json · CHANGELOG · README)
   → cargo publish --dry-run
   → npm publish --dry-run
   → GO! from wolfejam
-  → cargo publish
-  → npm publish
-  → git tag vX.Y.Z + gh release
-      (Release workflow attaches platform binaries)
+  → git tag vX.Y.Z + push the tag
+      Release workflow (.github/workflows/release.yml), on the tag:
+        build → platform binaries attached to the GitHub Release
+        test  → cargo test --locked --all-targets on the tagged commit
+        publish-registries (needs build + test, OIDC, no tokens):
+          cargo publish --locked → npm publish
   → mcp-publisher publish server.json   # cargo + npm packages
   → release-verify (incl. npx zero-toolchain)
 ```

@@ -2,17 +2,17 @@
 # mcp-better Doc Gate — three-file lockstep + docs identity
 # Usage: bash scripts/doc-gate.sh
 #
-# Prefer skill copy when present (local wolfejam machine); otherwise run
-# the inlined gate so GitHub Actions / cold clones still pass.
+# The inlined gate below always runs, so a local run checks what CI checks.
+# When the pubbetter skill copy is present (local machine), it runs as well.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$HOME/.claude/skills/pubbetter/scripts/doc-gate.sh"
 if [[ -f "$SKILL" ]]; then
-  exec bash "$SKILL" "$ROOT"
+  bash "$SKILL" "$ROOT"
 fi
 
-# ── Inlined gate (CI / no skill) ─────────────────────────────────
+# ── Inlined gate (same in CI and locally) ────────────────────────
 cd "$ROOT"
 
 if [[ ! -f Cargo.toml ]]; then
@@ -116,10 +116,35 @@ else
 fi
 
 if [[ -f README.md ]]; then
-  readme=$(grep -oE 'mcp-better v[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | sed 's/mcp-better v//' || true)
-  if [[ -n "$readme" && "$readme" != "$pkg" ]]; then
-    echo "❌ README version stamp = $readme (expected $pkg)"
+  # Every version pin a reader copies: install pins, the --version line,
+  # the Protocol claims heading. None found is drift too, so the check can't skip.
+  pins=$(grep -hoE -e '--version [0-9]+\.[0-9]+\.[0-9]+' -e '# mcp-better [0-9]+\.[0-9]+\.[0-9]+' -e 'Protocol claims \(v[0-9]+\.[0-9]+\.[0-9]+' README.md \
+    | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
+  if [[ -z "$pins" ]]; then
+    echo "❌ README: no version pins found (install line, --version line, Protocol claims heading)"
     drift=1
+  fi
+  for v in $pins; do
+    if [[ "$v" != "$pkg" ]]; then
+      echo "❌ README version pin = $v (expected $pkg)"
+      drift=1
+    fi
+  done
+  for f in GETTING-STARTED.md textbook/09-run-the-textbook.md; do
+    [[ -f "$f" ]] || continue
+    for v in $(grep -hoE -e '--version [0-9]+\.[0-9]+\.[0-9]+' -e 'mcp-better [0-9]+\.[0-9]+\.[0-9]+' "$f" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true); do
+      if [[ "$v" != "$pkg" ]]; then
+        echo "❌ $f version pin = $v (expected $pkg)"
+        drift=1
+      fi
+    done
+  done
+  if [[ -f agent.fafa ]]; then
+    fafa=$(grep -m1 -oE '^  version: [0-9]+\.[0-9]+\.[0-9]+' agent.fafa | grep -oE '[0-9.]+$' || true)
+    if [[ "$fafa" != "$pkg" ]]; then
+      echo "❌ agent.fafa version = ${fafa:-none} (expected $pkg)"
+      drift=1
+    fi
   fi
   if ! grep -q 'mcp-name: io.github.Wolfe-Jam/mcp-better' README.md; then
     echo "❌ README missing visible mcp-name: io.github.Wolfe-Jam/mcp-better"

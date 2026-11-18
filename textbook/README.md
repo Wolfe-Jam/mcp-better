@@ -1,5 +1,5 @@
 <!-- faf: textbook | md | mcp-728-textbook | Canonical MCP 7/28 textbook — compounding knowledge volume; AAIF = BETTER only. -->
-<!-- faf: doc=textbook-spine | lane=AAIF/MCP | related=../STATE.md,../mcp-good-better-best-plan-2026-07-28.md | canonical=this -->
+<!-- faf: doc=textbook-spine | lane=AAIF/MCP | related=../README.md | canonical=this -->
 
 # The MCP Textbook (7/28)
 
@@ -87,7 +87,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 | 06 | [Stateless core](./06-stateless-core.md) | **SOLID** | No protocol session; handles for app state |
 | 07 | [Transports](./07-transports.md) | **SOLID** | stdio default · Streamable HTTP road |
 | 08 | [Claim = wire](./08-claim-equals-wire.md) | **SOLID** | Honesty as engineering |
-| 09 | [Lab: run the textbook](./09-run-the-textbook.md) | **SOLID** | mcp-better 0.2 in ≤10 min |
+| 09 | [Lab: run the textbook](./09-run-the-textbook.md) | **SOLID** | mcp-better 0.7 in ≤10 min |
 | 10 | [What we resist](./10-what-we-resist.md) | **SOLID** | Non-goals that keep the book true |
 
 ### Appendices
@@ -134,7 +134,6 @@ Season 2 chapters must still pass the peer test. Flavor is illustration, not pro
 | Spec [2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) | Authority on the wire |
 | [Changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog) | What changed vs prior |
 | Part I extract (live) | [dev.to InterOp](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) |
-| Private lane STATE | [`../STATE.md`](../STATE.md) |
 
 ---
 
@@ -145,4 +144,4 @@ Write the contract. Prove the contract. Resist the platform.
 Season 1 = operational honesty. Season 2 = matrix. BEST = one hop up.
 ```
 
-*Opened 2026-07-31 · master lives under PLANET-FAF/AAIF/MCP/textbook/*
+*Opened 2026-07-31*

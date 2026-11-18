@@ -55,7 +55,7 @@
 | Spec direction | Textbook / mcp-better |
 |----------------|------------------------|
 | `resultType` on results | **MUST** (`complete` for ordinary tools) |
-| `input_required` flows | **LATER** for rich tools |
+| `input_required` flows | **On the wire since 0.4.3:** `confirm_echo` (MRTR), asked only of clients that declare elicitation (0.7) |
 
 ---
 

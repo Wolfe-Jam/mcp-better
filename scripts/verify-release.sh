@@ -58,7 +58,10 @@ else
 fi
 
 echo "— Truth-table"
-if bash "$HOME/.claude/skills/pubbetter/scripts/release-verify.sh" . >/tmp/mcp-better-truth.log 2>&1; then
+TRUTH="$HOME/.claude/skills/pubbetter/scripts/release-verify.sh"
+if [ ! -f "$TRUTH" ]; then
+  warn "truth-table skipped: maintainer-only script not present"
+elif bash "$TRUTH" . >/tmp/mcp-better-truth.log 2>&1; then
   pass "truth-table"
 else
   die "truth-table"
