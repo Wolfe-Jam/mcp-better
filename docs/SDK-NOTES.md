@@ -105,7 +105,16 @@ We claim **everything in v0.5.0**, plus:
 - CI runs the official conformance suite: the conformance build (`conformance/`) passes every check; the textbook binary passes every scored check that needs no suite fixture
 - `rmcp` 3.10 · `rust-version` 1.88
 
-We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0:
+### v0.7.0 — tools say what they do
+
+We claim **everything in v0.6.0**, plus:
+
+- Every tool sets all four annotation hints through the `#[tool(annotations(...))]` attribute: `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`
+- `mcp-better --version` (and `-V`) prints `mcp-better <version>` on stdout and exits 0, wherever it appears; `mcp-worse --version` likewise
+- An unknown argument or `MCP_TRANSPORT` / `MCP_BETTER_TRANSPORT` value exits 2 with the reason; nothing falls back to stdio silently (`mcp_better::cli`)
+- `server/discover` overrides the SDK default (`ttlMs: 0` + `private`) with the catalog's `ttlMs=60000` + `public`
+
+We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0 / v0.7.0:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  

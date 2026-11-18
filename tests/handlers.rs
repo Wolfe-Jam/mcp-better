@@ -3,8 +3,9 @@
 
 use mcp_better::{BetterServer, CATALOG_TTL_MS, LAB_SKILL_URI};
 use rmcp::model::{
-    CacheScope, ClientConfig, ErrorCode, GetPromptRequestParams, GetSkillRequestParams,
-    ProtocolVersion, ReadResourceRequestParams, SkillResources,
+    CacheScope, ClientCapabilities, ClientConfig, ErrorCode, GetPromptRequestParams,
+    GetSkillRequestParams, Implementation, ProtocolVersion, ReadResourceRequestParams,
+    RequestMetaObject, SkillResources,
 };
 use rmcp::service::{RoleClient, RunningService};
 use rmcp::{ClientLifecycleMode, ClientServiceExt, ServiceError, ServiceExt};
@@ -48,8 +49,18 @@ fn error_code(err: ServiceError) -> (ErrorCode, Option<serde_json::Value>) {
 }
 
 #[tokio::test]
-async fn every_list_and_read_carries_chosen_cache_hints() {
+async fn discover_and_every_list_and_read_carry_chosen_cache_hints() {
     let client = connect().await;
+
+    let discover = client
+        .discover(RequestMetaObject::with_client_context(
+            ProtocolVersion::V_2026_07_28,
+            Implementation::new("handlers-test", "0"),
+            ClientCapabilities::default(),
+        ))
+        .await
+        .unwrap();
+    chosen(Some(discover.ttl_ms), Some(discover.cache_scope));
 
     let tools = client.list_tools(None).await.unwrap();
     chosen(tools.ttl_ms, tools.cache_scope);
@@ -174,5 +185,33 @@ async fn not_found_errors_name_the_uri() {
         .unwrap_err();
     assert_eq!(error_code(err).1.unwrap()["uri"], "skill://nope/SKILL.md");
 
+    client.cancel().await.unwrap();
+}
+
+#[tokio::test]
+async fn every_tool_declares_all_four_annotation_hints() {
+    let client = connect().await;
+    let tools = client.list_tools(None).await.unwrap();
+    assert_eq!(tools.tools.len(), 3);
+    for tool in &tools.tools {
+        let a = tool
+            .annotations
+            .as_ref()
+            .unwrap_or_else(|| panic!("{} has no annotations", tool.name));
+        assert_eq!(a.read_only_hint, Some(true), "{} reads only", tool.name);
+        assert_eq!(
+            a.destructive_hint,
+            Some(false),
+            "{} destroys nothing",
+            tool.name
+        );
+        assert_eq!(a.idempotent_hint, Some(true), "{} is idempotent", tool.name);
+        assert_eq!(
+            a.open_world_hint,
+            Some(false),
+            "{} stays in-process",
+            tool.name
+        );
+    }
     client.cancel().await.unwrap();
 }

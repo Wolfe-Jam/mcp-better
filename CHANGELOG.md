@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.7.0] — 2026-11-16 — tools say what they do
+
+**Lesson:** a tool with no annotations gets the spec's defaults: it may write, may destroy, and reaches the outside world. The descriptions said "no side effects"; the wire didn't. The same goes for the command line: a flag the binary doesn't know should say so, not start a server.
+
+This release was checked as a candidate before the tag: the packaged crate and the packed npm tarball went through the cold-install probe, every flag, every MCP method over stdio and HTTP, and the README commands.
+
+### Fixed
+
+- **Every tool is annotated:** `health`, `echo` and `confirm_echo` set `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true` and `openWorldHint: false`. Before, `tools/list` carried no annotations, so clients had to assume the defaults. A handler test asserts all four hints on every tool.
+- **`--version` prints the version:** `--version` and `-V` print `mcp-better <version>` on stdout and exit 0, wherever they appear (`--http --version` included). Before, both started the stdio server, which exited 1 with `connection closed: initialize request`. `mcp-worse --version` does the same.
+- **Unknown arguments are errors:** `mcp-better --bogus`, a stray word, or `MCP_TRANSPORT=htp` print the reason and exit 2. Before, each silently started the stdio server. `mcp-worse` accepts only `--version`, `--help` and `--stdio`. One parser (`mcp_better::cli`) with unit tests; a test runs both built binaries.
+- **`server/discover` is stamped:** it carries `ttlMs=60000` + `cacheScope=public` like every list and read. Before, it carried the SDK default (`0` + `private`).
+- **No private paths in the public docs:** the textbook index no longer links a private notes file (`../STATE.md`, never in the repo); four lines naming a private vault or a local folder are gone.
+
+### Changed
+
+- **Release workflow:** the `aarch64-apple-darwin` build runs on `macos-15` (GitHub retired the `macos-14` runner). A pull request that changes `release.yml` now builds every target and downloads the artifacts, attaching and publishing nothing, so a retired runner or a broken action shows up before a tag.
+- **GitHub Actions on Node 24:** `actions/checkout` v6.1.0, `actions/upload-artifact` v6.0.0, `actions/download-artifact` v7.0.0, `actions/setup-node` v6.5.0 and `softprops/action-gh-release` v3.0.4, pinned by commit. Each is the first major that runs on Node 24; `setup-node` stays on v6 because v7 changes the npm auth setup the token-free publish runs with.
+- **Docs:** README (v0.7 row, "Annotated tools" in What BETTER means, Tool annotations and discover in the claims, the command-line rules), textbook ch. 05 (discover) and ch. 08 (annotation and `--version` proofs, "hint silence"), SDK-NOTES v0.7.0.
+
 ## [0.6.0] — 2026-11-15 — the official MCP conformance suite in CI
 
 **Lesson:** a textbook that claims a spec should pass that spec's own tests. CI runs the official MCP conformance suite against two binaries: the conformance build passes every check, and the textbook binary passes every scored check that needs no suite fixture.

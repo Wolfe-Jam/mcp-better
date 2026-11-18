@@ -9,6 +9,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use mcp_better::cli::{Action, Transport};
 use mcp_better::BetterServer;
 use rmcp::transport::streamable_http_server::{
     session::local::LocalSessionManager, StreamableHttpService,
@@ -24,46 +25,40 @@ async fn main() -> anyhow::Result<()> {
         .with_ansi(false)
         .init();
 
-    let mode = transport_mode();
-    match mode.as_str() {
-        "http" => run_http().await,
-        _ => run_stdio().await,
-    }
-}
-
-fn transport_mode() -> String {
-    // CLI wins over env
-    for a in std::env::args().skip(1) {
-        match a.as_str() {
-            "--http" | "http" => return "http".into(),
-            "--stdio" | "stdio" => return "stdio".into(),
-            "--help" | "-h" => {
-                eprintln!(
-                    "mcp-better v{} — built for 7/28\n\n\
-                     Usage:\n\
-                       mcp-better              stdio (default)\n\
-                       mcp-better --http       Streamable HTTP (local demo)\n\
-                       mcp-better --stdio      force stdio\n\n\
-                     Args (CLI wins over env):\n\
-                       --http | http           Streamable HTTP\n\
-                       --stdio | stdio         stdio\n\n\
-                     Env:\n\
-                       MCP_BETTER_HTTP_ADDR    default 127.0.0.1:8787 (loopback only recommended)\n\
-                       MCP_TRANSPORT           stdio | http  (read first if both set)\n\
-                       MCP_BETTER_TRANSPORT    same values (fallback)\n\
-                       RUST_LOG                tracing filter\n\n\
-                     Security: --http has no auth/TLS. Do not bind 0.0.0.0. See SECURITY.md.\n",
-                    env!("CARGO_PKG_VERSION")
-                );
-                std::process::exit(0);
-            }
-            _ => {}
+    match mcp_better::cli::from_env(true) {
+        Ok(Action::Version) => println!("mcp-better {}", env!("CARGO_PKG_VERSION")),
+        Ok(Action::Help) => eprint!("{}", help()),
+        Ok(Action::Serve(Transport::Http)) => run_http().await?,
+        Ok(Action::Serve(Transport::Stdio)) => run_stdio().await?,
+        Err(e) => {
+            eprintln!("mcp-better: {e}\nRun `mcp-better --help` for usage.");
+            std::process::exit(2);
         }
     }
-    std::env::var("MCP_TRANSPORT")
-        .or_else(|_| std::env::var("MCP_BETTER_TRANSPORT"))
-        .unwrap_or_else(|_| "stdio".into())
-        .to_lowercase()
+    Ok(())
+}
+
+fn help() -> String {
+    format!(
+        "mcp-better v{} — built for 7/28\n\n\
+         Usage:\n\
+           mcp-better              stdio (default)\n\
+           mcp-better --http       Streamable HTTP (local demo)\n\
+           mcp-better --stdio      force stdio\n\
+           mcp-better --version    print the version and exit\n\n\
+         Args (CLI wins over env; anything else is an error, exit 2):\n\
+           --http | http           Streamable HTTP\n\
+           --stdio | stdio         stdio\n\
+           --version | -V          version\n\
+           --help | -h             this help\n\n\
+         Env:\n\
+           MCP_BETTER_HTTP_ADDR    default 127.0.0.1:8787 (loopback only recommended)\n\
+           MCP_TRANSPORT           stdio | http  (read first if both set)\n\
+           MCP_BETTER_TRANSPORT    same values (fallback)\n\
+           RUST_LOG                tracing filter\n\n\
+         Security: --http has no auth/TLS. Do not bind 0.0.0.0. See SECURITY.md.\n",
+        env!("CARGO_PKG_VERSION")
+    )
 }
 
 async fn run_stdio() -> anyhow::Result<()> {

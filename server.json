@@ -1,13 +1,13 @@
 {
   "name": "io.github.Wolfe-Jam/mcp-better",
   "description": "Modern MCP setup for the 2026-07-28 spec (BETTER textbook). AAIF Ambassador contribution.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "packages": [
     {
       "registryType": "cargo",
       "registryBaseUrl": "https://crates.io",
       "identifier": "mcp-better",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "transport": {
         "type": "stdio"
       }
@@ -16,7 +16,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "mcp-better",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "transport": {
         "type": "stdio"
       }

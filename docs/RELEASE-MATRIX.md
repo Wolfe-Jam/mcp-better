@@ -237,7 +237,7 @@ v0.2 is **same era, more road** — not “when we become 7/28.”
 
 ```bash
 export PATH="$HOME/.cargo/bin:$PATH"
-cd ~/FAF/mcp-better
+cd mcp-better   # your clone
 
 bash scripts/doc-gate.sh
 bash scripts/ci.sh

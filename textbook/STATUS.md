@@ -2,7 +2,7 @@
 
 # Textbook status ledger
 
-**Last refresh:** 2026-11-15 (0.6.0 — the official MCP conformance suite in CI; ch. 04 + 05 updated)  
+**Last refresh:** 2026-11-16 (0.7.0 — tool annotations, a strict command line, discover stamped; ch. 05, 07, 08 updated)  
 **Season 1 goal:** All core chapters **SOLID** before heavy Season 2 writing.  
 **Shipped home:** `mcp-better/textbook/` — the book is the app is the book.
 
@@ -16,8 +16,8 @@
 | 05 | Stamped lists | SOLID | Catalog example matches three-tool order |
 | 06 | Stateless core | SOLID | `confirm_echo` = sealed retry; `mrtr-client` is the other half |
 | 07 | Transports | SOLID | Env precedence; http-smoke happy-path only |
-| 08 | Claim = wire | SOLID | Tool-list claim = `BETTER_TOOL_ORDER` |
-| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.6.0** |
+| 08 | Claim = wire | SOLID | Tool-list claim = `BETTER_TOOL_ORDER` · annotations + `--version` rows · “hint silence” |
+| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.7.0** |
 | 10 | What we resist | SOLID | |
 | A | Spec map | SOLID | Header precision |
 | B | Glossary | SOLID | mcp-better = three-tool catalog |

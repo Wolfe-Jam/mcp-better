@@ -248,7 +248,15 @@ struct ConfirmState {
 #[tool_router]
 impl BetterServer {
     /// No-side-effect liveness probe. Not a k8s/HTTP health contract — a normal MCP tool.
-    #[tool(description = "Liveness check. Returns ok + server version. No side effects.")]
+    #[tool(
+        description = "Liveness check. Returns ok + server version. No side effects.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
+    )]
     fn health(&self) -> String {
         serde_json::json!({
             "status": "ok",
@@ -261,7 +269,15 @@ impl BetterServer {
     }
 
     /// Pure demo tool — validates argument round-trip without I/O or shell.
-    #[tool(description = "Echo a message back. Pure function; no side effects.")]
+    #[tool(
+        description = "Echo a message back. Pure function; no side effects.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
+    )]
     fn echo(&self, Parameters(EchoParams { message }): Parameters<EchoParams>) -> String {
         message
     }
@@ -269,7 +285,13 @@ impl BetterServer {
     /// Textbook MRTR tool — schema only via router; execution is `call_tool` override
     /// (router context does not carry `inputResponses` / `requestState`).
     #[tool(
-        description = "Echo a message after mid-call confirmation (SEP-2322 MRTR). Round 1 returns input_required; retry with inputResponses + echoed requestState. Requires negotiated protocol ≥ 2026-07-28."
+        description = "Echo a message after mid-call confirmation (SEP-2322 MRTR). Round 1 returns input_required; retry with inputResponses + echoed requestState. Requires negotiated protocol ≥ 2026-07-28.",
+        annotations(
+            read_only_hint = true,
+            destructive_hint = false,
+            idempotent_hint = true,
+            open_world_hint = false
+        )
     )]
     fn confirm_echo(
         &self,
@@ -306,12 +328,27 @@ impl ServerHandler for BetterServer {
              Tools: health (liveness), echo (pure demo), confirm_echo (MRTR textbook). \
              Skills: extension io.modelcontextprotocol/skills — skills/list · skills/get · \
              resources/read skill://… (digests). \
-             Lists and reads stamp ttlMs + cacheScope (public, 60 s). \
+             Discover, lists and reads stamp ttlMs + cacheScope (public, 60 s). \
              Transports: stdio (default) · Streamable HTTP (--http, local demo). \
              MRTR: confirm_echo needs negotiated ≥ 2026-07-28; older clients get a protocol error on input_required."
                 .into(),
         );
         info
+    }
+
+    /// `server/discover` describes capabilities that never change while the process
+    /// runs, so it carries the same chosen hints as the lists (the SDK default is 0 + private).
+    async fn discover(
+        &self,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<DiscoverResult, McpError> {
+        let mut result = DiscoverResult::from_server_info(
+            self.supported_protocol_versions().into_owned(),
+            self.get_info(),
+        );
+        result.ttl_ms = CATALOG_TTL_MS;
+        result.cache_scope = CacheScope::Public;
+        Ok(result)
     }
 
     /// Override generated list_tools so BETTER stamps cache hints (Gap 4 / C3).

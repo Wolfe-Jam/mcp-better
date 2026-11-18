@@ -13,7 +13,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -68,7 +68,7 @@ jobs:
           # http-smoke spawns the bin; example alone does not build [[bin]]
           MCP_BETTER_BIN="${{ github.workspace }}/target/debug/mcp-better" cargo run --example http-smoke
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 22
 
@@ -96,7 +96,7 @@ jobs:
 
       - name: keep conformance results when a run fails
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: conformance-results
           path: ${{ runner.temp }}/conformance-*
@@ -114,7 +114,7 @@ jobs:
     # rust-version in Cargo.toml must stay true: build on exactly that toolchain.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Install Rust 1.88
         uses: dtolnay/rust-toolchain@1.88

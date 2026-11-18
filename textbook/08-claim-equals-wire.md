@@ -27,8 +27,9 @@ This is the entire BETTER rung in one inequality.
 | README transports | “Streamable HTTP” | HTTP smoke + header asserts |
 | `tools/list` docs | “cacheable” | `ttlMs` / `cacheScope` asserts |
 | Tool list | `health` → `echo` → `confirm_echo` | Exact name vector in tests (`BETTER_TOOL_ORDER`) |
+| Tool annotations | “reads only, changes nothing” | All four hints asserted per tool (`tests/handlers.rs`) |
 | SECURITY.md | “local demo only” | Default bind loopback · no auth features advertised as prod |
-| Registry / crates blurb | Version pin | Published artifact matches tag |
+| Registry / crates blurb | Version pin | Published artifact matches tag · `mcp-better --version` prints it (`tests/cli.rs`) |
 | Blog extract | “10-minute textbook” | Cold path still works |
 
 ---
@@ -55,6 +56,7 @@ Before any release that changes claims:
 | **Stamp theater** | Docs mention ttl; SDK default omits | Wire capture |
 | **Era cosplay** | “2026-07-28” string hardcoded in one tool result only | Discover + list + tool all checked |
 | **Directory cosplay** | Listed somewhere; wire is prior-era | InterOp card (Ch 03) |
+| **Hint silence** | Tool descriptions say “no side effects”; no annotations on the wire, so the spec's defaults apply: may write, may destroy, open world | `tools/list` capture: every hint present |
 | **Silent degrade** | Old client accepted with wrong shape | Version rejection tests |
 
 ---

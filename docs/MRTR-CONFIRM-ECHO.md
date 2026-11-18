@@ -83,7 +83,6 @@ The `rmcp` SDK only delivers `InputRequiredResult` to peers that negotiated **`2
 - Pattern: [SEP-2322 / Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports) (see also MCP SEP index for SEP-2322)
 - SDK types: `rmcp` `model/mrtr.rs` · `RequestStateCodec` (`request-state` feature)
 - Upstream example (when present in your `rmcp` tree): `examples/servers/src/mrtr.rs` / crate tests `test_mrtr_behavior.rs`
-- Vault placement: PLANET-FAF `CHECKLIST-728-QUALITY.md` **A8** (conditional) · `MRTR-PLACEMENT.md`
 
 ## Matching client (v0.5)
 

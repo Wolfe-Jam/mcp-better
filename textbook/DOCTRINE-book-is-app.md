@@ -112,10 +112,9 @@ Private drafts may lead.
 
 | Tree | Role |
 |------|------|
-| **`~/FAF/mcp-better/textbook/`** | **Public compounding home** — book face of the app |
-| **`PLANET-FAF/AAIF/MCP/textbook/`** | Editorial / STATUS / series ops — keep in sync |
+| **`textbook/`** (this repo) | **Public compounding home** — book face of the app |
 
-When they drift, **reconcile toward the binary**, then update both textbook trees.
+When a draft and the shipped book drift, **reconcile toward the binary**.
 
 ---
 
