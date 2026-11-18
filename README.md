@@ -1,7 +1,5 @@
 # mcp-better — built for 7/28
 
-[![Business card · Get yours →](https://wolfe-jam.github.io/agent-business-card/badge.svg)](https://wolfe-jam.github.io/agent-business-card/?repo=Wolfe-Jam/mcp-better)
-
 **NONE | GOOD | [BETTER] | BEST**
 
 Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER** step.  
@@ -236,3 +234,7 @@ For persistent, versionable AI project context beyond a protocol textbook:
 ## License
 
 MIT — see [LICENSE](./LICENSE). Except [`conformance/`](./conformance/) (the unpublished conformance build), which is Apache-2.0: see [`conformance/NOTICE`](./conformance/NOTICE).
+
+---
+
+[![Business card · Get yours →](https://wolfe-jam.github.io/agent-business-card/badge.svg)](https://wolfe-jam.github.io/agent-business-card/?repo=Wolfe-Jam/mcp-better)
