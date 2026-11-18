@@ -3,14 +3,18 @@
 
 use mcp_better::{BetterServer, CATALOG_TTL_MS, LAB_SKILL_URI};
 use rmcp::model::{
-    CacheScope, ClientCapabilities, ClientConfig, ErrorCode, GetPromptRequestParams,
-    GetSkillRequestParams, Implementation, ProtocolVersion, ReadResourceRequestParams,
-    RequestMetaObject, SkillResources,
+    CacheScope, CallToolRequestParams, CallToolResponse, ClientCapabilities, ClientConfig,
+    ErrorCode, GetPromptRequestParams, GetSkillRequestParams, Implementation, ProtocolVersion,
+    ReadResourceRequestParams, RequestMetaObject, SkillResources,
 };
 use rmcp::service::{RoleClient, RunningService};
 use rmcp::{ClientLifecycleMode, ClientServiceExt, ServiceError, ServiceExt};
 
 async fn connect() -> RunningService<RoleClient, ClientConfig> {
+    connect_with(ClientConfig::default()).await
+}
+
+async fn connect_with(config: ClientConfig) -> RunningService<RoleClient, ClientConfig> {
     let (server_io, client_io) = tokio::io::duplex(64 * 1024);
     tokio::spawn(async move {
         let (r, w) = tokio::io::split(server_io);
@@ -21,7 +25,7 @@ async fn connect() -> RunningService<RoleClient, ClientConfig> {
         let _ = running.waiting().await;
     });
     let (r, w) = tokio::io::split(client_io);
-    ClientConfig::default()
+    config
         .serve_with_lifecycle(
             (r, w),
             ClientLifecycleMode::Discover {
@@ -213,5 +217,37 @@ async fn every_tool_declares_all_four_annotation_hints() {
             tool.name
         );
     }
+    client.cancel().await.unwrap();
+}
+
+#[tokio::test]
+async fn confirm_echo_asks_only_clients_that_declared_elicitation() {
+    let call = || {
+        CallToolRequestParams::new("confirm_echo")
+            .with_arguments(rmcp::model::object(serde_json::json!({ "message": "m1" })))
+    };
+
+    // No elicitation declared: refused with -32021, naming what is required.
+    let client = connect().await;
+    let err = client.call_tool_once(call()).await.unwrap_err();
+    let (code, data) = error_code(err);
+    assert_eq!(code, ErrorCode::MISSING_REQUIRED_CLIENT_CAPABILITY);
+    assert!(
+        data.as_ref()
+            .and_then(|d| d.pointer("/requiredCapabilities/elicitation"))
+            .is_some(),
+        "error names elicitation: {data:?}"
+    );
+    client.cancel().await.unwrap();
+
+    // Elicitation declared: round 1 asks.
+    let mut config = ClientConfig::default();
+    config.capabilities = ClientCapabilities::builder().enable_elicitation().build();
+    let client = connect_with(config).await;
+    let r1 = client.call_tool_once(call()).await.expect("round 1");
+    assert!(
+        matches!(r1, CallToolResponse::InputRequired(_)),
+        "round 1 is input_required: {r1:?}"
+    );
     client.cancel().await.unwrap();
 }

@@ -49,13 +49,13 @@ A small textbook catalog with fixed `health` → `echo` → `confirm_echo` is a 
 
 **SHOULD** in the spirit of prompt-cache friendliness; **MUST** for BETTER pedagogy.
 
-| Guarantee | Level |
+| Promise | Level |
 |-----------|--------|
 | Same process, N consecutive `tools/list` | Same order |
 | Process restart, static catalog | Same order when the catalog is code-fixed (`BETTER_TOOL_ORDER`). **v0.3:** `order-restart-smoke` proves two processes; unit tests prove multi-instance |
 | Dynamic catalogs | Document when order may change; bump understanding of ttl |
 
-**mcp-better** order: `health`, then `echo`. Always.
+**mcp-better** order: `health`, `echo`, then `confirm_echo`. Always.
 
 ---
 

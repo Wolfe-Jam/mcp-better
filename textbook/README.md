@@ -87,7 +87,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 | 06 | [Stateless core](./06-stateless-core.md) | **SOLID** | No protocol session; handles for app state |
 | 07 | [Transports](./07-transports.md) | **SOLID** | stdio default · Streamable HTTP road |
 | 08 | [Claim = wire](./08-claim-equals-wire.md) | **SOLID** | Honesty as engineering |
-| 09 | [Lab: run the textbook](./09-run-the-textbook.md) | **SOLID** | mcp-better 0.2 in ≤10 min |
+| 09 | [Lab: run the textbook](./09-run-the-textbook.md) | **SOLID** | mcp-better 0.7 in ≤10 min |
 | 10 | [What we resist](./10-what-we-resist.md) | **SOLID** | Non-goals that keep the book true |
 
 ### Appendices

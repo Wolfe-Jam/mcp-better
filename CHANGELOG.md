@@ -2,7 +2,7 @@
 
 ## [0.7.0] — 2026-11-16 — tools say what they do
 
-**Lesson:** a tool with no annotations gets the spec's defaults: it may write, may destroy, and reaches the outside world. The descriptions said "no side effects"; the wire didn't. The same goes for the command line: a flag the binary doesn't know should say so, not start a server.
+**Lesson:** a tool with no annotations gets the spec's defaults: it may write, may destroy, and reaches the outside world. The descriptions said "no side effects"; the wire didn't. The same goes for the command line: a flag the binary doesn't know should say so, not start a server. And a server should ask only for what the client said it can answer.
 
 This release was checked as a candidate before the tag: the packaged crate and the packed npm tarball went through the cold-install probe, every flag, every MCP method over stdio and HTTP, and the README commands.
 
@@ -11,6 +11,8 @@ This release was checked as a candidate before the tag: the packaged crate and t
 - **Every tool is annotated:** `health`, `echo` and `confirm_echo` set `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true` and `openWorldHint: false`. Before, `tools/list` carried no annotations, so clients had to assume the defaults. A handler test asserts all four hints on every tool.
 - **`--version` prints the version:** `--version` and `-V` print `mcp-better <version>` on stdout and exit 0, wherever they appear (`--http --version` included). Before, both started the stdio server, which exited 1 with `connection closed: initialize request`. `mcp-worse --version` does the same.
 - **Unknown arguments are errors:** `mcp-better --bogus`, a stray word, or `MCP_TRANSPORT=htp` print the reason and exit 2. Before, each silently started the stdio server. `mcp-worse` accepts only `--version`, `--help` and `--stdio`. One parser (`mcp_better::cli`) with unit tests; a test runs both built binaries.
+- **`confirm_echo` asks only clients that declared elicitation:** round 1 requests an elicitation, so a client that didn't declare `elicitation` now gets `-32021` (missing required client capability) naming it, instead of an `input_required` it can't answer (SEP-2322, SEP-2575). The matching client declares elicitation; a unit test and a handler test over a real client/server pair check both sides. The suite's own checks for this run only on its fixture tools, so they stay baselined.
+- **`confirm_echo` round 2:** the integrity error no longer says "expired" (the sealed state has no expiry), and a no-op branch is gone; the sealed `message` stays the source of truth.
 - **`server/discover` is stamped:** it carries `ttlMs=60000` + `cacheScope=public` like every list and read. Before, it carried the SDK default (`0` + `private`).
 - **No private paths in the public docs:** the textbook index no longer links a private notes file (`../STATE.md`, never in the repo); four lines naming a private vault or a local folder are gone.
 
@@ -18,6 +20,10 @@ This release was checked as a candidate before the tag: the packaged crate and t
 
 - **Release workflow:** the `aarch64-apple-darwin` build runs on `macos-15` (GitHub retired the `macos-14` runner). A pull request that changes `release.yml` now builds every target and downloads the artifacts, attaching and publishing nothing, so a retired runner or a broken action shows up before a tag.
 - **GitHub Actions on Node 24:** `actions/checkout` v6.1.0, `actions/upload-artifact` v6.0.0, `actions/download-artifact` v7.0.0, `actions/setup-node` v6.5.0 and `softprops/action-gh-release` v3.0.4, pinned by commit. Each is the first major that runs on Node 24; `setup-node` stays on v6 because v7 changes the npm auth setup the token-free publish runs with.
+- **Release workflow gates the publish on tests:** a `test` job runs `cargo test --locked --all-targets` on the tagged commit, and `publish-registries` needs it as well as `build`. Release binaries build with `--locked`, like the documented install. The manual-run tag input has no stale default.
+- **Doc gate checks every version pin:** README install and `--version` lines and the Protocol claims heading, GETTING-STARTED, textbook ch. 09 and `agent.fafa` must match `Cargo.toml`, and a README with no pins fails. Before, its README pattern matched nothing, so the check never ran. The repo's gate now always runs, locally as in CI; the maintainer's copy runs as well when present. Scripts that call a maintainer-only script skip it when absent.
+- **Conformance wording:** "every check" → 196 checks pass, none fail or warn, and the suite itself skips one scenario (`tasks-status-notifications`, 0 checks).
+- **Docs:** v0.6 and v0.7 rows in the version maps (BETTER.md, DOCTRINE, STATUS), v0.6.0 and v0.7.0 in the release matrix, the current gate in AGENTS.md and PUBBETTER.md (OIDC publish on the tag), the MRTR doc (declared capabilities), the spec map (`input_required` on the wire), ch. 04 (`ClientConfig`), ch. 05 (three-tool order), and the lab skill's flow starts at `server/discover`.
 - **Docs:** README (v0.7 row, "Annotated tools" in What BETTER means, Tool annotations and discover in the claims, the command-line rules), textbook ch. 05 (discover) and ch. 08 (annotation and `--version` proofs, "hint silence"), SDK-NOTES v0.7.0.
 
 ## [0.6.0] — 2026-11-15 — the official MCP conformance suite in CI

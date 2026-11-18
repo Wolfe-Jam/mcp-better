@@ -11,8 +11,8 @@
 //! Or: MCP_BETTER_BIN=/path/to/mcp-better cargo run --example mrtr-client
 
 use rmcp::model::{
-    CacheScope, CallToolRequestParams, CallToolResponse, ClientConfig, InputResponses,
-    ProtocolVersion,
+    CacheScope, CallToolRequestParams, CallToolResponse, ClientCapabilities, ClientConfig,
+    InputResponses, ProtocolVersion,
 };
 use rmcp::transport::{ConfigureCommandExt, TokioChildProcess};
 use rmcp::{ClientLifecycleMode, ClientServiceExt};
@@ -64,7 +64,10 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("spawning server: {bin}");
 
     let transport = TokioChildProcess::new(Command::new(&bin).configure(|_c| {}))?;
-    let client = ClientConfig::default()
+    // confirm_echo asks for an elicitation, so the client declares it.
+    let mut config = ClientConfig::default();
+    config.capabilities = ClientCapabilities::builder().enable_elicitation().build();
+    let client = config
         .serve_with_lifecycle(
             transport,
             ClientLifecycleMode::Discover {

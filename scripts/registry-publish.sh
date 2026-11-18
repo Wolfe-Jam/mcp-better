@@ -43,4 +43,9 @@ head -c 400 /tmp/mcp-reg-verify.json; echo
 [[ "$HTTP" == "200" ]] && echo "✅ Registry live" || echo "⚠️  not 200 yet — retry curl in ~30s"
 
 echo "==> truth-table"
-bash "$HOME/.claude/skills/pubbetter/scripts/release-verify.sh" .
+TRUTH="$HOME/.claude/skills/pubbetter/scripts/release-verify.sh"
+if [[ -f "$TRUTH" ]]; then
+  bash "$TRUTH" .
+else
+  echo "· truth-table skipped: maintainer-only script not present"
+fi

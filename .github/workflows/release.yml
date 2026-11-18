@@ -30,9 +30,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to build and attach assets to (e.g. v0.4.1)"
+        description: "Release tag to build and attach assets to (e.g. v0.7.0)"
         required: true
-        default: "v0.4.1"
 
 # Default: no tokens. Jobs elevate only what they need.
 permissions: {}
@@ -75,7 +74,7 @@ jobs:
 
       - name: Build release binary
         shell: bash
-        run: cargo build --release --bin mcp-better --target ${{ matrix.target }}
+        run: cargo build --release --locked --bin mcp-better --target ${{ matrix.target }}
 
       - name: Package artifact
         shell: bash
@@ -153,11 +152,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # The tagged commit's own tests, so a registry publish never ships untested code.
+  test:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.ref }}
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+        with:
+          toolchain: stable
+      - name: test
+        run: cargo test --locked --all-targets
+
   # ── OIDC publish (tag push only — never workflow_dispatch / PR) ───────────
   # Requires Trusted Publishing + Environment `release` configured first.
   # Do NOT delete classic secrets until this job has succeeded once.
   publish-registries:
-    needs: [build]
+    needs: [build, test]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: release
