@@ -4,7 +4,7 @@ agent:
   displayName: mcp-better
   id: urn:air:wolfe-jam.github.io:agent:mcp-better
   version: 0.7.0
-  description: A Rust MCP server (rmcp 3.10) for protocol 2026-07-28, with cache hints on every list and read, mid-call confirmation (MRTR) and Skills over MCP, on stdio or Streamable HTTP.
+  description: A Rust MCP server (rmcp 3.10) for protocol 2026-07-28, with annotated tools, the official MCP conformance suite in CI, cache hints on every list and read, mid-call confirmation (MRTR) and Skills over MCP, on stdio or Streamable HTTP.
   homepage: https://wolfe-jam.github.io
 capabilities:
   - name: health

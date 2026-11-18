@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.7.0] — 2026-11-16 — tools say what they do
+## [0.7.0] — 2026-11-18 — tools say what they do
 
 **Lesson:** a tool with no annotations gets the spec's defaults: it may write, may destroy, and reaches the outside world. The descriptions said "no side effects"; the wire didn't. The same goes for the command line: a flag the binary doesn't know should say so, not start a server. And a server should ask only for what the client said it can answer.
 
