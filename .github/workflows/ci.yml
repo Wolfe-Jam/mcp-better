@@ -12,6 +12,8 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
@@ -35,8 +37,27 @@ jobs:
       - name: clippy
         run: cargo clippy --all-targets -- -D warnings
 
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.151
+
+      # nextest runs the same tests as `cargo test --all-targets` and writes a
+      # JUnit report (.config/nextest.toml) for the TAF receipt. It skips
+      # doctests, so they run on their own below.
       - name: test
-        run: cargo test --all-targets
+        run: cargo nextest run --profile ci --all-targets --no-fail-fast
+
+      - name: Upload test report for the TAF receipt
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: taf-test-output
+          path: target/nextest/ci/junit.xml
+          overwrite: true
+
+      - name: doctests
+        run: cargo test --doc
 
       - name: build release binary
         run: cargo build --release
@@ -109,6 +130,20 @@ jobs:
 
       - name: Registry listing (rust-mcp-preflight server.json)
         run: bash scripts/preflight.sh
+
+  # TAF receipt: one per push to main, red runs included (FAILED), saved to the
+  # taf-receipts branch by taf-git's receipt job, the only job that writes.
+  # test-result is the whole check job: any failing step records FAILED.
+  receipt:
+    needs: check
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    uses: Wolfe-Jam/taf-git/.github/workflows/receipt.yml@v3.0.1
+    with:
+      artifact-name: taf-test-output
+      test-output-file: junit.xml
+      test-result: ${{ needs.check.result }}
 
   msrv:
     # rust-version in Cargo.toml must stay true: build on exactly that toolchain.
