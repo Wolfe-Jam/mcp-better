@@ -48,10 +48,15 @@ const MRTR_AAD: &[u8] = b"mcp-better/confirm_echo";
 /// Elicitation map key the client must answer.
 const CONFIRM_INPUT_KEY: &str = "confirm";
 
+/// How long a round-1 `requestState` stays valid. 7/28 keeps no session, so the
+/// seal can't be marked "used"; an expiry bounds how long it can be replayed.
+pub const CONFIRM_STATE_TTL: std::time::Duration = std::time::Duration::from_secs(300);
+
 #[derive(Debug, Clone)]
 pub struct BetterServer {
     tool_router: ToolRouter<Self>,
     state_codec: RequestStateCodec,
+    confirm_ttl: std::time::Duration,
     skills: SkillCatalog,
 }
 
@@ -65,8 +70,15 @@ impl BetterServer {
             tool_router: Self::tool_router(),
             state_codec: RequestStateCodec::try_new(MRTR_STATE_KEY)
                 .expect("MRTR_STATE_KEY meets RequestStateCodec::MIN_KEY_LENGTH"),
+            confirm_ttl: CONFIRM_STATE_TTL,
             skills,
         }
+    }
+
+    /// Same server with a different `requestState` lifetime (tests use a short one).
+    pub fn with_confirm_ttl(mut self, ttl: std::time::Duration) -> Self {
+        self.confirm_ttl = ttl;
+        self
     }
 
     /// Skills catalog (for tests / smokes).
@@ -132,7 +144,9 @@ impl BetterServer {
                         &ConfirmState {
                             message: message.clone(),
                         },
-                        &SealOptions::new().associated_data(MRTR_AAD),
+                        &SealOptions::new()
+                            .associated_data(MRTR_AAD)
+                            .ttl(self.confirm_ttl),
                     )
                     .map_err(|e| {
                         McpError::internal_error(format!("failed to seal requestState: {e}"), None)
@@ -176,14 +190,24 @@ impl BetterServer {
                 let state: ConfirmState = self
                     .state_codec
                     .open_json_with(sealed, MRTR_AAD)
+                    // One client-facing error for every failure (tampered, wrong tool,
+                    // expired), as rmcp's `open_with` asks; the variant stays internal.
                     .map_err(|_| {
                         McpError::invalid_params(
-                            "requestState failed integrity check (tampered or wrong tool)",
+                            "requestState failed integrity check or expired (start again)",
                             None,
                         )
                     })?;
 
-                // The sealed message is the source of truth; a re-sent `message` is ignored.
+                // The sealed message is what the user confirmed. A retry that sends a
+                // different `message` is refused, so the caller is never told "done"
+                // for something it didn't send.
+                if message != state.message {
+                    return Err(McpError::invalid_params(
+                        "message changed since round 1; start again to confirm the new one",
+                        None,
+                    ));
+                }
                 let message = state.message;
 
                 let elicit = responses.get(CONFIRM_INPUT_KEY).ok_or_else(|| {
@@ -710,6 +734,51 @@ mod tests {
             }),
             digest
         );
+    }
+
+    fn accepted() -> InputResponses {
+        let mut responses = InputResponses::new();
+        responses.insert(
+            CONFIRM_INPUT_KEY.to_string(),
+            json!({ "action": "accept", "content": { "confirm": "CONFIRM" } }),
+        );
+        responses
+    }
+
+    fn round1_state(server: &BetterServer, message: &str) -> String {
+        let CallToolResponse::InputRequired(ir) = server
+            .confirm_echo_call(confirm_args(message), &elicit_caps())
+            .unwrap()
+        else {
+            panic!("round1");
+        };
+        ir.request_state.expect("sealed state")
+    }
+
+    /// #12: a round-1 token stops working once its TTL has passed.
+    #[test]
+    fn confirm_echo_rejects_expired_state() {
+        let server = BetterServer::new().with_confirm_ttl(std::time::Duration::from_millis(1));
+        let sealed = round1_state(&server, "late");
+        std::thread::sleep(std::time::Duration::from_millis(20));
+        let req = confirm_args("late")
+            .with_input_responses(accepted())
+            .with_request_state(sealed);
+        let err = server.confirm_echo_call(req, &elicit_caps()).unwrap_err();
+        assert_eq!(err.code, ErrorCode::INVALID_PARAMS);
+    }
+
+    /// #13: round 2 with a different `message` than round 1 is refused, not ignored.
+    #[test]
+    fn confirm_echo_rejects_changed_message() {
+        let server = BetterServer::new();
+        let sealed = round1_state(&server, "confirm me");
+        let req = confirm_args("SWAPPED")
+            .with_input_responses(accepted())
+            .with_request_state(sealed);
+        let err = server.confirm_echo_call(req, &elicit_caps()).unwrap_err();
+        assert_eq!(err.code, ErrorCode::INVALID_PARAMS);
+        assert!(err.message.contains("changed"), "{}", err.message);
     }
 
     #[test]
