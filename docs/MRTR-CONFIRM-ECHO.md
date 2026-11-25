@@ -108,8 +108,7 @@ tools/list → health → echo → confirm_echo
 confirm_echo R1 → input_required + requestState
 confirm_echo R2 → CONFIRM + echoed state → complete
 wrong CONFIRM → -32602
-tampered or expired state → -32602
-changed message in R2 → -32602
+tampered state → -32602 integrity
 ```
 
 ```bash
@@ -120,6 +119,8 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```text
 mrtr-client: OK (Discover + confirm_echo R1 input_required → R2 complete · reject wrong confirm · reject tampered state)
 ```
+
+Expiry and a changed round-2 `message` are checked by unit tests in `src/server.rs` (`confirm_echo_rejects_expired_state`, `confirm_echo_rejects_changed_message`), not by the client.
 
 `stdio-client` still lists `confirm_echo` and does not invoke it. That is the Discover baseline.
 
