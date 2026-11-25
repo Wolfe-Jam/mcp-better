@@ -55,6 +55,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` finishes `confirm_echo` |
 | **v0.6** | Same era + **the spec's own tests** — the official MCP conformance suite in CI ([Conformance](#conformance)) · cache hints on every list and read · declare what you answer · `rmcp` 3.10 |
 | **v0.7** | Same era + **tools say what they do** — every tool carries all four annotation hints (read-only, not destructive, idempotent, closed world) · `confirm_echo` asks only clients that declare elicitation (else `-32021`) · `server/discover` stamped like the lists · a strict command line (`--version`, unknown arguments exit 2) |
+| **v0.8** | Same era + **confirmations that hold** — `confirm_echo`'s `requestState` expires after 5 minutes · a changed `message` in round 2 is refused (`-32602`) · strict SKILL.md frontmatter (refuses what YAML reads differently) · single-file skills by design |
 
 ## What BETTER means
 
@@ -106,11 +107,11 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # install from crates.io — first hit compiles deps once (see above):
-cargo install mcp-better --version 0.7.0 --locked
-mcp-better --version   # mcp-better 0.7.0
+cargo install mcp-better --version 0.8.0 --locked
+mcp-better --version   # mcp-better 0.8.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.7.0 --locked --bin mcp-worse
+# cargo install mcp-better --version 0.8.0 --locked --bin mcp-worse
 ```
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
@@ -141,7 +142,7 @@ cargo run --release -- --http
 
 All three are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`: they read only, change nothing and stay in the process.
 
-## Protocol claims (v0.7.0 — same 7/28 era · the official conformance suite in CI)
+## Protocol claims (v0.8.0 — same 7/28 era · the official conformance suite in CI)
 
 | Surface | Status |
 |---------|--------|
@@ -152,8 +153,8 @@ All three are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempot
 | Capabilities | **tools** · **resources** (skill docs) · **skills** extension (SEP-2640, rmcp native) · prompts and completions **not declared** (`prompts/*`, `completion/complete` → method not found) |
 | Cache hints | discover, tools, resources and skills: **`ttlMs=60000`**, **`cacheScope=public`** · tool order **`health`→`echo`→`confirm_echo`** (restart-stable) |
 | Tool annotations | all four hints on every tool: read-only · not destructive · idempotent · closed world (`tests/handlers.rs`) |
-| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` · asked only of clients that declare elicitation (else `-32021`) · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
-| Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
+| MRTR (optional) | **`confirm_echo`** — mid-call confirm · sealed `requestState` (expires after 5 min; round 2 must resend the same `message`) · asked only of clients that declare elicitation (else `-32021`) · matching client **`mrtr-client`** · [`docs/MRTR-CONFIRM-ECHO.md`](./docs/MRTR-CONFIRM-ECHO.md)
+| Skills (optional) | **`mcp-better-lab`** · `skills/list` · digests · strict frontmatter · one file per skill by design · [`docs/SKILLS-OVER-MCP.md`](./docs/SKILLS-OVER-MCP.md) |
 | Lying companion | **`mcp-worse`** — reversed tool order (the lie) + the SDK defaults left in place: no cache hints of its own (the wire shows `ttlMs: 0` + `private`, valid but uninformative), no tool annotations, and `prompts/list` / `completion/complete` answered without being declared · stdio only · same `--version` · contrast-smoke only |
 | OAuth / tasks | out of hero |
 

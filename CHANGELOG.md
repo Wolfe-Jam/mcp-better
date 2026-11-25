@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.0] — 2026-11-25 — confirmations that hold
+
+**Lesson:** a confirmation should hold only for what the user confirmed, and only for a while. On 2026-07-28 the server keeps no session, so the sealed `requestState` has to carry that itself. And a skill's listing should say what the host reads, or not load at all.
+
+### Fixed
+
+- **`confirm_echo` state expires** ([#12](https://github.com/Wolfe-Jam/mcp-better/issues/12)): round 1 seals `requestState` with a 5-minute expiry (`CONFIRM_STATE_TTL`, rmcp's `SealOptions::ttl`). After that, round 2 is refused. Expired, tampered and wrong-tool tokens all get the same `-32602` ("failed integrity check or expired"), as rmcp asks. Before, a round-1 token completed round 2 any number of times, at any time. Within the 5 minutes it still can: a one-time token needs storage, which 7/28 avoids; `docs/MRTR-CONFIRM-ECHO.md` says so.
+- **A changed message in round 2 is refused** ([#13](https://github.com/Wolfe-Jam/mcp-better/issues/13)): round 2 with a `message` different from round 1 gets `-32602` ("message changed since round 1"). Before, it completed with the round-1 message and no error, so the caller was told "done" for something it didn't send.
+- **Strict SKILL.md frontmatter** ([#17](https://github.com/Wolfe-Jam/mcp-better/issues/17)): only one-line `key: value` pairs whose value a YAML parser reads as the same plain string load. Quotes, `>`/`|` blocks, indented lines, empty values, lists, numbers, YAML 1.1 dates and numbers (`2026-11-25`, `1_000`, `1:30`), booleans, null, tabs, inline comments and duplicate keys are refused at load, with the reason. An independent review before the tag found a panic on values starting with a non-ASCII character; fixed in [#23](https://github.com/Wolfe-Jam/mcp-better/pull/23). Before, `license: "MIT"` loaded with its quotes, so `skills/list` could differ from what the host reads. No new dependency.
+
+### Changed
+
+- **One file per skill, by design** ([#18](https://github.com/Wolfe-Jam/mcp-better/issues/18)): the code and the tutorial say so, and a test fails if a skill gains a second file under the SKILL.md labels.
+- **Docs:** `docs/MRTR-CONFIRM-ECHO.md` (Expiry and replay), the Skills tutorial (strict parser, single file), README (v0.8 row, MRTR and Skills claims), BETTER.md, SDK-NOTES v0.8.0, the release matrix (v0.7.0 released, v0.8.0 added), textbook ch. 09 and STATUS pins.
+
 ## [0.7.0] — 2026-11-18 — tools say what they do
 
 **Lesson:** a tool with no annotations gets the spec's defaults: it may write, may destroy, and reaches the outside world. The descriptions said "no side effects"; the wire didn't. The same goes for the command line: a flag the binary doesn't know should say so, not start a server. And a server should ask only for what the client said it can answer.

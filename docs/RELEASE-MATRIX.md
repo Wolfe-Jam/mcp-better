@@ -209,17 +209,31 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 | M13–M14 | tag + GH Release | **Yes** | ✅ | [v0.6.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.6.0) |
 | M15 | MCP Registry | **Yes** | ✅ | **0.6.0** active |
 
-## v0.7.0 — tools say what they do — **unreleased**
+## v0.7.0 — tools say what they do — **released 2026-11-18**
 
 **Lesson:** a tool with no annotations gets the spec's defaults; a server should ask only for what the client declared.
 
 | # | Surface | Required? | v0.7.0 | Notes |
 |---|---------|:---------:|:------:|-------|
-| M1 | Doc Gate (lockstep **0.7.0**, every README / guide pin) | **Yes** | | |
+| M1 | Doc Gate (lockstep **0.7.0**, every README / guide pin) | **Yes** | ✅ | |
+| M5 | `scripts/ci.sh` | **Yes** | ✅ | |
+| A1 | Every tool annotated (4 hints) | **Yes** | ✅ | handler test |
+| A2 | `confirm_echo` without declared elicitation → `-32021` | **Yes** | ✅ | unit + handler test |
+| A3 | `--version` / unknown arguments | **Yes** | ✅ | `tests/cli.rs` |
+| M11 · npm · M13–M15 | crates.io · npm · tag + GH Release · MCP Registry | **Yes** | ✅ | **0.7.0** on all four |
+
+## v0.8.0 — confirmations that hold — **unreleased**
+
+**Lesson:** a confirmation should hold only for what the user confirmed, and only for a while; a skill should list only what the host reads the same way.
+
+| # | Surface | Required? | v0.8.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (lockstep **0.8.0**, every README / guide pin) | **Yes** | | |
 | M5 | `scripts/ci.sh` | **Yes** | | |
-| A1 | Every tool annotated (4 hints) | **Yes** | | handler test |
-| A2 | `confirm_echo` without declared elicitation → `-32021` | **Yes** | | unit + handler test |
-| A3 | `--version` / unknown arguments | **Yes** | | `tests/cli.rs` |
+| R1 | Expired `requestState` → `-32602` | **Yes** | | `confirm_echo_rejects_expired_state` |
+| R2 | Changed round-2 `message` → `-32602` | **Yes** | | `confirm_echo_rejects_changed_message` |
+| S1 | Strict frontmatter refuses what YAML (1.2 or 1.1) reads differently; no panic on non-ASCII | **Yes** | | `frontmatter_refuses_what_it_cannot_read_exactly`, `frontmatter_refuses_review_cases` |
+| S2 | One file per skill | **Yes** | | `every_skill_is_a_single_skill_md` |
 | M11 · npm · M13–M15 | crates.io · npm · tag + GH Release · MCP Registry | **Yes** | | |
 
 ---

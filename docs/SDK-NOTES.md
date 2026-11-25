@@ -114,7 +114,18 @@ We claim **everything in v0.6.0**, plus:
 - An unknown argument or `MCP_TRANSPORT` / `MCP_BETTER_TRANSPORT` value exits 2 with the reason; nothing falls back to stdio silently (`mcp_better::cli`)
 - `server/discover` overrides the SDK default (`ttlMs: 0` + `private`) with the catalog's `ttlMs=60000` + `public`
 
-We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0 / v0.7.0:
+### v0.8.0 — confirmations that hold
+
+We claim **everything in v0.7.0**, plus:
+
+- `confirm_echo` seals round 1 with a 5-minute expiry (rmcp `SealOptions::ttl`); an expired, tampered or wrong-tool `requestState` gets one `-32602`
+- Round 2 with a `message` different from round 1 is refused (`-32602`), not answered with the sealed one
+- SKILL.md frontmatter loads only one-line plain-string values; anything a YAML parser reads differently is refused at load
+- One file per skill, by design, held by a test
+
+Not claimed: a one-time token. Within 5 minutes a round-1 token can complete round 2 more than once (no session on 7/28).
+
+We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0 / v0.7.0 / v0.8.0:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  

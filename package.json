@@ -1,6 +1,6 @@
 {
   "name": "mcp-better",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "mcpName": "io.github.Wolfe-Jam/mcp-better",
   "description": "Rust MCP textbook for 2026-07-28: annotated tools, MCP conformance suite in CI. AAIF contribution. npm shim downloads the native binary from GitHub Releases.",
   "license": "MIT",
