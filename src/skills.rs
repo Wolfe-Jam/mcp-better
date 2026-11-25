@@ -87,6 +87,10 @@ impl SkillCatalog {
         None
     }
 
+    /// One file per skill, by design (#18): each resource is the skill's SKILL.md, so
+    /// it takes the skill's name, description and `text/markdown`. A multi-file skill
+    /// (`references/`, `scripts/`) needs a name and media type per file, and
+    /// `resources/directory/read` if it declares `directoryRead` (SEP-2640).
     pub fn list_resources_meta(&self) -> Vec<Resource> {
         let mut out = Vec::new();
         for skill in self.skills.values() {
@@ -138,6 +142,7 @@ fn to_skill(entry: &SkillEntry) -> Skill {
     Skill::new(entry.uri.clone(), frontmatter, SkillResources::Files(files))
 }
 
+/// Builds a single-file skill: SKILL.md is its only resource (see `list_resources_meta`).
 fn load_skill_from_markdown(md: &str) -> Result<SkillEntry, String> {
     let (frontmatter, _body) = parse_frontmatter(md)?;
     let name = frontmatter
@@ -278,6 +283,17 @@ mod tests {
         assert_eq!(res.digest, digest);
         let recomputed = format!("sha256:{}", hex_sha256(res.bytes.as_ref()));
         assert_eq!(recomputed, digest);
+    }
+
+    /// #18: the catalog is single-file by design. A skill with more files must not
+    /// slip in under the SKILL.md labels; this fails first if one is added.
+    #[test]
+    fn every_skill_is_a_single_skill_md() {
+        let cat = SkillCatalog::load_lab().unwrap();
+        for skill in cat.skills.values() {
+            assert_eq!(skill.resources.len(), 1, "{}", skill.uri);
+            assert!(skill.resources[0].uri.ends_with("/SKILL.md"));
+        }
     }
 
     fn fm(lines: &str) -> Result<Map<String, Value>, String> {

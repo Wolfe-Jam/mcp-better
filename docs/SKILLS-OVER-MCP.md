@@ -45,7 +45,7 @@ On `2026-07-28` the host opens with **`server/discover`**, not `initialize`. The
 - The [digest](https://github.com/Wolfe-Jam/mcp-better/blob/561356f/src/skills.rs#L153) is `sha256:<hex>` over the whole file's bytes, frontmatter included, and the size is its byte length.
 - [`parse_frontmatter`](https://github.com/Wolfe-Jam/mcp-better/blob/main/src/skills.rs) requires `name` and `description`. **It is strict, not a YAML parser:** it accepts only one-line `key: value` pairs whose value a YAML parser reads as the same plain string, and refuses anything else at load (quotes, `>`/`|` blocks, nested `metadata:`, lists, numbers, booleans, comments). The host parses your SKILL.md with a real YAML parser, so the frontmatter you list must match what it reads: either be this strict, or use a real YAML parser for richer frontmatter.
 
-mcp-better serves one single-file skill. A skill with more files (`references/`, `scripts/`) lists every file with its own digest, size and media type, and can be browsed with `resources/directory/read` when the server declares `directoryRead`. See SEP-2640 for those rules; mcp-better doesn't exercise them.
+mcp-better serves one single-file skill, by design: the catalog labels each file as its skill's SKILL.md, and a test fails if a skill gains a second file. A skill with more files (`references/`, `scripts/`) lists every file with its own digest, size and media type, and can be browsed with `resources/directory/read` when the server declares `directoryRead`. See SEP-2640 for those rules; mcp-better doesn't exercise them.
 
 ## 3. Declare the extension
 
