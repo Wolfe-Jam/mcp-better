@@ -76,6 +76,8 @@ The demo signing key is a **constant for the textbook binary only**. Real deploy
 
 A sealed `requestState` is **signed, not encrypted**: anyone holding it can read the message inside. On `2026-07-28` the server keeps no session, so it can't mark a token as used. mcp-better seals each round-1 token with a **5-minute expiry** (`CONFIRM_STATE_TTL`, rmcp's `SealOptions::ttl`); after that, round 2 is refused. Expired, tampered and wrong-tool tokens all get the same `-32602`, as rmcp asks: the reason stays on the server.
 
+Round 2 must send the same `message` as round 1. A different one gets `-32602` ("message changed since round 1"): the user confirmed the sealed message, and a silent success for another one would tell the caller something untrue.
+
 Within those 5 minutes a token can still complete round 2 more than once. That's harmless for an echo. A tool with real effects (delete, pay, send) needs a one-time token too: a nonce in the seal plus a used-set the server keeps, which means storage.
 
 ## Protocol gate
@@ -107,6 +109,7 @@ confirm_echo R1 → input_required + requestState
 confirm_echo R2 → CONFIRM + echoed state → complete
 wrong CONFIRM → -32602
 tampered or expired state → -32602
+changed message in R2 → -32602
 ```
 
 ```bash

@@ -199,7 +199,15 @@ impl BetterServer {
                         )
                     })?;
 
-                // The sealed message is the source of truth; a re-sent `message` is ignored.
+                // The sealed message is what the user confirmed. A retry that sends a
+                // different `message` is refused, so the caller is never told "done"
+                // for something it didn't send.
+                if message != state.message {
+                    return Err(McpError::invalid_params(
+                        "message changed since round 1; start again to confirm the new one",
+                        None,
+                    ));
+                }
                 let message = state.message;
 
                 let elicit = responses.get(CONFIRM_INPUT_KEY).ok_or_else(|| {
@@ -758,6 +766,19 @@ mod tests {
             .with_request_state(sealed);
         let err = server.confirm_echo_call(req, &elicit_caps()).unwrap_err();
         assert_eq!(err.code, ErrorCode::INVALID_PARAMS);
+    }
+
+    /// #13: round 2 with a different `message` than round 1 is refused, not ignored.
+    #[test]
+    fn confirm_echo_rejects_changed_message() {
+        let server = BetterServer::new();
+        let sealed = round1_state(&server, "confirm me");
+        let req = confirm_args("SWAPPED")
+            .with_input_responses(accepted())
+            .with_request_state(sealed);
+        let err = server.confirm_echo_call(req, &elicit_caps()).unwrap_err();
+        assert_eq!(err.code, ErrorCode::INVALID_PARAMS);
+        assert!(err.message.contains("changed"), "{}", err.message);
     }
 
     #[test]
