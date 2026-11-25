@@ -26,7 +26,7 @@ Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador c
 
 One Agent Skill (`mcp-better-lab`) on the same process as tools:
 
-→ [docs/SKILLS-OVER-MCP.md](./docs/SKILLS-OVER-MCP.md) — extension · `skills/list` · `skills/get` · digests
+→ **Tutorial: [Ship a skill with your MCP server](./docs/SKILLS-OVER-MCP.md)** — each step linked to the code, and the four checks that prove a host loads the skill (verified in Claude Code 2.1.332: `mcp-better:mcp-better-lab` listed and loaded).
 
 ## What is 7/28?
 
