@@ -82,6 +82,8 @@ Check the current docs before relying on this list: the feature is in public bet
 
 The skill is public textbook data, not credentials, and nothing in it is a permission. Treat skill content from any server as untrusted input: a digest shows the bytes match what the server listed, not that the content is safe. Claude Code shows the same warning on its skills page: the provider can change its skills at any time, and a skill can direct Claude to run code.
 
+The skill drives `confirm_echo`, whose mid-call confirmation carries a `requestState` token. That token is signed, not encrypted: tampering is caught, but anyone can read what's inside, so never put private data in it. And on 2026-07-28 the server keeps no session, so a token can be used more than once ([#12](https://github.com/Wolfe-Jam/mcp-better/issues/12)). That's harmless for an echo; before copying the pattern to a tool with real effects, add an expiry or a one-time nonce.
+
 ## Not required
 
 Dual-package authors (Rust crate + npm launcher) don't need skills. See the dual-package guides.
