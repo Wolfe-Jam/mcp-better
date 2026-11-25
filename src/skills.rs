@@ -177,9 +177,9 @@ fn load_skill_from_markdown(md: &str) -> Result<SkillEntry, String> {
 fn parse_frontmatter(md: &str) -> Result<(Map<String, Value>, String), String> {
     let md = md.trim_start_matches('\u{feff}');
     let rest = md
-        .strip_prefix("---")
-        .ok_or_else(|| "missing opening frontmatter ---".to_string())?;
-    let rest = rest.strip_prefix('\n').unwrap_or(rest);
+        .strip_prefix("---\n")
+        .or_else(|| md.strip_prefix("---\r\n"))
+        .ok_or_else(|| "missing opening frontmatter --- on its own line".to_string())?;
     let (yaml, body) = rest
         .split_once("\n---")
         .ok_or_else(|| "missing closing frontmatter ---".to_string())?;
@@ -204,7 +204,8 @@ fn parse_frontmatter(md: &str) -> Result<(Map<String, Value>, String), String> {
         {
             return Err(refuse("key"));
         }
-        let v = v.trim();
+        // YAML trims only spaces and tabs; any other whitespace stays in the value.
+        let v = v.trim_matches([' ', '\t']);
         if let Some(why) = not_a_plain_string(v) {
             return Err(refuse(why));
         }
@@ -226,8 +227,11 @@ fn not_a_plain_string(v: &str) -> Option<&'static str> {
     let Some(first) = v.chars().next() else {
         return Some("empty value");
     };
+    if v.contains('\t') {
+        return Some("tab in value");
+    }
     // `-`, `?` and `:` start a plain string only when a non-space follows.
-    let lone = v.len() == 1 || v[1..].starts_with(' ');
+    let lone = v.chars().nth(1).is_none_or(|c| c == ' ');
     if "\"'|>[]{}&*!%@`#,".contains(first) || ("-?:".contains(first) && lone) {
         return Some("starts with a YAML indicator");
     }
@@ -244,6 +248,9 @@ fn not_a_plain_string(v: &str) -> Option<&'static str> {
     ) {
         return Some("null or boolean");
     }
+    if yaml11_number_or_date(v) {
+        return Some("number or date in YAML 1.1");
+    }
     let num = lower.trim_start_matches(['+', '-']);
     if num.parse::<f64>().is_ok()
         || num.starts_with("0x")
@@ -254,6 +261,32 @@ fn not_a_plain_string(v: &str) -> Option<&'static str> {
         return Some("number");
     }
     None
+}
+
+/// YAML 1.1 parsers (still common in hosts) read these as numbers or dates, not strings:
+/// `2026-11-25` (date), `1_000` (1000), `1:30` (sexagesimal 90).
+fn yaml11_number_or_date(v: &str) -> bool {
+    let b = v.as_bytes();
+    let digits =
+        |r: std::ops::Range<usize>| r.clone().all(|i| b.get(i).is_some_and(u8::is_ascii_digit));
+    if b.len() >= 10
+        && digits(0..4)
+        && b[4] == b'-'
+        && digits(5..7)
+        && b[7] == b'-'
+        && digits(8..10)
+    {
+        return true;
+    }
+    let body = v.trim_start_matches(['+', '-']);
+    let starts_digit = body.starts_with(|c: char| c.is_ascii_digit());
+    let numeric = |extra: &[char]| {
+        body.chars()
+            .all(|c| c.is_ascii_digit() || extra.contains(&c))
+    };
+    starts_digit
+        && ((body.contains('_') && numeric(&['_', '.']))
+            || (body.contains(':') && numeric(&[':', '_', '.'])))
 }
 
 fn hex_sha256(bytes: &[u8]) -> String {
@@ -333,6 +366,43 @@ mod tests {
             let got = fm(&format!("{base}\n{extra}"));
             assert!(got.is_err(), "{case} should be refused, got {got:?}");
         }
+    }
+
+    /// Review: a value starting with a multi-byte character is read, not a panic.
+    #[test]
+    fn frontmatter_reads_non_ascii_first_characters() {
+        for v in ["—Use it when testing", "日本語", "é", "-é"] {
+            let m = fm(&format!("name: lab\ndescription: {v}")).expect(v);
+            assert_eq!(m["description"], v);
+        }
+    }
+
+    /// Review: YAML trims only spaces and tabs, so other whitespace stays in the value.
+    #[test]
+    fn frontmatter_keeps_non_yaml_whitespace() {
+        let m = fm("name: lab\ndescription: foo\u{a0}").expect("nbsp");
+        assert_eq!(m["description"], "foo\u{a0}");
+    }
+
+    /// Review: tabs, YAML 1.1 dates/numbers/sexagesimals and a glued opening line are refused.
+    #[test]
+    fn frontmatter_refuses_review_cases() {
+        let base = "name: lab\ndescription: d";
+        for (case, extra) in [
+            ("tab comment", "license: MIT\t# see file"),
+            ("tab after dash", "x: -\tfoo"),
+            ("tab after colon", "x: a:\tb"),
+            ("date", "updated: 2026-11-25"),
+            ("datetime", "updated: 2026-11-25T10:00:00Z"),
+            ("underscore number", "n: 1_000"),
+            ("sexagesimal", "t: 1:30"),
+        ] {
+            let got = fm(&format!("{base}\n{extra}"));
+            assert!(got.is_err(), "{case} should be refused, got {got:?}");
+        }
+        assert!(parse_frontmatter("---name: lab\ndescription: d\n---\n").is_err());
+        let m = fm("name: lab\ndescription: d\nversion: 1.0.0\nlicense: Apache-2.0").unwrap();
+        assert_eq!(m["version"], "1.0.0");
     }
 
     #[test]
