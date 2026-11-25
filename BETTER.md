@@ -56,6 +56,7 @@ NONE  →  GOOD  →  BETTER  →  BEST
 | **v0.5** | Same era + **matching client completes MRTR** — `mrtr-client` |
 | **v0.6** | Same era + **the official MCP conformance suite in CI** — conformance build + textbook baseline |
 | **v0.7** | Same era + **tools say what they do** — annotations · strict command line · `confirm_echo` asks only clients that declared elicitation |
+| **v0.8** | Same era + **confirmations that hold** — `requestState` expires · changed round-2 message refused · strict skill frontmatter · single-file skills by design |
 | Later | More road / louder proof inside 7/28 — never a new “protocol era” by semver alone |
 
 Also: official **`rmcp` 3.10** · Registry `server.json` · **no** `project.faf` required on `main`.
