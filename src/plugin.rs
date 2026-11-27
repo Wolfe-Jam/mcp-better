@@ -456,56 +456,229 @@ pub fn via_of(entry: &Value) -> Option<Via> {
     }
 }
 
-/// Compare an on-disk plugin with what the registry lists now. Returns one line per
-/// difference; empty means no drift. Only what [`generate`] writes is compared: other
-/// servers, and fields such as `keywords` or `author`, are the author's own.
-pub fn check(server: &Value, manifest: &Value, mcp: &Value) -> Result<Vec<String>, String> {
+/// What `--check` found.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Report {
+    /// The `mcpServers` key that runs this registry server.
+    pub server: String,
+    /// The plugin no longer starts what the registry lists: exit 1.
+    pub drift: Vec<String>,
+    /// Differences that may be the author's choice: reported, not failed.
+    pub notes: Vec<String>,
+}
+
+/// `scheme://host[:port]` of a URL.
+fn origin(url: &str) -> &str {
+    let after = url.find("://").map_or(0, |i| i + 3);
+    url[after..]
+        .find(['/', '?', '#'])
+        .map_or(url, |k| &url[..after + k])
+}
+
+/// The package identifier an on-disk stdio entry starts (version and tag removed).
+fn started_package(entry: &Value, via: Via) -> Option<(String, Option<String>)> {
+    let args: Vec<&str> = arr(entry, "args")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect();
+    let split_at = |spec: &str, sep: &str| -> (String, Option<String>) {
+        // A scoped npm name starts with `@`: the version separator is the last one.
+        match spec.rfind(sep).filter(|&k| k > 0) {
+            Some(k) => (
+                spec[..k].to_string(),
+                Some(spec[k + sep.len()..].to_string()),
+            ),
+            None => (spec.to_string(), None),
+        }
+    };
+    match via {
+        Via::Npm | Via::Nuget => args
+            .iter()
+            .find(|a| !a.starts_with('-') && a.contains('@') && a.rfind('@') != Some(0))
+            .map(|a| split_at(a, "@")),
+        Via::Pypi => args.iter().find(|a| !a.starts_with('-')).map(|a| {
+            if a.contains("==") {
+                split_at(a, "==")
+            } else {
+                split_at(a, "@")
+            }
+        }),
+        Via::Oci => {
+            // `docker run -i --rm [-e K=V]… image …`: the first bare token after the flags.
+            let mut it = args.iter().skip_while(|a| **a != "run").skip(1);
+            let mut image = None;
+            while let Some(a) = it.next() {
+                if *a == "-e" || *a == "--env" {
+                    it.next();
+                } else if !a.starts_with('-') {
+                    image = Some(*a);
+                    break;
+                }
+            }
+            image.map(|img| {
+                let slash = img.rfind('/').map_or(0, |k| k + 1);
+                match img[slash..].rfind(':') {
+                    Some(k) => (
+                        img[..slash + k].to_string(),
+                        Some(img[slash + k + 1..].to_string()),
+                    ),
+                    None => (img.to_string(), None),
+                }
+            })
+        }
+        Via::Remote => None,
+    }
+}
+
+/// Does this on-disk entry run this registry server?
+fn runs(entry: &Value, server: &Value) -> bool {
+    match via_of(entry) {
+        Some(Via::Remote) => {
+            let url = str_of(entry, "url").unwrap_or_default();
+            arr(server, "remotes")
+                .iter()
+                .any(|r| origin(str_of(r, "url").unwrap_or_default()) == origin(url))
+        }
+        Some(via) => started_package(entry, via).is_some_and(|(id, _)| {
+            arr(server, "packages").iter().any(|p| {
+                package_via(p) == Some(via)
+                    && str_of(p, "identifier").is_some_and(|i| strip_tag(i, via) == id)
+            })
+        }),
+        None => false,
+    }
+}
+
+/// An OCI identifier without its tag; other identifiers as they are.
+fn strip_tag(id: &str, via: Via) -> &str {
+    if via != Via::Oci {
+        return id;
+    }
+    let slash = id.rfind('/').map_or(0, |k| k + 1);
+    id[slash..].rfind(':').map_or(id, |k| &id[..slash + k])
+}
+
+/// Compare an on-disk plugin with what the registry lists now, whoever wrote it.
+///
+/// The server entry is found by its key (the plugin name this tool writes), else as
+/// the entry that starts one of the registry's packages or remotes, else as the only
+/// entry. **Drift** (exit 1) is what changes which server starts: another runner or
+/// package, a pinned version the registry has moved past, a remote on another host,
+/// a wrong `$schema`. Everything else that differs from what this tool would write
+/// (extra arguments, another path on the same host, the plugin's own version) is a
+/// **note**: it may be the author's choice.
+pub fn check(server: &Value, manifest: &Value, mcp: &Value) -> Result<Report, String> {
     let reg_name = str_of(server, "name").ok_or("server.json has no `name`")?;
     let name = plugin_name(reg_name)?;
-    let on_disk = mcp
-        .pointer(&format!(
-            "/mcpServers/{}",
-            name.replace('~', "~0").replace('/', "~1")
-        ))
-        .ok_or_else(|| format!("mcp.json has no server named `{name}`"))?;
-    let via = via_of(on_disk)
-        .ok_or_else(|| format!("mcp.json `{name}`: not a command this tool writes"))?;
-    let want = generate(server, Some(via), pin_of(on_disk))?;
+    let servers = mcp
+        .get("mcpServers")
+        .and_then(Value::as_object)
+        .ok_or("mcp.json has no `mcpServers`")?;
+    let key = if servers.contains_key(&name) {
+        name.clone()
+    } else if let Some((k, _)) = servers.iter().find(|(_, e)| runs(e, server)) {
+        k.clone()
+    } else if servers.len() == 1 {
+        servers.keys().next().cloned().unwrap_or_default()
+    } else {
+        return Err(format!("no server in mcp.json runs `{reg_name}` (looked for `{name}` and for its packages and remotes)"));
+    };
+    let on_disk = &servers[&key];
+    let mut r = Report {
+        server: key.clone(),
+        ..Report::default()
+    };
 
-    let mut drift = Vec::new();
-    let expected = &want.mcp["mcpServers"][&name];
-    if on_disk != expected {
-        drift.push(format!(
-            "mcp.json `{name}`: on disk {on_disk}, registry now {expected}"
-        ));
-    }
-    let pin = pin_of(on_disk);
-    for key in [
-        "$schema",
-        "name",
-        "version",
-        "description",
-        "homepage",
-        "repository",
+    for (file, v, want) in [
+        ("plugin.json", manifest, PLUGIN_SCHEMA),
+        ("mcp.json", mcp, MCP_SCHEMA),
     ] {
-        // A plugin on @latest is never bumped, so its version is the author's.
-        if key == "version" && pin == Pin::Latest {
-            continue;
+        if v.get("$schema").and_then(Value::as_str) != Some(want) {
+            r.drift.push(format!("{file} $schema: expected {want}"));
         }
-        let (got, exp) = (manifest.get(key), want.manifest.get(key));
-        if got != exp {
-            let show = |v: Option<&Value>| v.map_or("(none)".to_string(), Value::to_string);
-            drift.push(format!(
-                "plugin.json {key}: on disk {}, registry now {}",
-                show(got),
-                show(exp)
+    }
+
+    let Some(via) = via_of(on_disk) else {
+        r.notes.push(format!(
+            "`{key}` starts `{}`, a command this check can't read",
+            str_of(on_disk, "command").unwrap_or("?")
+        ));
+        return Ok(r);
+    };
+    let pin = pin_of(on_disk);
+    match generate(server, Some(via), pin) {
+        Err(_) => r.drift.push(format!(
+            "`{key}` runs via {}, but the registry lists nothing for that now",
+            via.as_str()
+        )),
+        Ok(want) => {
+            let expected = &want.mcp["mcpServers"][&want.name];
+            if via == Via::Remote {
+                let (got, exp) = (
+                    str_of(on_disk, "url").unwrap_or_default(),
+                    str_of(expected, "url").unwrap_or_default(),
+                );
+                let listed = arr(server, "remotes")
+                    .iter()
+                    .filter_map(|x| str_of(x, "url"))
+                    .any(|u| u == got);
+                if str_of(on_disk, "type") != str_of(expected, "type") && !listed {
+                    r.drift.push(format!(
+                        "`{key}` type {}, registry lists {}",
+                        on_disk["type"], expected["type"]
+                    ));
+                }
+                if !listed {
+                    if origin(got) == origin(exp) {
+                        r.notes.push(format!(
+                            "`{key}` url {got}: same host, but the registry lists {exp}"
+                        ));
+                    } else {
+                        r.drift
+                            .push(format!("`{key}` url {got}: the registry lists {exp}"));
+                    }
+                }
+            } else {
+                let got = started_package(on_disk, via);
+                let exp = started_package(expected, via);
+                match (got, exp) {
+                    (Some((gid, gver)), Some((eid, ever))) if gid == eid => {
+                        if pin == Pin::Exact && gver != ever {
+                            r.drift.push(format!(
+                                "`{key}` pins {gid} {}, registry now {}",
+                                gver.as_deref().unwrap_or("(no version)"),
+                                ever.as_deref().unwrap_or("(no version)")
+                            ));
+                        }
+                    }
+                    (got, Some((eid, _))) => r.drift.push(format!(
+                        "`{key}` starts {}, registry lists {eid}",
+                        got.map_or("an unreadable package".to_string(), |(g, _)| g)
+                    )),
+                    _ => {}
+                }
+                for field in ["args", "env"] {
+                    if on_disk.get(field) != expected.get(field) && r.drift.is_empty() {
+                        r.notes.push(format!(
+                            "`{key}` {field} {}, from the registry {}",
+                            on_disk.get(field).map_or("(none)".into(), Value::to_string),
+                            expected
+                                .get(field)
+                                .map_or("(none)".into(), Value::to_string)
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    if let (Some(got), Some(server_v)) = (str_of(manifest, "version"), str_of(server, "version")) {
+        if got != server_v && pin == Pin::Exact {
+            r.notes.push(format!(
+                "plugin.json version {got}, server {server_v} (the plugin's version is yours)"
             ));
         }
     }
-    if mcp.get("$schema").and_then(Value::as_str) != Some(MCP_SCHEMA) {
-        drift.push(format!("mcp.json $schema: expected {MCP_SCHEMA}"));
-    }
-    Ok(drift)
+    Ok(r)
 }
 
 /// The order keys are written in: the spec's own order, `$schema` and `type` first.

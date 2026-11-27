@@ -208,16 +208,23 @@ pub fn run(args: Args, registry: &str) -> i32 {
             Err(e) => return fail(e),
         };
         return match check(&server, &manifest, &mcp) {
-            Ok(drift) if drift.is_empty() => {
-                println!("no drift: {} matches the registry", dir.display());
-                0
-            }
-            Ok(drift) => {
-                println!("drift in {}:", dir.display());
-                for d in drift {
-                    println!("  - {d}");
+            Ok(r) => {
+                if r.drift.is_empty() {
+                    println!(
+                        "no drift: {} (server `{}`) starts what the registry lists",
+                        dir.display(),
+                        r.server
+                    );
+                } else {
+                    println!("drift in {} (server `{}`):", dir.display(), r.server);
+                    for d in &r.drift {
+                        println!("  - {d}");
+                    }
                 }
-                1
+                for n in &r.notes {
+                    println!("note: {n}");
+                }
+                i32::from(!r.drift.is_empty())
             }
             Err(e) => fail(e),
         };

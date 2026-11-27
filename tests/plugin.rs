@@ -233,28 +233,100 @@ fn nothing_to_start_says_why() {
 fn check_finds_drift_and_only_drift() {
     let s = server(json!({ "packages": [npm(json!({}))] }));
     let p = generate(&s, None, Pin::Exact).unwrap();
-    assert!(check(&s, &p.manifest, &p.mcp).unwrap().is_empty());
+    let r = check(&s, &p.manifest, &p.mcp).unwrap();
+    assert_eq!(
+        (r.server.as_str(), r.drift.len(), r.notes.len()),
+        ("demo-server", 0, 0)
+    );
 
     // The author's own fields and other servers are not drift.
     let mut m = p.manifest.clone();
     m["keywords"] = json!(["demo"]);
     let mut mcp = p.mcp.clone();
     mcp["mcpServers"]["other"] = json!({ "type": "stdio", "command": "other" });
-    assert!(check(&s, &m, &mcp).unwrap().is_empty());
+    assert!(check(&s, &m, &mcp).unwrap().drift.is_empty());
 
-    // The registry moved on.
+    // The registry moved on: the pin is drift, the plugin's own version a note.
     let newer =
         server(json!({ "version": "1.3.0", "packages": [npm(json!({ "version": "1.3.0" }))] }));
-    let drift = check(&newer, &p.manifest, &p.mcp).unwrap();
-    assert_eq!(drift.len(), 2, "{drift:?}");
-    assert!(drift[0].contains("@example/demo@1.3.0"));
-    assert!(drift[1].starts_with("plugin.json version"));
+    let r = check(&newer, &p.manifest, &p.mcp).unwrap();
+    assert_eq!(
+        r.drift,
+        vec!["`demo-server` pins @example/demo 1.2.0, registry now 1.3.0"]
+    );
+    assert_eq!(
+        r.notes,
+        vec!["plugin.json version 1.2.0, server 1.3.0 (the plugin's version is yours)"]
+    );
 
     // A plugin on @latest is never bumped.
     let latest = generate(&s, None, Pin::Latest).unwrap();
-    assert!(check(&newer, &latest.manifest, &latest.mcp)
-        .unwrap()
-        .is_empty());
+    let r = check(&newer, &latest.manifest, &latest.mcp).unwrap();
+    assert!(r.drift.is_empty() && r.notes.is_empty(), "{r:?}");
+
+    // Another package is drift.
+    let mut other = p.mcp.clone();
+    other["mcpServers"]["demo-server"]["args"] = json!(["-y", "@example/other@1.2.0"]);
+    let r = check(&s, &p.manifest, &other).unwrap();
+    assert_eq!(
+        r.drift,
+        vec!["`demo-server` starts @example/other, registry lists @example/demo"]
+    );
+
+    // Extra arguments are the author's: a note.
+    let mut extra = p.mcp.clone();
+    extra["mcpServers"]["demo-server"]["args"] = json!(["-y", "@example/demo@1.2.0", "--verbose"]);
+    let r = check(&s, &p.manifest, &extra).unwrap();
+    assert!(r.drift.is_empty());
+    assert!(r.notes[0].starts_with("`demo-server` args"), "{r:?}");
+}
+
+#[test]
+fn check_reads_hand_written_plugins() {
+    let s = server(
+        json!({ "remotes": [{ "type": "streamable-http", "url": "https://mcp.example.com/mcp" }] }),
+    );
+    let manifest = json!({ "$schema": PLUGIN_SCHEMA, "name": "demo", "version": "0.1.0" });
+    let mcp = |key: &str, url: &str| {
+        json!({ "$schema": MCP_SCHEMA, "mcpServers": {
+        "helper": { "type": "stdio", "command": "helper" },
+        key: { "type": "streamable-http", "url": url } } })
+    };
+
+    // Found by its URL under the author's own key; the plugin's version is a note.
+    let r = check(&s, &manifest, &mcp("demo", "https://mcp.example.com/mcp")).unwrap();
+    assert_eq!(r.server, "demo");
+    assert!(r.drift.is_empty(), "{r:?}");
+
+    // Another path on the same host may be on purpose (an OAuth endpoint): a note.
+    let r = check(
+        &s,
+        &manifest,
+        &mcp("demo", "https://mcp.example.com/mcp/oauth"),
+    )
+    .unwrap();
+    assert!(r.drift.is_empty());
+    assert!(r.notes.iter().any(|n| n.contains("same host")), "{r:?}");
+
+    // Another host is drift; with two servers and no match, it says so.
+    let e = check(&s, &manifest, &mcp("demo", "https://old.example.com/mcp")).unwrap_err();
+    assert!(e.contains("no server in mcp.json runs"), "{e}");
+    let one = json!({ "$schema": MCP_SCHEMA, "mcpServers": { "demo": { "type": "streamable-http", "url": "https://old.example.com/mcp" } } });
+    let r = check(&s, &manifest, &one).unwrap();
+    assert_eq!(r.drift, vec!["`demo` url https://old.example.com/mcp: the registry lists https://mcp.example.com/mcp"]);
+
+    // A package found under the author's key; a wrong $schema is drift.
+    let pkg = server(json!({ "packages": [npm(json!({}))] }));
+    let mut m = manifest.clone();
+    m["$schema"] = json!("https://example.com/other.json");
+    let mcp = json!({ "$schema": MCP_SCHEMA, "mcpServers": { "helper": { "type": "stdio", "command": "helper" },
+        "demo": { "type": "stdio", "command": "npx", "args": ["-y", "@example/demo@1.2.0"] } } });
+    let r = check(&pkg, &m, &mcp).unwrap();
+    assert_eq!(r.server, "demo");
+    assert_eq!(
+        r.drift,
+        vec![format!("plugin.json $schema: expected {PLUGIN_SCHEMA}")]
+    );
 }
 
 #[test]

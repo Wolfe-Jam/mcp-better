@@ -63,7 +63,7 @@ mcp-better plugin --from server.json --out ./plugin         # offline, from a fi
 
 - **How it runs the server:** npm via `npx`, PyPI via `uvx`, a remote (HTTPS), OCI via `docker`, NuGet via `dnx`, the first the entry has (`--via` picks one). Crates and `.mcpb` bundles have no one-command runner, so they are named, not used.
 - **What it never writes:** secrets, values with a `{variable}`, and required values with no default. `mcp.json` has no secret field and expands only `${PLUGIN_ROOT}` and `${PLUGIN_DATA}` (spec §7.2, §9), so each one is listed for you to set in your client, instead of a server that fails to start with no message.
-- **`--check`** compares only what it writes: other servers and your own `plugin.json` fields are yours. A plugin on `@latest` is never asked to bump its version.
+- **`--check`** works on any plugin, ours or hand-written: it finds the server by its package or remote, even under the author's own key. Drift (exit 1) is what changes which server starts: another package or runner, a pin the registry has moved past, a remote on another host. Extra arguments, another path on the same host and the plugin's own version are notes. A plugin on `@latest` is never asked to bump.
 
 ## What is 7/28?
 
