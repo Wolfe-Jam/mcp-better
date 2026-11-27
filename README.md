@@ -1,5 +1,10 @@
 # mcp-better — built for 7/28
 
+[![CI](https://github.com/Wolfe-Jam/mcp-better/actions/workflows/ci.yml/badge.svg)](https://github.com/Wolfe-Jam/mcp-better/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/mcp-better?color=e6822c)](https://crates.io/crates/mcp-better)
+[![npm](https://img.shields.io/npm/v/mcp-better?color=cb3837)](https://www.npmjs.com/package/mcp-better)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **NONE | GOOD | [BETTER] | BEST**
 
 Textbook for **AGENTS.md** on that scale — honest modern MCP at the **BETTER** step.  
@@ -14,6 +19,23 @@ Modern MCP textbook **that runs**, reviewed and approved as an AAIF Ambassador c
 **App:** this binary + smokes. Lesson after lesson, version after version — knowledge compounds.
 
 > **BEST** (BETTER **plus** `project.faf` that is resident **and used**: persistent project context that authors the agent files) lives at **[faf.one/agents](https://faf.one/agents)**, one hop up from this textbook.
+
+## Use
+
+```bash
+cargo install mcp-better       # the install (crates.io, native binary)
+npx mcp-better --help          # try it with no Rust toolchain
+npx mcp-better --http          # Streamable HTTP on http://127.0.0.1:8787/mcp
+```
+
+More in the [Quickstart](#quickstart-10-min).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Wolfe-Jam/mcp-better/main/docs/img/confirm-flow-dark.png">
+  <img alt="confirm_echo over MCP 2026-07-28: round 1 returns input_required and a sealed requestState; the client asks the user, then sends the same call with the answer and the same requestState; the server opens and checks the token and completes, keeping no session." src="https://raw.githubusercontent.com/Wolfe-Jam/mcp-better/main/docs/img/confirm-flow-light.png" width="720">
+</picture>
+
+*`confirm_echo`: a confirmation in two round trips, no session ([walk-through](https://wolfejam.dev/blog/stateless-confirmation) · [doc](./docs/MRTR-CONFIRM-ECHO.md)).*
 
 ## Dual-package (optional)
 
