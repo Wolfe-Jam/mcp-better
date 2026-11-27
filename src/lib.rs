@@ -7,6 +7,8 @@
 
 pub mod cli;
 pub mod http;
+pub mod plugin;
+pub mod plugin_cli;
 pub mod server;
 pub mod skills;
 pub mod worse;

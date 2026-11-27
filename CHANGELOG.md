@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`mcp-better plugin`: a registry entry in, an Agent Plugins folder out.** `mcp-better plugin <registry-name>` fetches the entry's latest version and writes `plugin.json` and `mcp.json` (Agent Plugins 1.0.0); `--from server.json` works offline. The server starts at the registry's version (`--latest` for `@latest`), via npm, PyPI, a remote, OCI or NuGet, the first the entry has. Secrets, `{variable}` values and required values with no default are listed, never written. `--check DIR` exits 1 when the plugin no longer matches the registry. Over 500 latest registry entries (2026-11-27): 497 plugins written, every file valid against the Agent Plugins schemas; 3 entries had nothing to start. New dependency: `ureq` (blocking HTTP, rustls).
+
 ## [0.8.0] — 2026-11-25 — confirmations that hold
 
 **Lesson:** a confirmation should hold only for what the user confirmed, and only for a while. On 2026-07-28 the server keeps no session, so the sealed `requestState` has to carry that itself. And a skill's listing should say what the host reads, or not load at all.
