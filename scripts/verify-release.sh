@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # Post-ship / pre-matrix verification for mcp-better
-# Usage: bash scripts/verify-release.sh [version]
+# Usage: bash scripts/verify-release.sh [version] [--local]
+#   The ship bar (scripts/ci.sh) runs here only when GitHub CI has no green push
+#   run for the tagged commit, or with --local. CI already builds and tests it
+#   (on Linux; --local also covers this machine's platform).
 set -euo pipefail
 
 export PATH="$HOME/.cargo/bin:${PATH:-}"
 cd "$(dirname "$0")/.."
+LOCAL=0
+args=()
+for a in "$@"; do [ "$a" = "--local" ] && LOCAL=1 || args+=("$a"); done
+set -- "${args[@]+"${args[@]}"}"
 VER="${1:-$(grep -E '^version\s*=' Cargo.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')}"
 REPO=Wolfe-Jam/mcp-better
 fail=0
@@ -20,9 +27,24 @@ echo "— Docs / purity"
 bash scripts/doc-gate.sh >/dev/null && pass "doc-gate" || die "doc-gate"
 test ! -f project.faf && test ! -f .faf && pass "purity" || die "purity"
 
-echo "— Local CI"
-if bash scripts/ci.sh >/tmp/mcp-better-verify-ci.log 2>&1; then
-  pass "scripts/ci.sh"
+echo "— CI (the ship bar)"
+SHA=$(git rev-list -n 1 "v$VER" 2>/dev/null || echo "")
+CI_CONCLUSION=""
+WHY="--local given"
+if [ "$LOCAL" -eq 0 ]; then
+  if [ -z "$SHA" ]; then WHY="no tag v$VER"
+  elif ! command -v gh >/dev/null; then WHY="gh not installed"
+  else
+    # the newest push run on that commit decides (a green PR run alone does not)
+    CI_CONCLUSION=$(gh run list --repo "$REPO" --workflow ci.yml --commit "$SHA" --event push --limit 1 \
+      --json conclusion -q '.[0].conclusion // ""' 2>/dev/null || echo "")
+    WHY="GitHub CI on ${SHA:0:7}: ${CI_CONCLUSION:-no finished push run, or gh failed}"
+  fi
+fi
+if [ "$CI_CONCLUSION" = "success" ]; then
+  pass "GitHub CI green on v$VER (${SHA:0:7}); local ship bar skipped (--local to run it)"
+elif echo "  · running scripts/ci.sh locally ($WHY)" && bash scripts/ci.sh >/tmp/mcp-better-verify-ci.log 2>&1; then
+  pass "scripts/ci.sh (local)"
 else
   die "scripts/ci.sh (see /tmp/mcp-better-verify-ci.log)"
 fi
