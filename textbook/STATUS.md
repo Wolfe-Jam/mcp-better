@@ -2,7 +2,7 @@
 
 # Textbook status ledger
 
-**Last refresh:** 2026-11-27 (0.8.0 released — `confirm_echo` state expires, a changed message is refused, strict skill frontmatter; MRTR doc and Skills tutorial updated)  
+**Last refresh:** 2026-11-28 (0.9.0 — `mcp-better plugin`: a registry entry in, an Agent Plugins folder out; no chapter changes)  
 **Season 1 goal:** All core chapters **SOLID** before heavy Season 2 writing.  
 **Shipped home:** `mcp-better/textbook/` — the book is the app is the book.
 
@@ -17,7 +17,7 @@
 | 06 | Stateless core | SOLID | `confirm_echo` = sealed retry; `mrtr-client` is the other half |
 | 07 | Transports | SOLID | Env precedence; http-smoke happy-path only |
 | 08 | Claim = wire | SOLID | Tool-list claim = `BETTER_TOOL_ORDER` · annotations + `--version` rows · “hint silence” |
-| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.8.0** |
+| 09 | Lab | SOLID | Path C = `mrtr-client` · pin **0.9.0** |
 | 10 | What we resist | SOLID | |
 | A | Spec map | SOLID | Header precision |
 | B | Glossary | SOLID | mcp-better = three-tool catalog |
@@ -78,7 +78,7 @@ Binary remains source of truth if docs and wire disagree again.
 |---------|-------------------|----------|------|
 | Part I InterOp | 03 (+ 09 lab slice) | [dev.to](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) | [#363](https://github.com/aaif/ambassadors/issues/363) **20 tutorial** ✅ |
 | A confirmation with no session (sealed `requestState`) | 06 | [wolfejam.dev](https://wolfejam.dev/blog/stateless-confirmation) · [dev.to](https://dev.to/wolfejam/a-confirmation-with-no-session-268i) | pending |
-| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.8.0** | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
+| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.9.0** | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
 
 **Policy:** teach points for protocol lessons; product once; no semver diary filings.
 

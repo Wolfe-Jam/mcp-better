@@ -236,6 +236,20 @@ Same 7/28 era. Matrix not rewritten per patch; receipts live in CHANGELOG + GH R
 | S2 | One file per skill | **Yes** | ✅ | `every_skill_is_a_single_skill_md` |
 | M11 · npm · M13–M15 | crates.io · npm · tag + GH Release · MCP Registry | **Yes** | ✅ | **0.8.0** on all four; npm with provenance; [v0.8.0](https://github.com/Wolfe-Jam/mcp-better/releases/tag/v0.8.0), 9 assets |
 
+## v0.9.0 — a plugin from the registry
+
+**Lesson:** A plugin is packaging: `mcp-better plugin` turns an MCP Registry entry into an Agent Plugins folder, and `--check` says when the registry has moved on.
+
+| # | Surface | Required? | v0.9.0 | Notes |
+|---|---------|:---------:|:------:|-------|
+| M1 | Doc Gate (lockstep **0.9.0**, every README / guide pin) | **Yes** | ⏳ | `doc-gate.sh` in CI on the release commit |
+| M5 | `scripts/ci.sh` | **Yes** | ⏳ | CI on the release commit |
+| P1 | Plugin files follow Agent Plugins 1.0.0 (names, key order) | **Yes** | ✅ | `plugin_names_follow_the_spec`, `json_keys_in_spec_order` |
+| P2 | Secrets, `{variable}` and required values with no default listed, never written | **Yes** | ✅ | `secrets_and_missing_values_are_listed_never_written` |
+| P3 | `--check` exits 1 on drift only, hand-written plugins included | **Yes** | ✅ | `check_finds_drift_and_only_drift`, `check_reads_hand_written_plugins` |
+| P4 | npm shim maps only the release's five targets (Windows ARM → `cargo install`) | **Yes** | ✅ | `lib/platform.js` |
+| M11 · npm · M13–M15 | crates.io · npm · tag + GH Release · MCP Registry | **Yes** | ⏳ | **0.9.0** on all four |
+
 ---
 
 ## Version roadmap × matrix (advance here)

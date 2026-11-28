@@ -93,6 +93,7 @@ Humans say **7/28**. Machines negotiate **`2026-07-28`**.
 | **v0.6** | Same era + **the spec's own tests** — the official MCP conformance suite in CI ([Conformance](#conformance)) · cache hints on every list and read · declare what you answer · `rmcp` 3.10 |
 | **v0.7** | Same era + **tools say what they do** — every tool carries all four annotation hints (read-only, not destructive, idempotent, closed world) · `confirm_echo` asks only clients that declare elicitation (else `-32021`) · `server/discover` stamped like the lists · a strict command line (`--version`, unknown arguments exit 2) |
 | **v0.8** | Same era + **confirmations that hold** — `confirm_echo`'s `requestState` expires after 5 minutes · a changed `message` in round 2 is refused (`-32602`) · strict SKILL.md frontmatter (refuses what YAML reads differently) · single-file skills by design |
+| **v0.9** | Same era + **a plugin from the registry** — A plugin is packaging: `mcp-better plugin` turns an MCP Registry entry into an Agent Plugins folder, and `--check` says when the registry has moved on. · Windows ARM `npx` points to `cargo install` |
 
 ## What BETTER means
 
@@ -144,11 +145,11 @@ MCP_BETTER_BIN="$(pwd)/target/debug/mcp-better" cargo run --example mrtr-client
 ```bash
 cargo run --release
 # install from crates.io — first hit compiles deps once (see above):
-cargo install mcp-better --version 0.8.0 --locked
-mcp-better --version   # mcp-better 0.8.0
+cargo install mcp-better --version 0.9.0 --locked
+mcp-better --version   # mcp-better 0.9.0
 mcp-better --help
 # optional lying companion (teaching only — not for hosts):
-# cargo install mcp-better --version 0.8.0 --locked --bin mcp-worse
+# cargo install mcp-better --version 0.9.0 --locked --bin mcp-worse
 ```
 
 **Streamable HTTP** (local demo only — see [SECURITY.md](./SECURITY.md)):
@@ -179,7 +180,7 @@ cargo run --release -- --http
 
 All three are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`: they read only, change nothing and stay in the process.
 
-## Protocol claims (v0.8.0 — same 7/28 era · the official conformance suite in CI)
+## Protocol claims (v0.9.0 — same 7/28 era · the official conformance suite in CI)
 
 | Surface | Status |
 |---------|--------|

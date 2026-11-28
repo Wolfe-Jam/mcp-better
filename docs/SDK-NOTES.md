@@ -125,7 +125,17 @@ We claim **everything in v0.7.0**, plus:
 
 Not claimed: a one-time token. Within 5 minutes a round-1 token can complete round 2 more than once (no session on 7/28).
 
-We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0 / v0.7.0 / v0.8.0:
+### v0.9.0 — a plugin from the registry
+
+We claim **everything in v0.8.0**, plus:
+
+- `mcp-better plugin <registry-name>` writes `plugin.json` + `mcp.json` (Agent Plugins 1.0.0) from the MCP Registry entry's latest version; `--from server.json` works offline
+- Secrets, `{variable}` values and required values with no default are listed, never written
+- `--check DIR` exits 1 only when the plugin no longer starts what the registry lists (another package or runner, a stale pin, another host)
+
+The server's MCP surface is unchanged from v0.8.0: same tools, resources and Skills.
+
+We do **not** claim on v0.4.3 / v0.5.0 / v0.6.0 / v0.7.0 / v0.8.0 / v0.9.0:
 
 - Production remote HTTP (auth, TLS, open bind)  
 - Registry package transport other than **stdio** (HTTP is opt-in in-binary, not a second Registry package)  
