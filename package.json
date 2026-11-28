@@ -1,6 +1,6 @@
 {
   "name": "mcp-better",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "mcpName": "io.github.Wolfe-Jam/mcp-better",
   "description": "A working MCP server in Rust, written as a textbook for MCP 2026-07-28. rmcp 3.10 · install with cargo or npx. The npm package downloads the native binary from GitHub Releases.",
   "license": "MIT",

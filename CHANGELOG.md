@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-11-28 — a plugin from the registry
+
+**Lesson:** A plugin is packaging: `mcp-better plugin` turns an MCP Registry entry into an Agent Plugins folder, and `--check` says when the registry has moved on.
+
 ### Added
 
 - **`mcp-better plugin`: a registry entry in, an Agent Plugins folder out.** `mcp-better plugin <registry-name>` fetches the entry's latest version and writes `plugin.json` and `mcp.json` (Agent Plugins 1.0.0); `--from server.json` works offline. The server starts at the registry's version (`--latest` for `@latest`), via npm, PyPI, a remote, OCI or NuGet, the first the entry has. Secrets, `{variable}` values and required values with no default are listed, never written. `--check DIR` works on hand-written plugins too, and exits 1 only when the plugin no longer starts what the registry lists (another package, a stale pin, another host); other differences are notes. On Context7's and GitHub's own plugins it finds their server and reports no drift. Over 500 latest registry entries (2026-11-27): 497 plugins written, every file valid against the Agent Plugins schemas; 3 entries had nothing to start. New dependency: `ureq` (blocking HTTP, rustls).
