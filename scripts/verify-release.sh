@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Post-ship / pre-matrix verification for mcp-better
-# Usage: bash scripts/verify-release.sh [version]
+# Usage: bash scripts/verify-release.sh [version] [--local]
+#   The ship bar (scripts/ci.sh) runs here only when GitHub CI has no green run
+#   for the tagged commit, or with --local. CI already builds and tests it.
 set -euo pipefail
 
 export PATH="$HOME/.cargo/bin:${PATH:-}"
 cd "$(dirname "$0")/.."
+LOCAL=0
+args=()
+for a in "$@"; do [ "$a" = "--local" ] && LOCAL=1 || args+=("$a"); done
+set -- "${args[@]+"${args[@]}"}"
 VER="${1:-$(grep -E '^version\s*=' Cargo.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')}"
 REPO=Wolfe-Jam/mcp-better
 fail=0
@@ -20,9 +26,17 @@ echo "— Docs / purity"
 bash scripts/doc-gate.sh >/dev/null && pass "doc-gate" || die "doc-gate"
 test ! -f project.faf && test ! -f .faf && pass "purity" || die "purity"
 
-echo "— Local CI"
-if bash scripts/ci.sh >/tmp/mcp-better-verify-ci.log 2>&1; then
-  pass "scripts/ci.sh"
+echo "— CI (the ship bar)"
+SHA=$(git rev-list -n 1 "v$VER" 2>/dev/null || echo "")
+CI_SHA=""
+if [ "$LOCAL" -eq 0 ] && [ -n "$SHA" ] && command -v gh >/dev/null; then
+  CI_SHA=$(gh run list --repo "$REPO" --workflow ci.yml --commit "$SHA" --limit 5 --json conclusion \
+    -q '[.[] | select(.conclusion == "success")] | length' 2>/dev/null || echo "")
+fi
+if [ -n "$CI_SHA" ] && [ "$CI_SHA" != "0" ]; then
+  pass "GitHub CI green on v$VER (${SHA:0:7}); local ship bar skipped (--local to run it)"
+elif bash scripts/ci.sh >/tmp/mcp-better-verify-ci.log 2>&1; then
+  pass "scripts/ci.sh (local)"
 else
   die "scripts/ci.sh (see /tmp/mcp-better-verify-ci.log)"
 fi
