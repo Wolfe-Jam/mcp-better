@@ -4,7 +4,7 @@ version = "0.8.0"
 edition = "2021"
 rust-version = "1.88"
 authors = ["Wolfe-Jam <team@faf.one>"]
-description = "Rust MCP textbook for 2026-07-28: annotated tools, MCP conformance suite in CI. AAIF contribution."
+description = "A working MCP server in Rust, written as a textbook for MCP 2026-07-28. rmcp 3.10 · install with cargo or npx."
 license = "MIT"
 repository = "https://github.com/Wolfe-Jam/mcp-better"
 homepage = "https://github.com/Wolfe-Jam/mcp-better"
@@ -43,6 +43,7 @@ tokio-util = "0.7"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 sha2 = "0.10"
+ureq = { version = "3", default-features = false, features = ["rustls", "json"] }
 
 [[bin]]
 name = "mcp-better"

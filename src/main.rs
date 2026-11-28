@@ -25,6 +25,34 @@ async fn main() -> anyhow::Result<()> {
         .with_ansi(false)
         .init();
 
+    // `mcp-better plugin …`: registry entry → Agent Plugins folder (see `plugin_cli`).
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("plugin") {
+        use mcp_better::plugin_cli::{self, Cmd};
+        let code = match plugin_cli::parse(&args[1..]) {
+            Ok(Cmd::Version) => {
+                println!("mcp-better {}", env!("CARGO_PKG_VERSION"));
+                0
+            }
+            Ok(Cmd::Help) => {
+                eprint!("{}", plugin_cli::help());
+                0
+            }
+            Ok(Cmd::Run(a)) => {
+                let registry = std::env::var("MCP_REGISTRY_URL")
+                    .ok()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or_else(|| plugin_cli::DEFAULT_REGISTRY.to_string());
+                plugin_cli::run(a, &registry)
+            }
+            Err(e) => {
+                eprintln!("mcp-better plugin: {e}\nRun `mcp-better plugin --help` for usage.");
+                2
+            }
+        };
+        std::process::exit(code);
+    }
+
     match mcp_better::cli::from_env(true) {
         Ok(Action::Version) => println!("mcp-better {}", env!("CARGO_PKG_VERSION")),
         Ok(Action::Help) => eprint!("{}", help()),
@@ -45,7 +73,8 @@ fn help() -> String {
            mcp-better              stdio (default)\n\
            mcp-better --http       Streamable HTTP (local demo)\n\
            mcp-better --stdio      force stdio\n\
-           mcp-better --version    print the version and exit\n\n\
+           mcp-better --version    print the version and exit\n\
+           mcp-better plugin …     registry entry → Agent Plugins folder (plugin --help)\n\n\
          Args (CLI wins over env; anything else is an error, exit 2):\n\
            --http | http           Streamable HTTP\n\
            --stdio | stdio         stdio\n\

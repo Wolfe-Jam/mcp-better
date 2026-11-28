@@ -50,6 +50,21 @@ One Agent Skill (`mcp-better-lab`) on the same process as tools:
 
 → **Tutorial: [Ship a skill with your MCP server](./docs/SKILLS-OVER-MCP.md)** — each step linked to the code, and the four checks that prove a host loads the skill (verified in Claude Code 2.1.332: `mcp-better:mcp-better-lab` listed and loaded).
 
+## A plugin from the registry (optional)
+
+A plugin is packaging: it adds no runtime, the tools are in the server it points to. `mcp-better plugin` turns an [MCP Registry](https://registry.modelcontextprotocol.io) entry into an [Agent Plugins](https://agent-plugins.org) 1.0.0 folder, `plugin.json` and `mcp.json`, and checks a plugin against the registry later.
+
+```bash
+mcp-better plugin io.github.Wolfe-Jam/mcp-better            # → mcp-better/plugin.json + mcp.json
+mcp-better plugin <registry-name> --latest                  # start the server at @latest
+mcp-better plugin <registry-name> --check ./mcp-better      # exit 1 if the registry moved on
+mcp-better plugin --from server.json --out ./plugin         # offline, from a file
+```
+
+- **How it runs the server:** npm via `npx`, PyPI via `uvx`, a remote (HTTPS), OCI via `docker`, NuGet via `dnx`, the first the entry has (`--via` picks one). Crates and `.mcpb` bundles have no one-command runner, so they are named, not used.
+- **What it never writes:** secrets, values with a `{variable}`, and required values with no default. `mcp.json` has no secret field and expands only `${PLUGIN_ROOT}` and `${PLUGIN_DATA}` (spec §7.2, §9), so each one is listed for you to set in your client, instead of a server that fails to start with no message.
+- **`--check`** works on any plugin, ours or hand-written: it finds the server by its package or remote, even under the author's own key. Drift (exit 1) is what changes which server starts: another package or runner, a pin the registry has moved past, a remote on another host. Extra arguments, another path on the same host and the plugin's own version are notes. A plugin on `@latest` is never asked to bump.
+
 ## What is 7/28?
 
 | Name | What it is |

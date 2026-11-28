@@ -1,6 +1,6 @@
 {
   "name": "io.github.Wolfe-Jam/mcp-better",
-  "description": "Rust MCP textbook for 2026-07-28: annotated tools, MCP conformance suite in CI. AAIF contribution.",
+  "description": "A working MCP server in Rust, written as a textbook for MCP 2026-07-28.",
   "version": "0.8.0",
   "packages": [
     {
