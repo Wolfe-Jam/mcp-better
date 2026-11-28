@@ -126,7 +126,7 @@ jobs:
       - name: Install rust-mcp-preflight
         uses: taiki-e/install-action@v2
         with:
-          tool: rust-mcp-preflight@0.2.3
+          tool: rust-mcp-preflight@0.2.4
 
       - name: Registry listing (rust-mcp-preflight server.json)
         run: bash scripts/preflight.sh
