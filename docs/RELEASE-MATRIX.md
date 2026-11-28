@@ -305,7 +305,7 @@ cargo install mcp-better --version 0.2.0
 MCP_BETTER_BIN="$(command -v mcp-better)" cargo run --example stdio-client
 MCP_BETTER_BIN="$(command -v mcp-better)" cargo run --example http-smoke
 
-bash scripts/verify-release.sh .   # or pubbetter release-verify
+bash scripts/verify-release.sh <version>   # e.g. 0.9.0; --local also runs scripts/ci.sh here
 
 gh run list --repo Wolfe-Jam/mcp-better --branch main --limit 3
 ```
