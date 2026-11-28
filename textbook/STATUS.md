@@ -2,7 +2,7 @@
 
 # Textbook status ledger
 
-**Last refresh:** 2026-11-25 (0.8.0 — `confirm_echo` state expires, a changed message is refused, strict skill frontmatter; MRTR doc and Skills tutorial updated)  
+**Last refresh:** 2026-11-27 (0.8.0 released — `confirm_echo` state expires, a changed message is refused, strict skill frontmatter; MRTR doc and Skills tutorial updated)  
 **Season 1 goal:** All core chapters **SOLID** before heavy Season 2 writing.  
 **Shipped home:** `mcp-better/textbook/` — the book is the app is the book.
 
@@ -42,7 +42,7 @@
 |------|--------|
 | [`DOCTRINE-book-is-app.md`](./DOCTRINE-book-is-app.md) | LOCKED |
 | Public mirror `mcp-better/textbook/` | ✅ Season 1 + doctrine copied |
-| Version = lesson map | 0.1 stdio · 0.2 HTTP · 0.3 louder proof · 0.4 dual-package · 0.4.3 MRTR+Skills · 0.4.4 book=wire · 0.5 matching client · 0.6 conformance suite in CI · 0.7 tools say what they do |
+| Version = lesson map | 0.1 stdio · 0.2 HTTP · 0.3 louder proof · 0.4 dual-package · 0.4.3 MRTR+Skills · 0.4.4 book=wire · 0.5 matching client · 0.6 conformance suite in CI · 0.7 tools say what they do · 0.8 confirmations that hold |
 | Rule | Every version: code + smoke + book what/why/how |
 
 ### Product honesty pass (2026-07-31) — closed
@@ -77,7 +77,8 @@ Binary remains source of truth if docs and wire disagree again.
 | Extract | Canonical chapter | Live URL | AAIF |
 |---------|-------------------|----------|------|
 | Part I InterOp | 03 (+ 09 lab slice) | [dev.to](https://dev.to/wolfejam/not-all-mcp-servers-are-equal-what-728-just-made-official-2f29) | [#363](https://github.com/aaif/ambassadors/issues/363) **20 tutorial** ✅ |
-| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.7.0** (this tree **0.8.0**) | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
+| A confirmation with no session (sealed `requestState`) | 06 | [wolfejam.dev](https://wolfejam.dev/blog/stateless-confirmation) · [dev.to](https://dev.to/wolfejam/a-confirmation-with-no-session-268i) | pending |
+| Product lab | whole book + binary | [mcp-better](https://github.com/Wolfe-Jam/mcp-better) / crates **0.8.0** | [#310](https://github.com/aaif/ambassadors/issues/310) **15** ✅ — no re-score on 0.2/0.3/0.4/0.5 |
 
 **Policy:** teach points for protocol lessons; product once; no semver diary filings.
 
